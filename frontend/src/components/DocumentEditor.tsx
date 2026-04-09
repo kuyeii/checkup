@@ -992,7 +992,17 @@ export const DocumentEditor = forwardRef<
     let reverted = false
 
     const markedNodes = findPatchMarkedNodes(block, key)
-    if (markedNodes.length > 0) {
+    const canRestoreBlockSnapshot =
+      Boolean(record.blockHtmlBefore) &&
+      (markedNodes.length > 0 || currentText === record.afterText || block.innerHTML === record.blockHtmlAfter)
+
+    if (canRestoreBlockSnapshot) {
+      block.innerHTML = record.blockHtmlBefore
+      block.normalize()
+      reverted = true
+    }
+
+    if (!reverted && markedNodes.length > 0) {
       const range = document.createRange()
       const first = markedNodes[0]
       const last = markedNodes[markedNodes.length - 1]

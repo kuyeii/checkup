@@ -530,6 +530,10 @@ export default function App() {
   const previewWaitingRef = useRef<boolean>(isPreviewWaitingMode())
   const previewAutoCompleteRef = useRef<boolean>(isPreviewAutoCompleteMode())
   const routeRunId = parseReviewRunId(location.pathname)
+  const isBootstrappingRouteReview =
+    !!routeRunId &&
+    !previewWaitingRef.current &&
+    (isHydratingReview || (routeRunId !== runId && result == null))
 
   const persistTriggeredRunIds = useCallback(() => {
     writeSessionValue(AUTO_AI_TRIGGERED_STORAGE_KEY, JSON.stringify(Array.from(autoAiTriggeredRef.current)))
@@ -1890,7 +1894,9 @@ export default function App() {
 
   const goUploadPage = useCallback(() => {
     navigate(pathForNav('upload'))
+    setIsHydratingReview(false)
     setIsReviewing(false)
+    setFile(null)
     setRunId(null)
     setMeta(null)
     setResult(null)
@@ -1982,7 +1988,7 @@ export default function App() {
                 </section>
 
                 <aside className="riskPane glassPane">
-                  {isHydratingReview ? (
+                  {isBootstrappingRouteReview ? (
                     <div className="reviewProgressCard">
                       <div className="reviewProgressBadge">正在载入</div>
                       <div className="reviewProgressTitle">正在恢复审查结果工作区…</div>
