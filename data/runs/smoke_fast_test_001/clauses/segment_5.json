@@ -1,0 +1,54 @@
+[
+  {
+    "clause_id": "",
+    "clause_title": "",
+    "clause_text": "本项目合同总价为人民币 贰拾肆万 元整（¥_240000_元），采取以下第 1 种方式：",
+    "segment_id": "segment_5",
+    "segment_title": "五、合同价款及支付",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "本项目合同总价为人民币 贰拾肆万 元整（¥_240000_元），采取以下第 1 种方式：",
+    "numberingconfidence": 0,
+    "titleconfidence": 0,
+    "numbering_confidence": null,
+    "title_confidence": null
+  },
+  {
+    "clause_id": "1",
+    "clause_title": "",
+    "clause_text": "1. 合同签订后10日内向中标供应商支付合同总额的60%；项目验收合格后甲方向乙方支付合同总额的40%货款。",
+    "segment_id": "segment_5",
+    "segment_title": "五、合同价款及支付",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "1. 合同签订后10日内向中标供应商支付合同总额的60%；项目验收合格后甲方向乙方支付合同总额的40%货款。",
+    "numberingconfidence": 1,
+    "titleconfidence": 0,
+    "numbering_confidence": null,
+    "title_confidence": null
+  },
+  {
+    "clause_id": "2",
+    "clause_title": "",
+    "clause_text": "2. 一次性付款\n\n内，在乙方提供相应金额、要素齐全的合法发票后全额支付。",
+    "segment_id": "segment_5",
+    "segment_title": "五、合同价款及支付",
+    "clause_kind": "placeholder_clause",
+    "source_excerpt": "2. 一次性付款\n\n内，在乙方提供相应金额、要素齐全的合法发票后全额支付。",
+    "numberingconfidence": 1,
+    "titleconfidence": 0,
+    "numbering_confidence": null,
+    "title_confidence": null
+  },
+  {
+    "clause_id": "3",
+    "clause_title": "",
+    "clause_text": "3. 其他付款方式\n\n付款条件成就后，甲方将相应款项付至乙方下列指定账户，视为完成付款义务。\n\n户名： 浙江永鼎律师事务所 开户行: 中国工商银行朝晖支行\n\n账号： 1202022109900115275",
+    "segment_id": "segment_5",
+    "segment_title": "五、合同价款及支付",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "3. 其他付款方式\n\n付款条件成就后，甲方将相应款项付至乙方下列指定账户，视为完成付款义务。\n\n户名： 浙江永鼎律师事务所 开户行: 中国工商银行朝晖支行\n\n账号： 1202022109900115275",
+    "numberingconfidence": 1,
+    "titleconfidence": 0,
+    "numbering_confidence": null,
+    "title_confidence": null
+  }
+]

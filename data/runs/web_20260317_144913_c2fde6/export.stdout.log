@@ -1,0 +1,247 @@
+{
+  "output_docx": "/Volumes/samsang/workflow/一站式-并行处理风险点/contract_review_poc_ui_dynamic_gap_no_bottom_comments/data/runs/web_20260317_144913_c2fde6/reviewed_comments.docx",
+  "added_comments": 25,
+  "unmatched": [
+    {
+      "risk_id": 29,
+      "clause_uid": null,
+      "display_clause_id": "",
+      "risk_label": "验收与付款联动条件不明确"
+    },
+    {
+      "risk_id": 29,
+      "clause_uid": "",
+      "display_clause_id": "",
+      "risk_label": "验收与付款联动条件不明确"
+    }
+  ],
+  "comments": [
+    {
+      "comment_id": 5,
+      "risk_id": 1,
+      "paragraph_index": 19,
+      "matched_text": "1.知识产权管理体系建设 包含高价值专利品台体系建设相关费用，具体要求如下： 完成实验室专利高价值平台知识产权管理制度文件：规范建设平台架构、各个部门的资源管理、规范生产经营各个环节的知识产权管理等相关机制，为平台取得GB/T 29490贯标证书。构建“研发-知识产权”融合流程，包含针对开源代码合规性审查、技术秘密分级保护的具体制度设计，生成相应制度文件和报告。编制《知识产权管理制度》1份、《专利管理流程手册》1份以及相关报告1份。为建设机密计算高价值专利平台提供相关咨询，包括但不限于平台架构设计，专利运用率、专利成果转化方面。 时间要求：管理制度文件2026年6月30日前完成。咨询在2027年11月31日前完成。",
+      "clause_uid": "segment_1::1.（二）",
+      "display_clause_id": "1.（二）"
+    },
+    {
+      "comment_id": 6,
+      "risk_id": 2,
+      "paragraph_index": 19,
+      "matched_text": "1.知识产权管理体系建设 包含高价值专利品台体系建设相关费用，具体要求如下： 完成实验室专利高价值平台知识产权管理制度文件：规范建设平台架构、各个部门的资源管理、规范生产经营各个环节的知识产权管理等相关机制，为平台取得GB/T 29490贯标证书。构建“研发-知识产权”融合流程，包含针对开源代码合规性审查、技术秘密分级保护的具体制度设计，生成相应制度文件和报告。编制《知识产权管理制度》1份、《专利管理流程手册》1份以及相关报告1份。为建设机密计算高价值专利平台提供相关咨询，包括但不限于平台架构设计，专利运用率、专利成果转化方面。 时间要求：管理制度文件2026年6月30日前完成。咨询在2027年11月31日前完成。",
+      "clause_uid": "segment_1::1.（二）",
+      "display_clause_id": "1.（二）"
+    },
+    {
+      "comment_id": 7,
+      "risk_id": 3,
+      "paragraph_index": 24,
+      "matched_text": "2.专利申请前评估 包含机密计算相关专利申请前评估费用，具体要求如下： 建立包含法律稳定性、技术先进性、市场应用前景、侵权可检测性的多维评估模型；提供详细的评估报告样本，且具备“查新-规避-布局”的一体化建议能力。 基于省平台专利申请前评估申请表/评估表在申请前对相关技术发明从技术、法律、市场等维度进行评估并生成相应报告（是否申请、如何申请（保护范围、权利要求设计）等）。评估数量根据平台实际需求为准，评估数量最多能达15件。 时间要求：根据具体专利申请时限要求进行。",
+      "clause_uid": "segment_1::1.2",
+      "display_clause_id": "1.2"
+    },
+    {
+      "comment_id": 8,
+      "risk_id": 4,
+      "paragraph_index": 24,
+      "matched_text": "2.专利申请前评估 包含机密计算相关专利申请前评估费用，具体要求如下： 建立包含法律稳定性、技术先进性、市场应用前景、侵权可检测性的多维评估模型；提供详细的评估报告样本，且具备“查新-规避-布局”的一体化建议能力。 基于省平台专利申请前评估申请表/评估表在申请前对相关技术发明从技术、法律、市场等维度进行评估并生成相应报告（是否申请、如何申请（保护范围、权利要求设计）等）。评估数量根据平台实际需求为准，评估数量最多能达15件。 时间要求：根据具体专利申请时限要求进行。",
+      "clause_uid": "segment_1::1.2",
+      "display_clause_id": "1.2"
+    },
+    {
+      "comment_id": 9,
+      "risk_id": 5,
+      "paragraph_index": 42,
+      "matched_text": "3、项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+      "clause_uid": "segment_2::2.3",
+      "display_clause_id": "2.3"
+    },
+    {
+      "comment_id": 10,
+      "risk_id": 6,
+      "paragraph_index": 47,
+      "matched_text": "在合同期内，甲方有权随时对乙方的工作进行监控。如日常工作中或抽检时发现因乙方原因造成的未按合同要求及时提供服务的，甲方有权提出限期整改意见。",
+      "clause_uid": "segment_3::3.2",
+      "display_clause_id": "3.2"
+    },
+    {
+      "comment_id": 11,
+      "risk_id": 7,
+      "paragraph_index": 47,
+      "matched_text": "在合同期内，甲方有权随时对乙方的工作进行监控。如日常工作中或抽检时发现因乙方原因造成的未按合同要求及时提供服务的，甲方有权提出限期整改意见。",
+      "clause_uid": "segment_3::3.2",
+      "display_clause_id": "3.2"
+    },
+    {
+      "comment_id": 12,
+      "risk_id": 8,
+      "paragraph_index": 53,
+      "matched_text": "乙方必须积极配合甲方的日常监控和临时抽检，不得以任何理由拒绝检查或在检查中弄虚作假。",
+      "clause_uid": "segment_4::4.3",
+      "display_clause_id": "4.3"
+    },
+    {
+      "comment_id": 13,
+      "risk_id": 9,
+      "paragraph_index": 54,
+      "matched_text": "_乙方需按相关规定使用资金，并将经费使用预算报甲方。",
+      "clause_uid": "segment_4::4",
+      "display_clause_id": "4"
+    },
+    {
+      "comment_id": 14,
+      "risk_id": 10,
+      "paragraph_index": 57,
+      "matched_text": "1. 合同签订后10日内向中标供应商支付合同总额的60%；项目验收合格后甲方向乙方支付合同总额的40%货款。",
+      "clause_uid": "segment_5::5.1",
+      "display_clause_id": "5.1"
+    },
+    {
+      "comment_id": 15,
+      "risk_id": 11,
+      "paragraph_index": 63,
+      "matched_text": "3. 其他付款方式 付款条件成就后，甲方将相应款项付至乙方下列指定账户，视为完成付款义务。 户名： 浙江永鼎律师事务所 开户行: 中国工商银行朝晖支行 账号： 1202022109900115275",
+      "clause_uid": "segment_5::5.3",
+      "display_clause_id": "5.3"
+    },
+    {
+      "comment_id": 16,
+      "risk_id": 12,
+      "paragraph_index": 67,
+      "matched_text": "如出现因乙方原因导致不能按时完成任务的情况，乙方应及时以书面的形式将不能按时完成任务的理由、延误时间通知甲方，并获得甲方同意。",
+      "clause_uid": "segment_6::6.1",
+      "display_clause_id": "6.1"
+    },
+    {
+      "comment_id": 17,
+      "risk_id": 13,
+      "paragraph_index": 69,
+      "matched_text": "乙方未能按本合同约定要求提供周到、及时服务，应向甲方承担违约责任，应向甲方支付违约金，即合同总额 5 %。",
+      "clause_uid": "segment_6::6.3",
+      "display_clause_id": "6.3"
+    },
+    {
+      "comment_id": 18,
+      "risk_id": 14,
+      "paragraph_index": 72,
+      "matched_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
+      "clause_uid": "segment_7::7.1",
+      "display_clause_id": "7.1"
+    },
+    {
+      "comment_id": 19,
+      "risk_id": 15,
+      "paragraph_index": 77,
+      "matched_text": "对乙方在履行本合同过程中所涉及的因乙方原因引起的对任何版权和其他知识产权的侵犯，应由乙方自行承担可能发生的一切法律责任费用，甲方不承担任何相关责任和费用。",
+      "clause_uid": "segment_7::7.5",
+      "display_clause_id": "7.5"
+    },
+    {
+      "comment_id": 20,
+      "risk_id": 16,
+      "paragraph_index": 79,
+      "matched_text": "双方任一方由于不可抗力的影响而不能执行合同时，履行合同的期限应予延长。延长的期限应相当于事故所影响的时间。如果不可抗力影响时间延续_30__天以上的，双方可通过友好协商达成在合理的时间内继续履行本合同或解除本合同的协议。不可抗力系指甲乙双方在缔结合同时所不能预见的，并且它的发生及其后果无法避免和无法克服的事故。",
+      "clause_uid": "segment_8::8.u32",
+      "display_clause_id": "8.u32"
+    },
+    {
+      "comment_id": 21,
+      "risk_id": 17,
+      "paragraph_index": 79,
+      "matched_text": "双方任一方由于不可抗力的影响而不能执行合同时，履行合同的期限应予延长。延长的期限应相当于事故所影响的时间。如果不可抗力影响时间延续_30__天以上的，双方可通过友好协商达成在合理的时间内继续履行本合同或解除本合同的协议。不可抗力系指甲乙双方在缔结合同时所不能预见的，并且它的发生及其后果无法避免和无法克服的事故。",
+      "clause_uid": "segment_8::8.u32",
+      "display_clause_id": "8.u32"
+    },
+    {
+      "comment_id": 22,
+      "risk_id": 18,
+      "paragraph_index": 81,
+      "matched_text": "对甲方在履行本合同过程中向乙方提供的业务资料、技术资料等，以及乙方在履行本合同过程中知悉的甲方的所有秘密信息，乙方均应严格保密，未经甲方同意不得自行使用或披露给任何第三方。",
+      "clause_uid": "segment_9::9.1",
+      "display_clause_id": "9.1"
+    },
+    {
+      "comment_id": 23,
+      "risk_id": 19,
+      "paragraph_index": 81,
+      "matched_text": "对甲方在履行本合同过程中向乙方提供的业务资料、技术资料等，以及乙方在履行本合同过程中知悉的甲方的所有秘密信息，乙方均应严格保密，未经甲方同意不得自行使用或披露给任何第三方。",
+      "clause_uid": "segment_9::9.1",
+      "display_clause_id": "9.1"
+    },
+    {
+      "comment_id": 24,
+      "risk_id": 20,
+      "paragraph_index": 83,
+      "matched_text": "乙方违反保密法及相关法律，应承担相应法律责任。",
+      "clause_uid": "segment_9::9.3",
+      "display_clause_id": "9.3"
+    },
+    {
+      "comment_id": 25,
+      "risk_id": 21,
+      "paragraph_index": 84,
+      "matched_text": "本条规定的效力不受本合同效力的影响。",
+      "clause_uid": "segment_9::9.4",
+      "display_clause_id": "9.4"
+    },
+    {
+      "comment_id": 26,
+      "risk_id": 22,
+      "paragraph_index": 86,
+      "matched_text": "双方在履行合同时如有争议，都应尽最大的努力友好协商解决，如友好协商不能解决时，应按照以下第 1 种方式处理：",
+      "clause_uid": "segment_10::10.u37",
+      "display_clause_id": "10.u37"
+    },
+    {
+      "comment_id": 27,
+      "risk_id": 23,
+      "paragraph_index": 88,
+      "matched_text": "2. 提交嘉兴市仲裁委员会申请仲裁。",
+      "clause_uid": "segment_10::10.2",
+      "display_clause_id": "10.2"
+    },
+    {
+      "comment_id": 28,
+      "risk_id": 24,
+      "paragraph_index": 93,
+      "matched_text": "未经甲方事先书面许可，乙方不得擅自转让本合同项下的全部或部分权利义务。",
+      "clause_uid": "segment_11::11.3",
+      "display_clause_id": "11.3"
+    },
+    {
+      "comment_id": 29,
+      "risk_id": 25,
+      "paragraph_index": 94,
+      "matched_text": "本合同中所约定的损失包括但不限于诉讼费/仲裁费、律师费、调查费、差旅费等维权成本和费用。",
+      "clause_uid": "segment_11::11.4",
+      "display_clause_id": "11.4"
+    }
+  ],
+  "missing_clause_skipped_count": 4,
+  "missing_clause_items": [
+    {
+      "risk_id": 26,
+      "risk_label": "验收标准缺失",
+      "issue": "合同中缺少明确的验收标准、验收流程和验收主体定义",
+      "evidence_text": "合同3.3条款为placeholder（每_1年_综合验收一次），5.1条款约定'项目验收合格后支付40%'，但未定义合格的具体标准"
+    },
+    {
+      "risk_id": 27,
+      "risk_label": "知识产权归属边界不清晰",
+      "issue": "合同约定项目所有文件资料所有权归甲方，但未界定乙方自有知识产权的边界",
+      "evidence_text": "7.1条款约定'由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有'，但未明确：1) 乙方原有的技术、工具、方法论是否包含在转让范围；2) 乙方员工个人专业知识是否被一并转让；3) 乙方在项目过程中新产生的技术成果归属"
+    },
+    {
+      "risk_id": 28,
+      "risk_label": "保密期限未约定",
+      "issue": "合同约定了保密义务，但未明确合同终止后保密义务的存续期限",
+      "evidence_text": "9.1-9.4条款约定了乙方对甲方秘密信息的保密义务，但未明确合同终止后保密义务是否继续有效及有效期限"
+    },
+    {
+      "risk_id": 30,
+      "risk_label": "违约责任上限未约定",
+      "issue": "合同约定了多种违约金情形，但未约定供应商承担违约责任的总金额上限",
+      "evidence_text": "6.3条约定'乙方未能按本合同约定要求提供周到、及时服务，应向甲方支付违约金，即合同总额5%'；3.3条约定'每追加验收一次按合同价款5%的标准支付违约金'；9.2条约定保密违约责任为合同价款5%；6.4条约定重大安全责任事故违约金（百分比未填）"
+    }
+  ]
+}

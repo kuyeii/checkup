@@ -1,0 +1,65 @@
+[ai_patch]
+{
+  "output_docx": "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/data/runs/web_20260319_143402_f028a2/ai_patched.docx",
+  "applied": 3,
+  "failed": 0,
+  "unmatched": [],
+  "items": [
+    {
+      "risk_id": 2,
+      "paragraph_index": 24,
+      "target_text": "评估数量根据平台实际需求为准，评估数量最多能达15件。",
+      "revised_text": "评估数量根据平台实际需求确定，其中最低评估数量不少于X件，最高评估数量不超过15件。",
+      "revision_id": 0
+    },
+    {
+      "risk_id": 3,
+      "paragraph_index": 42,
+      "target_text": "项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+      "revised_text": "项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求，该实际需求的具体范围及标准由双方另行确认。",
+      "revision_id": 1
+    },
+    {
+      "risk_id": 15,
+      "paragraph_index": 79,
+      "target_text": "双方任一方由于不可抗力的影响而不能执行合同时，履行合同的期限应予延长。",
+      "revised_text": "双方任一方由于不可抗力的影响而不能执行合同时，应在不可抗力发生后及时书面通知对方，履行合同的期限应予延长。",
+      "revision_id": 2
+    }
+  ]
+}
+
+[risk_comments]
+{
+  "output_docx": "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/data/runs/web_20260319_143402_f028a2/reviewed_comments.docx",
+  "added_comments": 3,
+  "unmatched": [],
+  "comments": [
+    {
+      "comment_id": 5,
+      "risk_id": 2,
+      "paragraph_index": 24,
+      "matched_text": "基于省平台专利申请前评估申请表/评估表在申请前对相关技术发明从技术、法律、市场等维度进行评估并生成相应报告（是否申请、如何申请（保护范围、权利要求设计）等）。评估数量根据平台实际需求为准，评估数量最多能达15件。",
+      "clause_uid": "segment_1::1.2",
+      "display_clause_id": "1.2"
+    },
+    {
+      "comment_id": 6,
+      "risk_id": 3,
+      "paragraph_index": 42,
+      "matched_text": "项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+      "clause_uid": "segment_2::2.3",
+      "display_clause_id": "2.3"
+    },
+    {
+      "comment_id": 7,
+      "risk_id": 15,
+      "paragraph_index": 79,
+      "matched_text": "双方任一方由于不可抗力的影响而不能执行合同时，履行合同的期限应予延长。",
+      "clause_uid": "segment_8::8.u32",
+      "display_clause_id": "8.u32"
+    }
+  ],
+  "missing_clause_skipped_count": 0,
+  "missing_clause_items": []
+}

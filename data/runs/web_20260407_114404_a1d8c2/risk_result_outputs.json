@@ -1,0 +1,1083 @@
+{
+  "anchored": {
+    "by_clause": [
+      {
+        "clause_uid": "segment_1::1",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_1::1",
+          "clause_id": "1",
+          "display_clause_id": "1",
+          "clause_title": "测试周期",
+          "clause_text": "第一条 测试周期\n\n自受测件接收开始起 30 天完成。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "第一条 测试周期\n\n自受测件接收开始起 30 天完成。",
+          "segment_id": "segment_1",
+          "segment_title": "第一条 测试周期",
+          "numbering_confidence": "1",
+          "title_confidence": "1",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：1\n条款标题：测试周期\n条款正文：第一条 测试周期\n\n自受测件接收开始起 30 天完成。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"ambiguous_acceptance_trigger\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"服务期限、里程碑与验收标准\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"期限起算点“接收”定义不明，易导致测试期被不当缩短\",\n      \"issue\": \"条款中“自受测件接收开始起”表述不清，未界定“接收”是指物理签收还是验收合格确认。\",\n      \"evidence_text\": \"自受测件接收开始起\",\n      \"anchor_text\": \"受测件接收\",\n      \"factual_basis\": \"条款仅表述“自受测件接收开始起”，未明确“接收”是指甲方对受测件进行物理签收，还是指甲方完成外观、数量及初步功能检验后的确认接收。\",\n      \"reasoning_basis\": \"若“接收”被解释为物理签收，甲方在开箱验货、确认设备符合测试条件期间的时长将被计入测试周期，导致实际测试时间被实质性压缩；若受测件存在初始缺陷，甲方将面临测试期无谓消耗甚至被迫逾期的风险，严重损害甲方权益。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"关键期限起算点应具备客观、可控的触发条件\",\n        \"basis_detail\": \"作为限制甲方验收时间的核心条款，起算点应当明确且可控，避免因概念模糊导致甲方期限利益受损。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"明确“接收”的定义与程序，建议修改为“自甲方签署《受测件验收合格确认书》之日起”或“自受测件经甲方验收合格之日起”。\",\n      \"suggestion_minimal\": \"修改为“自受测件经甲方验收合格并签署接收单之日起”。\",\n      \"suggestion_optimized\": \"修改为“自受测件经甲方验收合格（包括但不限于外观、数量及基础功能检测），并由甲方授权代表签署书面接收确认文件之日起”。\",\n      \"suggestion_basis\": \"将起算点与验收合格挂钩，确保甲方在受测件具备测试条件时才开始计算周期，消除物理签收带来的时间风险。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_1::1\",\n      \"display_clause_id\": \"1\"\n    },\n    {\n      \"risk_code\": \"ambiguous_completion_standard\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"服务范围与交付内容\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"“完成”标准缺失，未明确是否包含成果交付与验收\",\n      \"issue\": \"条款仅约定“30天完成”，未明确“完成”是指乙方完成测试动作，还是提交测试报告并经甲方验收合格。\",\n      \"evidence_text\": \"30 天完成\",\n      \"anchor_text\": \"完成\",\n      \"factual_basis\": \"条款仅使用“完成”一词，未明确该状态是指乙方完成内部测试行为，还是指向甲方交付测试成果（如测试报告）并通过甲方验收。\",\n      \"reasoning_basis\": \"若“完成”仅指乙方完成测试动作，乙方可能在第30天完成测试但拖延提交报告或数据，导致甲方无法按时获取成果；且在甲方验收环节，因缺乏“交付验收”的时间约束，甲方难以追究乙方逾期交付的违约责任，影响后续科研或生产进度。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"服务履约节点应与成果交付挂钩\",\n        \"basis_detail\": \"在技术服务合同中，委托方的合同目的在于获取成果，因此“完成”应当包含交付并验收通过的含义，而非仅指受托方完成工作行为。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将“完成”具体化为交付成果的验收，建议修改为“30天内提交测试报告并经甲方验收合格”。\",\n      \"suggestion_minimal\": \"修改为“30天内完成测试并提交测试报告”。\",\n      \"suggestion_optimized\": \"修改为“30天内完成测试工作，向甲方提交全部测试成果（包括但不限于测试报告、原始数据），并经甲方书面验收合格”。\",\n      \"suggestion_basis\": \"明确“完成”包含交付与验收两个环节，确保甲方在期限内获得可用的成果，锁定乙方的交付责任。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_1::1\",\n      \"display_clause_id\": \"1\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "ambiguous_acceptance_trigger",
+            "risk_source_type": "anchored",
+            "dimension": "服务期限、里程碑与验收标准",
+            "risk_level": "high",
+            "risk_label": "期限起算点“接收”定义不明，易导致测试期被不当缩短",
+            "issue": "条款中“自受测件接收开始起”表述不清，未界定“接收”是指物理签收还是验收合格确认。",
+            "evidence_text": "自受测件接收开始起",
+            "anchor_text": "第一条 测试周期\n\n自受测件接收开始起 30 天完成。",
+            "factual_basis": "条款仅表述“自受测件接收开始起”，未明确“接收”是指甲方对受测件进行物理签收，还是指甲方完成外观、数量及初步功能检验后的确认接收。",
+            "reasoning_basis": "若“接收”被解释为物理签收，甲方在开箱验货、确认设备符合测试条件期间的时长将被计入测试周期，导致实际测试时间被实质性压缩；若受测件存在初始缺陷，甲方将面临测试期无谓消耗甚至被迫逾期的风险，严重损害甲方权益。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "关键期限起算点应具备客观、可控的触发条件",
+              "basis_detail": "作为限制甲方验收时间的核心条款，起算点应当明确且可控，避免因概念模糊导致甲方期限利益受损。",
+              "citation_text": ""
+            },
+            "suggestion": "明确“接收”的定义与程序，建议修改为“自甲方签署《受测件验收合格确认书》之日起”或“自受测件经甲方验收合格之日起”。",
+            "suggestion_minimal": "修改为“自受测件经甲方验收合格并签署接收单之日起”。",
+            "suggestion_optimized": "修改为“自受测件经甲方验收合格（包括但不限于外观、数量及基础功能检测），并由甲方授权代表签署书面接收确认文件之日起”。",
+            "suggestion_basis": "将起算点与验收合格挂钩，确保甲方在受测件具备测试条件时才开始计算周期，消除物理签收带来的时间风险。",
+            "needs_human_review": true,
+            "clause_uid": "segment_1::1",
+            "display_clause_id": "1",
+            "clause_uids": [
+              "segment_1::1"
+            ],
+            "clause_id": "1",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          },
+          {
+            "risk_code": "ambiguous_completion_standard",
+            "risk_source_type": "anchored",
+            "dimension": "服务范围与交付内容",
+            "risk_level": "medium",
+            "risk_label": "“完成”标准缺失，未明确是否包含成果交付与验收",
+            "issue": "条款仅约定“30天完成”，未明确“完成”是指乙方完成测试动作，还是提交测试报告并经甲方验收合格。",
+            "evidence_text": "30 天完成",
+            "anchor_text": "第一条 测试周期\n\n自受测件接收开始起 30 天完成。",
+            "factual_basis": "条款仅使用“完成”一词，未明确该状态是指乙方完成内部测试行为，还是指向甲方交付测试成果（如测试报告）并通过甲方验收。",
+            "reasoning_basis": "若“完成”仅指乙方完成测试动作，乙方可能在第30天完成测试但拖延提交报告或数据，导致甲方无法按时获取成果；且在甲方验收环节，因缺乏“交付验收”的时间约束，甲方难以追究乙方逾期交付的违约责任，影响后续科研或生产进度。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "服务履约节点应与成果交付挂钩",
+              "basis_detail": "在技术服务合同中，委托方的合同目的在于获取成果，因此“完成”应当包含交付并验收通过的含义，而非仅指受托方完成工作行为。",
+              "citation_text": ""
+            },
+            "suggestion": "将“完成”具体化为交付成果的验收，建议修改为“30天内提交测试报告并经甲方验收合格”。",
+            "suggestion_minimal": "修改为“30天内完成测试并提交测试报告”。",
+            "suggestion_optimized": "修改为“30天内完成测试工作，向甲方提交全部测试成果（包括但不限于测试报告、原始数据），并经甲方书面验收合格”。",
+            "suggestion_basis": "明确“完成”包含交付与验收两个环节，确保甲方在期限内获得可用的成果，锁定乙方的交付责任。",
+            "needs_human_review": true,
+            "clause_uid": "segment_1::1",
+            "display_clause_id": "1",
+            "clause_uids": [
+              "segment_1::1"
+            ],
+            "clause_id": "1",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_2::2.u1",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_2::2.u1",
+          "clause_id": "2.u1",
+          "display_clause_id": "2.u1",
+          "clause_title": "",
+          "clause_text": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+          "segment_id": "segment_2",
+          "segment_title": "第二条 检测和咨询内容",
+          "numbering_confidence": "0",
+          "title_confidence": "0",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：2.u1\n条款标题：\n条款正文：甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"weak_reference_to_acceptance_criteria\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"服务期限、里程碑与验收标准\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"验收标准约束力弱化风险\",\n      \"issue\": \"条款使用“参照”一词引用验收指标，而非“依据”或“应符合”，降低了验收标准的强制约束力，可能导致甲方无法基于指标偏差主张违约。\",\n      \"evidence_text\": \"参照“甲方提供的验收指标”\",\n      \"anchor_text\": \"参照\",\n      \"factual_basis\": \"条款文本表述为“参照‘甲方提供的验收指标’”，使用了非强制性词汇“参照”，而非“依据”或“必须符合”。\",\n      \"reasoning_basis\": \"在司法实践中，“参照”通常被理解为参考、借鉴，而非必须严格遵守的强制性标准。若乙方未完全达到附件中的指标但主张已履行“参照”义务，甲方难以据此认定乙方违约或拒收成果，导致验收抓手失效。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"合同义务的确定性原则\",\n        \"basis_detail\": \"技术服务合同中，验收标准应当具体、明确且具有强制约束力。使用模棱两可的词汇会导致合同义务边界不清，增加履约争议风险。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将“参照”修改为“依据”或“应符合”，明确验收指标的强制约束力。\",\n      \"suggestion_minimal\": \"将“参照”修改为“依据”。\",\n      \"suggestion_optimized\": \"将“参照‘甲方提供的验收指标’”修改为“依据‘甲方提供的验收指标’进行测试，测试结果必须完全符合该指标要求”。\",\n      \"suggestion_basis\": \"将“参照”改为“依据”或“应符合”，确立了验收指标的强制性地位，确保甲方在乙方未达标时有权要求整改或拒收，保障甲方权益。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_2::2.u1\",\n      \"display_clause_id\": \"2.u1\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "weak_reference_to_acceptance_criteria",
+            "risk_source_type": "anchored",
+            "dimension": "服务期限、里程碑与验收标准",
+            "risk_level": "medium",
+            "risk_label": "验收标准约束力弱化风险",
+            "issue": "条款使用“参照”一词引用验收指标，而非“依据”或“应符合”，降低了验收标准的强制约束力，可能导致甲方无法基于指标偏差主张违约。",
+            "evidence_text": "参照“甲方提供的验收指标”",
+            "anchor_text": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+            "factual_basis": "条款文本表述为“参照‘甲方提供的验收指标’”，使用了非强制性词汇“参照”，而非“依据”或“必须符合”。",
+            "reasoning_basis": "在司法实践中，“参照”通常被理解为参考、借鉴，而非必须严格遵守的强制性标准。若乙方未完全达到附件中的指标但主张已履行“参照”义务，甲方难以据此认定乙方违约或拒收成果，导致验收抓手失效。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "合同义务的确定性原则",
+              "basis_detail": "技术服务合同中，验收标准应当具体、明确且具有强制约束力。使用模棱两可的词汇会导致合同义务边界不清，增加履约争议风险。",
+              "citation_text": ""
+            },
+            "suggestion": "将“参照”修改为“依据”或“应符合”，明确验收指标的强制约束力。",
+            "suggestion_minimal": "将“参照”修改为“依据”。",
+            "suggestion_optimized": "将“参照‘甲方提供的验收指标’”修改为“依据‘甲方提供的验收指标’进行测试，测试结果必须完全符合该指标要求”。",
+            "suggestion_basis": "将“参照”改为“依据”或“应符合”，确立了验收指标的强制性地位，确保甲方在乙方未达标时有权要求整改或拒收，保障甲方权益。",
+            "needs_human_review": true,
+            "clause_uid": "segment_2::2.u1",
+            "display_clause_id": "2.u1",
+            "clause_uids": [
+              "segment_2::2.u1"
+            ],
+            "clause_id": "2.u1",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_2::2.u2",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_2::2.u2",
+          "clause_id": "2.u2",
+          "display_clause_id": "2.u2",
+          "clause_title": "",
+          "clause_text": "课题及对应测试对象如下：\n\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\n| --- | --- | --- | --- |\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "课题及对应测试对象如下：\n\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\n| --- | --- | --- | --- |\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |",
+          "segment_id": "segment_2",
+          "segment_title": "第二条 检测和咨询内容",
+          "numbering_confidence": "0",
+          "title_confidence": "0",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：2.u2\n条款标题：\n条款正文：课题及对应测试对象如下：\n\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\n| --- | --- | --- | --- |\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"weak_reference_to_acceptance_criteria\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"服务期限、里程碑与验收标准\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"验收标准约束力弱化风险\",\n      \"issue\": \"条款使用“参照”一词引用验收指标，而非“依据”或“应符合”，降低了验收标准的强制约束力，可能导致甲方无法基于指标偏差主张违约。\",\n      \"evidence_text\": \"参照“甲方提供的验收指标”\",\n      \"anchor_text\": \"参照\",\n      \"factual_basis\": \"条款文本表述为“参照‘甲方提供的验收指标’”，使用了非强制性词汇“参照”，而非“依据”或“必须符合”。\",\n      \"reasoning_basis\": \"在司法实践中，“参照”通常被理解为参考、借鉴，而非必须严格遵守的强制性标准。若乙方未完全达到附件中的指标但主张已履行“参照”义务，甲方难以据此认定乙方违约或拒收成果，导致验收抓手失效。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"合同义务的确定性原则\",\n        \"basis_detail\": \"技术服务合同中，验收标准应当具体、明确且具有强制约束力。使用模棱两可的词汇会导致合同义务边界不清，增加履约争议风险。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将“参照”修改为“依据”或“应符合”，明确验收指标的强制约束力。\",\n      \"suggestion_minimal\": \"将“参照”修改为“依据”。\",\n      \"suggestion_optimized\": \"将“参照‘甲方提供的验收指标’”修改为“依据‘甲方提供的验收指标’进行测试，测试结果必须完全符合该指标要求”。\",\n      \"suggestion_basis\": \"将“参照”改为“依据”或“应符合”，确立了验收指标的强制性地位，确保甲方在乙方未达标时有权要求整改或拒收，保障甲方权益。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_2::2.u1\",\n      \"display_clause_id\": \"2.u1\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_3::3.u1",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_3::3.u1",
+          "clause_id": "3.u1",
+          "display_clause_id": "3.u1",
+          "clause_title": "",
+          "clause_text": "甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。",
+          "segment_id": "segment_3",
+          "segment_title": "第三条 检测经费及付款方式",
+          "numbering_confidence": "0",
+          "title_confidence": "0",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：3.u1\n条款标题：\n条款正文：甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"payment_full_prepay_without_milestone\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"付款结算、发票与税费\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"付款节点设置全额预付，缺乏履约抓手\",\n      \"issue\": \"条款规定甲方在合同签订后30日内一次性支付全部费用，未将付款进度与乙方履约进度（如验收合格）挂钩。\",\n      \"evidence_text\": \"合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）\",\n      \"anchor_text\": \"甲方一次性向乙方支付检测费用\",\n      \"factual_basis\": \"条款明确约定甲方需在合同签订后30日内“一次性”支付全部款项，未设置任何与检测服务交付或验收结果相关联的付款前置条件。\",\n      \"reasoning_basis\": \"在服务合同中，全额预付模式导致甲方在乙方未履约或履约不符时丧失合同履行抗辩权及资金控制力，一旦乙方违约，甲方需通过诉讼追回全款，维权成本高且执行风险大。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"付款节点应与履约进度挂钩\",\n        \"basis_detail\": \"技术服务合同中，付款节点通常应与服务里程碑或验收结果对应，以平衡双方风险，避免委托方资金风险敞口过大。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将付款拆分为“预付款+验收款”或“分期付款”，例如：合同签订后支付50%，验收合格后支付50%。\",\n      \"suggestion_minimal\": \"将“一次性”改为“分期”，并增加验收合格后支付尾款的安排。\",\n      \"suggestion_optimized\": \"合同签订后X日内支付合同总额的X%作为预付款；乙方交付检测报告并经甲方验收合格后X日内，支付剩余款项。\",\n      \"suggestion_basis\": \"通过分期付款和挂钩验收，确保乙方需完成交付义务才能获得全部对价，为甲方保留资金作为履约担保。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_3::3.u2\",\n      \"display_clause_id\": \"3.u2\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_3::3.u2",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_3::3.u2",
+          "clause_id": "3.u2",
+          "display_clause_id": "3.u2",
+          "clause_title": "",
+          "clause_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+          "segment_id": "segment_3",
+          "segment_title": "第三条 检测经费及付款方式",
+          "numbering_confidence": "0",
+          "title_confidence": "0",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：3.u2\n条款标题：\n条款正文：合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"payment_full_prepay_without_milestone\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"付款结算、发票与税费\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"付款节点设置全额预付，缺乏履约抓手\",\n      \"issue\": \"条款规定甲方在合同签订后30日内一次性支付全部费用，未将付款进度与乙方履约进度（如验收合格）挂钩。\",\n      \"evidence_text\": \"合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）\",\n      \"anchor_text\": \"甲方一次性向乙方支付检测费用\",\n      \"factual_basis\": \"条款明确约定甲方需在合同签订后30日内“一次性”支付全部款项，未设置任何与检测服务交付或验收结果相关联的付款前置条件。\",\n      \"reasoning_basis\": \"在服务合同中，全额预付模式导致甲方在乙方未履约或履约不符时丧失合同履行抗辩权及资金控制力，一旦乙方违约，甲方需通过诉讼追回全款，维权成本高且执行风险大。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"付款节点应与履约进度挂钩\",\n        \"basis_detail\": \"技术服务合同中，付款节点通常应与服务里程碑或验收结果对应，以平衡双方风险，避免委托方资金风险敞口过大。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将付款拆分为“预付款+验收款”或“分期付款”，例如：合同签订后支付50%，验收合格后支付50%。\",\n      \"suggestion_minimal\": \"将“一次性”改为“分期”，并增加验收合格后支付尾款的安排。\",\n      \"suggestion_optimized\": \"合同签订后X日内支付合同总额的X%作为预付款；乙方交付检测报告并经甲方验收合格后X日内，支付剩余款项。\",\n      \"suggestion_basis\": \"通过分期付款和挂钩验收，确保乙方需完成交付义务才能获得全部对价，为甲方保留资金作为履约担保。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_3::3.u2\",\n      \"display_clause_id\": \"3.u2\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "payment_full_prepay_without_milestone",
+            "risk_source_type": "anchored",
+            "dimension": "付款结算、发票与税费",
+            "risk_level": "high",
+            "risk_label": "付款节点设置全额预付，缺乏履约抓手",
+            "issue": "条款规定甲方在合同签订后30日内一次性支付全部费用，未将付款进度与乙方履约进度（如验收合格）挂钩。",
+            "evidence_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）",
+            "anchor_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+            "factual_basis": "条款明确约定甲方需在合同签订后30日内“一次性”支付全部款项，未设置任何与检测服务交付或验收结果相关联的付款前置条件。",
+            "reasoning_basis": "在服务合同中，全额预付模式导致甲方在乙方未履约或履约不符时丧失合同履行抗辩权及资金控制力，一旦乙方违约，甲方需通过诉讼追回全款，维权成本高且执行风险大。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "付款节点应与履约进度挂钩",
+              "basis_detail": "技术服务合同中，付款节点通常应与服务里程碑或验收结果对应，以平衡双方风险，避免委托方资金风险敞口过大。",
+              "citation_text": ""
+            },
+            "suggestion": "将付款拆分为“预付款+验收款”或“分期付款”，例如：合同签订后支付50%，验收合格后支付50%。",
+            "suggestion_minimal": "将“一次性”改为“分期”，并增加验收合格后支付尾款的安排。",
+            "suggestion_optimized": "合同签订后X日内支付合同总额的X%作为预付款；乙方交付检测报告并经甲方验收合格后X日内，支付剩余款项。",
+            "suggestion_basis": "通过分期付款和挂钩验收，确保乙方需完成交付义务才能获得全部对价，为甲方保留资金作为履约担保。",
+            "needs_human_review": true,
+            "clause_uid": "segment_3::3.u2",
+            "display_clause_id": "3.u2",
+            "clause_uids": [
+              "segment_3::3.u2"
+            ],
+            "clause_id": "3.u2",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_3::3.u3",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_3::3.u3",
+          "clause_id": "3.u3",
+          "display_clause_id": "3.u3",
+          "clause_title": "甲方发票信息：",
+          "clause_text": "单位名称：南湖实验室\n\n统一社会信用代码：12330400MB1D62272G\n\n开户银行：嘉兴银行股份有限公司科技支行\n\n银行账号：109101201900080105\n\n开票地址：嘉兴市南湖区七星街道香湖别墅29幢\n\n电 话：0573-82866610\n\n纳税人身份：☑增值税一般纳税人 □非增值税一般纳税人",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "甲方发票信息：\n\n单位名称：南湖实验室\n\n统一社会信用代码：12330400MB1D62272G\n\n开户银行：嘉兴银行股份有限公司科技支行\n\n银行账号：109101201900080105\n\n开票地址：嘉兴市南湖区七星街道香湖别墅29幢\n\n电 话：0573-82866610\n\n纳税人身份：☑增值税一般纳税人 □非增值税一般纳税人",
+          "segment_id": "segment_3",
+          "segment_title": "第三条 检测经费及付款方式",
+          "numbering_confidence": "0",
+          "title_confidence": "1",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：3.u3\n条款标题：甲方发票信息：\n条款正文：单位名称：南湖实验室\n\n统一社会信用代码：12330400MB1D62272G\n\n开户银行：嘉兴银行股份有限公司科技支行\n\n银行账号：109101201900080105\n\n开票地址：嘉兴市南湖区七星街道香湖别墅29幢\n\n电 话：0573-82866610\n\n纳税人身份：☑增值税一般纳税人 □非增值税一般纳税人"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"payment_full_prepay_without_milestone\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"付款结算、发票与税费\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"付款节点设置全额预付，缺乏履约抓手\",\n      \"issue\": \"条款规定甲方在合同签订后30日内一次性支付全部费用，未将付款进度与乙方履约进度（如验收合格）挂钩。\",\n      \"evidence_text\": \"合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）\",\n      \"anchor_text\": \"甲方一次性向乙方支付检测费用\",\n      \"factual_basis\": \"条款明确约定甲方需在合同签订后30日内“一次性”支付全部款项，未设置任何与检测服务交付或验收结果相关联的付款前置条件。\",\n      \"reasoning_basis\": \"在服务合同中，全额预付模式导致甲方在乙方未履约或履约不符时丧失合同履行抗辩权及资金控制力，一旦乙方违约，甲方需通过诉讼追回全款，维权成本高且执行风险大。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"付款节点应与履约进度挂钩\",\n        \"basis_detail\": \"技术服务合同中，付款节点通常应与服务里程碑或验收结果对应，以平衡双方风险，避免委托方资金风险敞口过大。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将付款拆分为“预付款+验收款”或“分期付款”，例如：合同签订后支付50%，验收合格后支付50%。\",\n      \"suggestion_minimal\": \"将“一次性”改为“分期”，并增加验收合格后支付尾款的安排。\",\n      \"suggestion_optimized\": \"合同签订后X日内支付合同总额的X%作为预付款；乙方交付检测报告并经甲方验收合格后X日内，支付剩余款项。\",\n      \"suggestion_basis\": \"通过分期付款和挂钩验收，确保乙方需完成交付义务才能获得全部对价，为甲方保留资金作为履约担保。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_3::3.u2\",\n      \"display_clause_id\": \"3.u2\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_3::3.u4",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_3::3.u4",
+          "clause_id": "3.u4",
+          "display_clause_id": "3.u4",
+          "clause_title": "乙方账户信息：",
+          "clause_text": "开户银行：工行北京北新桥支行\n\n开 户 名：中国电子技术标准化研究院\n\n账 户：0200 0043 0908 8116 710\n\n税 号： 12100000400002195R",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "乙方账户信息：\n\n开户银行：工行北京北新桥支行\n\n开 户 名：中国电子技术标准化研究院\n\n账 户：0200 0043 0908 8116 710\n\n税 号： 12100000400002195R",
+          "segment_id": "segment_3",
+          "segment_title": "第三条 检测经费及付款方式",
+          "numbering_confidence": "0",
+          "title_confidence": "1",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：3.u4\n条款标题：乙方账户信息：\n条款正文：开户银行：工行北京北新桥支行\n\n开 户 名：中国电子技术标准化研究院\n\n账 户：0200 0043 0908 8116 710\n\n税 号： 12100000400002195R"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"payment_full_prepay_without_milestone\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"付款结算、发票与税费\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"付款节点设置全额预付，缺乏履约抓手\",\n      \"issue\": \"条款规定甲方在合同签订后30日内一次性支付全部费用，未将付款进度与乙方履约进度（如验收合格）挂钩。\",\n      \"evidence_text\": \"合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）\",\n      \"anchor_text\": \"甲方一次性向乙方支付检测费用\",\n      \"factual_basis\": \"条款明确约定甲方需在合同签订后30日内“一次性”支付全部款项，未设置任何与检测服务交付或验收结果相关联的付款前置条件。\",\n      \"reasoning_basis\": \"在服务合同中，全额预付模式导致甲方在乙方未履约或履约不符时丧失合同履行抗辩权及资金控制力，一旦乙方违约，甲方需通过诉讼追回全款，维权成本高且执行风险大。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"付款节点应与履约进度挂钩\",\n        \"basis_detail\": \"技术服务合同中，付款节点通常应与服务里程碑或验收结果对应，以平衡双方风险，避免委托方资金风险敞口过大。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将付款拆分为“预付款+验收款”或“分期付款”，例如：合同签订后支付50%，验收合格后支付50%。\",\n      \"suggestion_minimal\": \"将“一次性”改为“分期”，并增加验收合格后支付尾款的安排。\",\n      \"suggestion_optimized\": \"合同签订后X日内支付合同总额的X%作为预付款；乙方交付检测报告并经甲方验收合格后X日内，支付剩余款项。\",\n      \"suggestion_basis\": \"通过分期付款和挂钩验收，确保乙方需完成交付义务才能获得全部对价，为甲方保留资金作为履约担保。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_3::3.u2\",\n      \"display_clause_id\": \"3.u2\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_4::4",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_4::4",
+          "clause_id": "4",
+          "display_clause_id": "4",
+          "clause_title": "检测方式",
+          "clause_text": "甲方向乙方提供“机密计算与可信执行环境关键技术和应用研究项目”所研发的“可信执行环境和同态加密混合国产异构系统”中的“基于可信执行环境的同态加密计算加速系统”系统/产品样品、乙方所要求的技术资料、辅助工具和设备，由乙方独立对送检样品进行验收检测。测试过程中受测样品会进行破拆和存档，检测样品不会退换，大型设备在检测完成后退还。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "甲方向乙方提供“机密计算与可信执行环境关键技术和应用研究项目”所研发的“可信执行环境和同态加密混合国产异构系统”中的“基于可信执行环境的同态加密计算加速系统”系统/产品样品、乙方所要求的技术资料、辅助工具和设备，由乙方独立对送检样品进行验收检测。测试过程中受测样品会进行破拆和存档，检测样品不会退换，大型设备在检测完成后退还。",
+          "segment_id": "segment_4",
+          "segment_title": "第四条 检测方式",
+          "numbering_confidence": "1",
+          "title_confidence": "1",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：4\n条款标题：检测方式\n条款正文：甲方向乙方提供“机密计算与可信执行环境关键技术和应用研究项目”所研发的“可信执行环境和同态加密混合国产异构系统”中的“基于可信执行环境的同态加密计算加速系统”系统/产品样品、乙方所要求的技术资料、辅助工具和设备，由乙方独立对送检样品进行验收检测。测试过程中受测样品会进行破拆和存档，检测样品不会退换，大型设备在检测完成后退还。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"acceptance_procedure_unilateral_control\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"服务期限、里程碑与验收标准\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"验收检测程序由乙方独立进行，缺乏甲方监督或第三方见证机制\",\n      \"issue\": \"条款规定“由乙方独立对送检样品进行验收检测”，导致验收过程完全由乙方单方控制，甲方丧失对验收过程及结果的知情权、监督权和异议权。\",\n      \"evidence_text\": \"由乙方独立对送检样品进行验收检测\",\n      \"anchor_text\": \"乙方独立\",\n      \"factual_basis\": \"条款明确约定检测方式为“乙方独立”进行，未设置甲方在场监督、双方共同检测或第三方见证的程序安排。\",\n      \"reasoning_basis\": \"在技术服务合同中，验收是判定履约是否符合标准的核心环节。若由乙方独立验收，乙方既当“运动员”又当“裁判员”，极易利用信息不对称隐瞒缺陷、伪造数据或作出不利于甲方的结论，导致甲方在付款、追责时陷入被动，难以推翻乙方的验收结论。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"验收程序公平原则\",\n        \"basis_detail\": \"验收程序应保障委托方的参与权和监督权，避免受托方单方控制验收结果导致利益失衡。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将“由乙方独立对送检样品进行验收检测”修改为“由乙方在甲方现场或双方认可的第三方检测机构进行检测，甲方有权派员在场监督”。\",\n      \"suggestion_minimal\": \"增加“甲方有权派员在场监督”的表述。\",\n      \"suggestion_optimized\": \"约定“检测应在甲方指定地点或双方认可的国家级检测机构进行，检测过程需全程录像并由甲方代表签字确认，检测报告需经甲方盖章确认方为有效”。\",\n      \"suggestion_basis\": \"通过引入监督机制或第三方机构，打破乙方的单方控制，确保验收数据的真实性和公正性，保障甲方权益。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_4::4\",\n      \"display_clause_id\": \"4\"\n    },\n    {\n      \"risk_code\": \"delivery_scope_unilaterally_defined\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"服务范围与交付内容\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"技术资料提供范围由乙方单方决定，可能导致甲方知识产权泄露或义务不当扩大\",\n      \"issue\": \"条款约定甲方向乙方提供“乙方所要求的技术资料”，将提供资料的范围界定权完全赋予乙方，缺乏标准或限制。\",\n      \"evidence_text\": \"乙方所要求的技术资料\",\n      \"anchor_text\": \"乙方所要求\",\n      \"factual_basis\": \"条款规定甲方需提供“乙方所要求”的技术资料，意味着乙方可以单方决定甲方必须提供的资料范围、深度和形式。\",\n      \"reasoning_basis\": \"在涉及“机密计算”、“同态加密”等高敏感技术的研发项目中，技术资料往往包含核心算法、密钥管理等商业秘密。若乙方可无限制要求提供资料，甲方将面临核心知识产权泄露风险，且若无法提供乙方要求的资料还可能被认定为违约。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"合同义务明确性原则\",\n        \"basis_detail\": \"交付义务的范围应当明确、具体或具有客观的确定标准，不应由合同相对方单方指定，否则会导致权利义务严重失衡。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将“乙方所要求的技术资料”修改为“检测所必需且经甲方确认的技术资料”或“本合同附件X所列的技术资料”。\",\n      \"suggestion_minimal\": \"在“乙方所要求”后增加“且经甲方确认”字样。\",\n      \"suggestion_optimized\": \"明确列出资料清单作为附件，并约定“仅限于检测必需之资料，且需签署保密协议后方可提供，甲方有权对敏感核心代码进行脱敏处理”。\",\n      \"suggestion_basis\": \"将资料提供范围限定在“检测必需”的合理范围内，并赋予甲方确认权，防止乙方滥用权利刺探甲方技术秘密或设置履约陷阱。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_4::4\",\n      \"display_clause_id\": \"4\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "acceptance_procedure_unilateral_control",
+            "risk_source_type": "anchored",
+            "dimension": "服务期限、里程碑与验收标准",
+            "risk_level": "high",
+            "risk_label": "验收检测程序由乙方独立进行，缺乏甲方监督或第三方见证机制",
+            "issue": "条款规定“由乙方独立对送检样品进行验收检测”，导致验收过程完全由乙方单方控制，甲方丧失对验收过程及结果的知情权、监督权和异议权。",
+            "evidence_text": "由乙方独立对送检样品进行验收检测",
+            "anchor_text": "甲方向乙方提供“机密计算与可信执行环境关键技术和应用研究项目”所研发的“可信执行环境和同态加密混合国产异构系统”中的“基于可信执行环境的同态加密计算加速系统”系统/产品样品、乙方所要求的技术资料、辅助工具和设备，由乙方独立对送检样品进行验收检测。测试过程中受测样品会进行破拆和存档，检测样品不会退换，大型设备在检测完成后退还。",
+            "factual_basis": "条款明确约定检测方式为“乙方独立”进行，未设置甲方在场监督、双方共同检测或第三方见证的程序安排。",
+            "reasoning_basis": "在技术服务合同中，验收是判定履约是否符合标准的核心环节。若由乙方独立验收，乙方既当“运动员”又当“裁判员”，极易利用信息不对称隐瞒缺陷、伪造数据或作出不利于甲方的结论，导致甲方在付款、追责时陷入被动，难以推翻乙方的验收结论。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "验收程序公平原则",
+              "basis_detail": "验收程序应保障委托方的参与权和监督权，避免受托方单方控制验收结果导致利益失衡。",
+              "citation_text": ""
+            },
+            "suggestion": "将“由乙方独立对送检样品进行验收检测”修改为“由乙方在甲方现场或双方认可的第三方检测机构进行检测，甲方有权派员在场监督”。",
+            "suggestion_minimal": "增加“甲方有权派员在场监督”的表述。",
+            "suggestion_optimized": "约定“检测应在甲方指定地点或双方认可的国家级检测机构进行，检测过程需全程录像并由甲方代表签字确认，检测报告需经甲方盖章确认方为有效”。",
+            "suggestion_basis": "通过引入监督机制或第三方机构，打破乙方的单方控制，确保验收数据的真实性和公正性，保障甲方权益。",
+            "needs_human_review": true,
+            "clause_uid": "segment_4::4",
+            "display_clause_id": "4",
+            "clause_uids": [
+              "segment_4::4"
+            ],
+            "clause_id": "4",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          },
+          {
+            "risk_code": "delivery_scope_unilaterally_defined",
+            "risk_source_type": "anchored",
+            "dimension": "服务范围与交付内容",
+            "risk_level": "medium",
+            "risk_label": "技术资料提供范围由乙方单方决定，可能导致甲方知识产权泄露或义务不当扩大",
+            "issue": "条款约定甲方向乙方提供“乙方所要求的技术资料”，将提供资料的范围界定权完全赋予乙方，缺乏标准或限制。",
+            "evidence_text": "乙方所要求的技术资料",
+            "anchor_text": "甲方向乙方提供“机密计算与可信执行环境关键技术和应用研究项目”所研发的“可信执行环境和同态加密混合国产异构系统”中的“基于可信执行环境的同态加密计算加速系统”系统/产品样品、乙方所要求的技术资料、辅助工具和设备，由乙方独立对送检样品进行验收检测。测试过程中受测样品会进行破拆和存档，检测样品不会退换，大型设备在检测完成后退还。",
+            "factual_basis": "条款规定甲方需提供“乙方所要求”的技术资料，意味着乙方可以单方决定甲方必须提供的资料范围、深度和形式。",
+            "reasoning_basis": "在涉及“机密计算”、“同态加密”等高敏感技术的研发项目中，技术资料往往包含核心算法、密钥管理等商业秘密。若乙方可无限制要求提供资料，甲方将面临核心知识产权泄露风险，且若无法提供乙方要求的资料还可能被认定为违约。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "合同义务明确性原则",
+              "basis_detail": "交付义务的范围应当明确、具体或具有客观的确定标准，不应由合同相对方单方指定，否则会导致权利义务严重失衡。",
+              "citation_text": ""
+            },
+            "suggestion": "将“乙方所要求的技术资料”修改为“检测所必需且经甲方确认的技术资料”或“本合同附件X所列的技术资料”。",
+            "suggestion_minimal": "在“乙方所要求”后增加“且经甲方确认”字样。",
+            "suggestion_optimized": "明确列出资料清单作为附件，并约定“仅限于检测必需之资料，且需签署保密协议后方可提供，甲方有权对敏感核心代码进行脱敏处理”。",
+            "suggestion_basis": "将资料提供范围限定在“检测必需”的合理范围内，并赋予甲方确认权，防止乙方滥用权利刺探甲方技术秘密或设置履约陷阱。",
+            "needs_human_review": true,
+            "clause_uid": "segment_4::4",
+            "display_clause_id": "4",
+            "clause_uids": [
+              "segment_4::4"
+            ],
+            "clause_id": "4",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_5::5.1",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_5::5.1",
+          "clause_id": "5.1",
+          "display_clause_id": "5.1",
+          "clause_title": "",
+          "clause_text": "双方应共同遵守保密条款，本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "1、双方应共同遵守保密条款，本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。",
+          "segment_id": "segment_5",
+          "segment_title": "第五条 保密要求",
+          "numbering_confidence": "0.9",
+          "title_confidence": "0",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：5.1\n条款标题：\n条款正文：双方应共同遵守保密条款，本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"confidentiality_scope_limited_to_contract_text\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"保密、数据安全与合规\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"保密范围仅限合同文本，遗漏核心履约数据\",\n      \"issue\": \"条款将保密客体限定为“本合同书的内容”，导致双方在服务过程中交付的技术资料、数据、源代码等核心信息不在保密范围内。\",\n      \"evidence_text\": \"本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。\",\n      \"anchor_text\": \"本合同书的内容\",\n      \"factual_basis\": \"条款文本明确将保密客体限定为“本合同书的内容”，未包含双方在合同履行过程中交换的技术资料、业务数据、源代码等实质性信息。\",\n      \"reasoning_basis\": \"在技术服务合同中，核心价值与风险点在于履约过程中产生的数据与技术交互。若保密范围仅限于合同文本，乙方泄露甲方提供的技术数据或研发成果将不构成违约，导致甲方核心资产流失且无法追责。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"保密范围应覆盖交易实质内容\",\n        \"basis_detail\": \"保密条款应保护合同履行中交换的所有敏感信息，而非仅保护合同文本本身，否则违背订立保密条款的商业初衷。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将保密范围扩展至“本合同内容及双方在履行本合同过程中知悉的对方商业秘密、技术资料、数据、源代码及其他保密信息”。\",\n      \"suggestion_minimal\": \"将“本合同书的内容”修改为“本合同内容及双方在履行过程中交换的保密信息”。\",\n      \"suggestion_optimized\": \"明确保密信息的定义与范围，包括但不限于合同文本、技术方案、源代码、业务数据、经营信息等，并排除公知领域信息。\",\n      \"suggestion_basis\": \"扩大保密范围能确保甲方提供的科研数据、技术资料及乙方交付的成果均受保护，防止核心资产泄露。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_5::5.1\",\n      \"display_clause_id\": \"5.1\"\n    },\n    {\n      \"risk_code\": \"confidentiality_prohibition_incomplete\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"保密、数据安全与合规\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"仅禁止“公开泄露”，未禁止未经授权的使用或向特定第三方披露\",\n      \"issue\": \"条款仅约定“不得公开泄露”，未禁止乙方在合同履行范围之外擅自使用甲方数据或向特定第三方（如竞争对手）私下披露。\",\n      \"evidence_text\": \"双方保证对方的业务活动、技术资料等其他信息不得公开泄露。\",\n      \"anchor_text\": \"不得公开泄露\",\n      \"factual_basis\": \"条款文本仅设定了“不得公开泄露”的消极义务，未禁止未经授权的内部使用或向特定第三方的私下披露。\",\n      \"reasoning_basis\": \"乙方可能将甲方的业务数据用于其他项目训练、分析，或将甲方的技术资料私下提供给关联公司，只要未向公众公开即不违约。这对甲方构成实质性竞争威胁和数据滥用风险。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"保密义务应包含禁止不当使用\",\n        \"basis_detail\": \"完整的保密义务应当包含“不得披露”与“不得擅自使用”双重禁令，仅禁止公开泄露无法覆盖所有侵权场景。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"修改为“不得以任何形式向第三方披露，亦不得在合同履行范围之外擅自使用”。\",\n      \"suggestion_minimal\": \"在“不得公开泄露”后增加“或擅自使用”。\",\n      \"suggestion_optimized\": \"约定“未经甲方书面同意，乙方不得以任何方式披露、使用或允许第三方使用保密信息，且仅得为履行本合同之目的使用该等信息”。\",\n      \"suggestion_basis\": \"补充“禁止使用”和“禁止私下披露”的义务，堵住乙方滥用甲方数据或私下转移资产的漏洞。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_5::5.2\",\n      \"display_clause_id\": \"5.2\"\n    },\n    {\n      \"risk_code\": \"confidentiality_term_fixed_for_trade_secrets\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"保密、数据安全与合规\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"保密期限设定固定上限，导致商业秘密保护期满失效\",\n      \"issue\": \"条款设定了固定的3年保密期限，与商业秘密应持续保护直至公开的法律属性冲突，导致期满后甲方核心秘密丧失保护。\",\n      \"evidence_text\": \"本保密条款在本合同书到期后3年内继续保持有效。\",\n      \"anchor_text\": \"3年内继续保持有效\",\n      \"factual_basis\": \"条款文本设定了明确的“3年”保密期限，意味着合同到期3年后，无论信息是否仍具秘密性，保密义务均终止。\",\n      \"reasoning_basis\": \"对于甲方的核心商业秘密（如核心算法、未公开科研数据），只要未公开就应受保护。设定固定期限意味着甲方同意3年后乙方可以披露其仍具秘密性的核心信息，导致权利永久丧失。\",\n      \"normative_basis\": {\n        \"basis_type\": \"legal_rule\",\n        \"basis_title\": \"商业秘密保护应持续至信息公开\",\n        \"basis_detail\": \"商业秘密构成要件之一为“保密性”，法律保护不应受固定期限限制。约定固定期限等同于权利人提前放弃期限届满后的保密权益。\",\n        \"citation_text\": \"《反不正当竞争法》第九条\"\n      },\n      \"suggestion\": \"补充约定“对于属于商业秘密的信息，保密义务应持续有效，直至该信息合法公开为止”。\",\n      \"suggestion_minimal\": \"在条款末尾增加“但涉及商业秘密的，应持续至信息公开为止”。\",\n      \"suggestion_optimized\": \"区分一般保密信息与商业秘密，约定一般信息保密期限为3年，商业秘密保密义务持续至信息公开为止。\",\n      \"suggestion_basis\": \"避免因期限届满导致核心商业秘密被合法泄露，确保甲方核心知识产权的长期安全。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_5::5.3\",\n      \"display_clause_id\": \"5.3\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "confidentiality_scope_limited_to_contract_text",
+            "risk_source_type": "anchored",
+            "dimension": "保密、数据安全与合规",
+            "risk_level": "high",
+            "risk_label": "保密范围仅限合同文本，遗漏核心履约数据",
+            "issue": "条款将保密客体限定为“本合同书的内容”，导致双方在服务过程中交付的技术资料、数据、源代码等核心信息不在保密范围内。",
+            "evidence_text": "本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。",
+            "anchor_text": "1、双方应共同遵守保密条款，本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。",
+            "factual_basis": "条款文本明确将保密客体限定为“本合同书的内容”，未包含双方在合同履行过程中交换的技术资料、业务数据、源代码等实质性信息。",
+            "reasoning_basis": "在技术服务合同中，核心价值与风险点在于履约过程中产生的数据与技术交互。若保密范围仅限于合同文本，乙方泄露甲方提供的技术数据或研发成果将不构成违约，导致甲方核心资产流失且无法追责。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "保密范围应覆盖交易实质内容",
+              "basis_detail": "保密条款应保护合同履行中交换的所有敏感信息，而非仅保护合同文本本身，否则违背订立保密条款的商业初衷。",
+              "citation_text": ""
+            },
+            "suggestion": "将保密范围扩展至“本合同内容及双方在履行本合同过程中知悉的对方商业秘密、技术资料、数据、源代码及其他保密信息”。",
+            "suggestion_minimal": "将“本合同书的内容”修改为“本合同内容及双方在履行过程中交换的保密信息”。",
+            "suggestion_optimized": "明确保密信息的定义与范围，包括但不限于合同文本、技术方案、源代码、业务数据、经营信息等，并排除公知领域信息。",
+            "suggestion_basis": "扩大保密范围能确保甲方提供的科研数据、技术资料及乙方交付的成果均受保护，防止核心资产泄露。",
+            "needs_human_review": true,
+            "clause_uid": "segment_5::5.1",
+            "display_clause_id": "5.1",
+            "clause_uids": [
+              "segment_5::5.1"
+            ],
+            "clause_id": "5.1",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_5::5.2",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_5::5.2",
+          "clause_id": "5.2",
+          "display_clause_id": "5.2",
+          "clause_title": "",
+          "clause_text": "双方应互相保守对方的商业机密。除本专项规定可公开发布信息外、双方保证对方的业务活动、技术资料等其他信息不得公开泄露。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "2、双方应互相保守对方的商业机密。除本专项规定可公开发布信息外、双方保证对方的业务活动、技术资料等其他信息不得公开泄露。",
+          "segment_id": "segment_5",
+          "segment_title": "第五条 保密要求",
+          "numbering_confidence": "0.9",
+          "title_confidence": "0",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：5.2\n条款标题：\n条款正文：双方应互相保守对方的商业机密。除本专项规定可公开发布信息外、双方保证对方的业务活动、技术资料等其他信息不得公开泄露。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"confidentiality_scope_limited_to_contract_text\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"保密、数据安全与合规\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"保密范围仅限合同文本，遗漏核心履约数据\",\n      \"issue\": \"条款将保密客体限定为“本合同书的内容”，导致双方在服务过程中交付的技术资料、数据、源代码等核心信息不在保密范围内。\",\n      \"evidence_text\": \"本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。\",\n      \"anchor_text\": \"本合同书的内容\",\n      \"factual_basis\": \"条款文本明确将保密客体限定为“本合同书的内容”，未包含双方在合同履行过程中交换的技术资料、业务数据、源代码等实质性信息。\",\n      \"reasoning_basis\": \"在技术服务合同中，核心价值与风险点在于履约过程中产生的数据与技术交互。若保密范围仅限于合同文本，乙方泄露甲方提供的技术数据或研发成果将不构成违约，导致甲方核心资产流失且无法追责。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"保密范围应覆盖交易实质内容\",\n        \"basis_detail\": \"保密条款应保护合同履行中交换的所有敏感信息，而非仅保护合同文本本身，否则违背订立保密条款的商业初衷。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将保密范围扩展至“本合同内容及双方在履行本合同过程中知悉的对方商业秘密、技术资料、数据、源代码及其他保密信息”。\",\n      \"suggestion_minimal\": \"将“本合同书的内容”修改为“本合同内容及双方在履行过程中交换的保密信息”。\",\n      \"suggestion_optimized\": \"明确保密信息的定义与范围，包括但不限于合同文本、技术方案、源代码、业务数据、经营信息等，并排除公知领域信息。\",\n      \"suggestion_basis\": \"扩大保密范围能确保甲方提供的科研数据、技术资料及乙方交付的成果均受保护，防止核心资产泄露。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_5::5.1\",\n      \"display_clause_id\": \"5.1\"\n    },\n    {\n      \"risk_code\": \"confidentiality_prohibition_incomplete\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"保密、数据安全与合规\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"仅禁止“公开泄露”，未禁止未经授权的使用或向特定第三方披露\",\n      \"issue\": \"条款仅约定“不得公开泄露”，未禁止乙方在合同履行范围之外擅自使用甲方数据或向特定第三方（如竞争对手）私下披露。\",\n      \"evidence_text\": \"双方保证对方的业务活动、技术资料等其他信息不得公开泄露。\",\n      \"anchor_text\": \"不得公开泄露\",\n      \"factual_basis\": \"条款文本仅设定了“不得公开泄露”的消极义务，未禁止未经授权的内部使用或向特定第三方的私下披露。\",\n      \"reasoning_basis\": \"乙方可能将甲方的业务数据用于其他项目训练、分析，或将甲方的技术资料私下提供给关联公司，只要未向公众公开即不违约。这对甲方构成实质性竞争威胁和数据滥用风险。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"保密义务应包含禁止不当使用\",\n        \"basis_detail\": \"完整的保密义务应当包含“不得披露”与“不得擅自使用”双重禁令，仅禁止公开泄露无法覆盖所有侵权场景。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"修改为“不得以任何形式向第三方披露，亦不得在合同履行范围之外擅自使用”。\",\n      \"suggestion_minimal\": \"在“不得公开泄露”后增加“或擅自使用”。\",\n      \"suggestion_optimized\": \"约定“未经甲方书面同意，乙方不得以任何方式披露、使用或允许第三方使用保密信息，且仅得为履行本合同之目的使用该等信息”。\",\n      \"suggestion_basis\": \"补充“禁止使用”和“禁止私下披露”的义务，堵住乙方滥用甲方数据或私下转移资产的漏洞。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_5::5.2\",\n      \"display_clause_id\": \"5.2\"\n    },\n    {\n      \"risk_code\": \"confidentiality_term_fixed_for_trade_secrets\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"保密、数据安全与合规\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"保密期限设定固定上限，导致商业秘密保护期满失效\",\n      \"issue\": \"条款设定了固定的3年保密期限，与商业秘密应持续保护直至公开的法律属性冲突，导致期满后甲方核心秘密丧失保护。\",\n      \"evidence_text\": \"本保密条款在本合同书到期后3年内继续保持有效。\",\n      \"anchor_text\": \"3年内继续保持有效\",\n      \"factual_basis\": \"条款文本设定了明确的“3年”保密期限，意味着合同到期3年后，无论信息是否仍具秘密性，保密义务均终止。\",\n      \"reasoning_basis\": \"对于甲方的核心商业秘密（如核心算法、未公开科研数据），只要未公开就应受保护。设定固定期限意味着甲方同意3年后乙方可以披露其仍具秘密性的核心信息，导致权利永久丧失。\",\n      \"normative_basis\": {\n        \"basis_type\": \"legal_rule\",\n        \"basis_title\": \"商业秘密保护应持续至信息公开\",\n        \"basis_detail\": \"商业秘密构成要件之一为“保密性”，法律保护不应受固定期限限制。约定固定期限等同于权利人提前放弃期限届满后的保密权益。\",\n        \"citation_text\": \"《反不正当竞争法》第九条\"\n      },\n      \"suggestion\": \"补充约定“对于属于商业秘密的信息，保密义务应持续有效，直至该信息合法公开为止”。\",\n      \"suggestion_minimal\": \"在条款末尾增加“但涉及商业秘密的，应持续至信息公开为止”。\",\n      \"suggestion_optimized\": \"区分一般保密信息与商业秘密，约定一般信息保密期限为3年，商业秘密保密义务持续至信息公开为止。\",\n      \"suggestion_basis\": \"避免因期限届满导致核心商业秘密被合法泄露，确保甲方核心知识产权的长期安全。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_5::5.3\",\n      \"display_clause_id\": \"5.3\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "confidentiality_prohibition_incomplete",
+            "risk_source_type": "anchored",
+            "dimension": "保密、数据安全与合规",
+            "risk_level": "high",
+            "risk_label": "仅禁止“公开泄露”，未禁止未经授权的使用或向特定第三方披露",
+            "issue": "条款仅约定“不得公开泄露”，未禁止乙方在合同履行范围之外擅自使用甲方数据或向特定第三方（如竞争对手）私下披露。",
+            "evidence_text": "双方保证对方的业务活动、技术资料等其他信息不得公开泄露。",
+            "anchor_text": "2、双方应互相保守对方的商业机密。除本专项规定可公开发布信息外、双方保证对方的业务活动、技术资料等其他信息不得公开泄露。",
+            "factual_basis": "条款文本仅设定了“不得公开泄露”的消极义务，未禁止未经授权的内部使用或向特定第三方的私下披露。",
+            "reasoning_basis": "乙方可能将甲方的业务数据用于其他项目训练、分析，或将甲方的技术资料私下提供给关联公司，只要未向公众公开即不违约。这对甲方构成实质性竞争威胁和数据滥用风险。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "保密义务应包含禁止不当使用",
+              "basis_detail": "完整的保密义务应当包含“不得披露”与“不得擅自使用”双重禁令，仅禁止公开泄露无法覆盖所有侵权场景。",
+              "citation_text": ""
+            },
+            "suggestion": "修改为“不得以任何形式向第三方披露，亦不得在合同履行范围之外擅自使用”。",
+            "suggestion_minimal": "在“不得公开泄露”后增加“或擅自使用”。",
+            "suggestion_optimized": "约定“未经甲方书面同意，乙方不得以任何方式披露、使用或允许第三方使用保密信息，且仅得为履行本合同之目的使用该等信息”。",
+            "suggestion_basis": "补充“禁止使用”和“禁止私下披露”的义务，堵住乙方滥用甲方数据或私下转移资产的漏洞。",
+            "needs_human_review": true,
+            "clause_uid": "segment_5::5.2",
+            "display_clause_id": "5.2",
+            "clause_uids": [
+              "segment_5::5.2"
+            ],
+            "clause_id": "5.2",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_5::5.3",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_5::5.3",
+          "clause_id": "5.3",
+          "display_clause_id": "5.3",
+          "clause_title": "",
+          "clause_text": "本保密条款在本合同书到期后3年内继续保持有效。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "3、本保密条款在本合同书到期后3年内继续保持有效。",
+          "segment_id": "segment_5",
+          "segment_title": "第五条 保密要求",
+          "numbering_confidence": "0.9",
+          "title_confidence": "0",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：5.3\n条款标题：\n条款正文：本保密条款在本合同书到期后3年内继续保持有效。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"confidentiality_scope_limited_to_contract_text\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"保密、数据安全与合规\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"保密范围仅限合同文本，遗漏核心履约数据\",\n      \"issue\": \"条款将保密客体限定为“本合同书的内容”，导致双方在服务过程中交付的技术资料、数据、源代码等核心信息不在保密范围内。\",\n      \"evidence_text\": \"本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。\",\n      \"anchor_text\": \"本合同书的内容\",\n      \"factual_basis\": \"条款文本明确将保密客体限定为“本合同书的内容”，未包含双方在合同履行过程中交换的技术资料、业务数据、源代码等实质性信息。\",\n      \"reasoning_basis\": \"在技术服务合同中，核心价值与风险点在于履约过程中产生的数据与技术交互。若保密范围仅限于合同文本，乙方泄露甲方提供的技术数据或研发成果将不构成违约，导致甲方核心资产流失且无法追责。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"保密范围应覆盖交易实质内容\",\n        \"basis_detail\": \"保密条款应保护合同履行中交换的所有敏感信息，而非仅保护合同文本本身，否则违背订立保密条款的商业初衷。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将保密范围扩展至“本合同内容及双方在履行本合同过程中知悉的对方商业秘密、技术资料、数据、源代码及其他保密信息”。\",\n      \"suggestion_minimal\": \"将“本合同书的内容”修改为“本合同内容及双方在履行过程中交换的保密信息”。\",\n      \"suggestion_optimized\": \"明确保密信息的定义与范围，包括但不限于合同文本、技术方案、源代码、业务数据、经营信息等，并排除公知领域信息。\",\n      \"suggestion_basis\": \"扩大保密范围能确保甲方提供的科研数据、技术资料及乙方交付的成果均受保护，防止核心资产泄露。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_5::5.1\",\n      \"display_clause_id\": \"5.1\"\n    },\n    {\n      \"risk_code\": \"confidentiality_prohibition_incomplete\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"保密、数据安全与合规\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"仅禁止“公开泄露”，未禁止未经授权的使用或向特定第三方披露\",\n      \"issue\": \"条款仅约定“不得公开泄露”，未禁止乙方在合同履行范围之外擅自使用甲方数据或向特定第三方（如竞争对手）私下披露。\",\n      \"evidence_text\": \"双方保证对方的业务活动、技术资料等其他信息不得公开泄露。\",\n      \"anchor_text\": \"不得公开泄露\",\n      \"factual_basis\": \"条款文本仅设定了“不得公开泄露”的消极义务，未禁止未经授权的内部使用或向特定第三方的私下披露。\",\n      \"reasoning_basis\": \"乙方可能将甲方的业务数据用于其他项目训练、分析，或将甲方的技术资料私下提供给关联公司，只要未向公众公开即不违约。这对甲方构成实质性竞争威胁和数据滥用风险。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"保密义务应包含禁止不当使用\",\n        \"basis_detail\": \"完整的保密义务应当包含“不得披露”与“不得擅自使用”双重禁令，仅禁止公开泄露无法覆盖所有侵权场景。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"修改为“不得以任何形式向第三方披露，亦不得在合同履行范围之外擅自使用”。\",\n      \"suggestion_minimal\": \"在“不得公开泄露”后增加“或擅自使用”。\",\n      \"suggestion_optimized\": \"约定“未经甲方书面同意，乙方不得以任何方式披露、使用或允许第三方使用保密信息，且仅得为履行本合同之目的使用该等信息”。\",\n      \"suggestion_basis\": \"补充“禁止使用”和“禁止私下披露”的义务，堵住乙方滥用甲方数据或私下转移资产的漏洞。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_5::5.2\",\n      \"display_clause_id\": \"5.2\"\n    },\n    {\n      \"risk_code\": \"confidentiality_term_fixed_for_trade_secrets\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"保密、数据安全与合规\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"保密期限设定固定上限，导致商业秘密保护期满失效\",\n      \"issue\": \"条款设定了固定的3年保密期限，与商业秘密应持续保护直至公开的法律属性冲突，导致期满后甲方核心秘密丧失保护。\",\n      \"evidence_text\": \"本保密条款在本合同书到期后3年内继续保持有效。\",\n      \"anchor_text\": \"3年内继续保持有效\",\n      \"factual_basis\": \"条款文本设定了明确的“3年”保密期限，意味着合同到期3年后，无论信息是否仍具秘密性，保密义务均终止。\",\n      \"reasoning_basis\": \"对于甲方的核心商业秘密（如核心算法、未公开科研数据），只要未公开就应受保护。设定固定期限意味着甲方同意3年后乙方可以披露其仍具秘密性的核心信息，导致权利永久丧失。\",\n      \"normative_basis\": {\n        \"basis_type\": \"legal_rule\",\n        \"basis_title\": \"商业秘密保护应持续至信息公开\",\n        \"basis_detail\": \"商业秘密构成要件之一为“保密性”，法律保护不应受固定期限限制。约定固定期限等同于权利人提前放弃期限届满后的保密权益。\",\n        \"citation_text\": \"《反不正当竞争法》第九条\"\n      },\n      \"suggestion\": \"补充约定“对于属于商业秘密的信息，保密义务应持续有效，直至该信息合法公开为止”。\",\n      \"suggestion_minimal\": \"在条款末尾增加“但涉及商业秘密的，应持续至信息公开为止”。\",\n      \"suggestion_optimized\": \"区分一般保密信息与商业秘密，约定一般信息保密期限为3年，商业秘密保密义务持续至信息公开为止。\",\n      \"suggestion_basis\": \"避免因期限届满导致核心商业秘密被合法泄露，确保甲方核心知识产权的长期安全。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_5::5.3\",\n      \"display_clause_id\": \"5.3\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "confidentiality_term_fixed_for_trade_secrets",
+            "risk_source_type": "anchored",
+            "dimension": "保密、数据安全与合规",
+            "risk_level": "medium",
+            "risk_label": "保密期限设定固定上限，导致商业秘密保护期满失效",
+            "issue": "条款设定了固定的3年保密期限，与商业秘密应持续保护直至公开的法律属性冲突，导致期满后甲方核心秘密丧失保护。",
+            "evidence_text": "本保密条款在本合同书到期后3年内继续保持有效。",
+            "anchor_text": "3、本保密条款在本合同书到期后3年内继续保持有效。",
+            "factual_basis": "条款文本设定了明确的“3年”保密期限，意味着合同到期3年后，无论信息是否仍具秘密性，保密义务均终止。",
+            "reasoning_basis": "对于甲方的核心商业秘密（如核心算法、未公开科研数据），只要未公开就应受保护。设定固定期限意味着甲方同意3年后乙方可以披露其仍具秘密性的核心信息，导致权利永久丧失。",
+            "normative_basis": {
+              "basis_type": "legal_rule",
+              "basis_title": "商业秘密保护应持续至信息公开",
+              "basis_detail": "商业秘密构成要件之一为“保密性”，法律保护不应受固定期限限制。约定固定期限等同于权利人提前放弃期限届满后的保密权益。",
+              "citation_text": "《反不正当竞争法》第九条"
+            },
+            "suggestion": "补充约定“对于属于商业秘密的信息，保密义务应持续有效，直至该信息合法公开为止”。",
+            "suggestion_minimal": "在条款末尾增加“但涉及商业秘密的，应持续至信息公开为止”。",
+            "suggestion_optimized": "区分一般保密信息与商业秘密，约定一般信息保密期限为3年，商业秘密保密义务持续至信息公开为止。",
+            "suggestion_basis": "避免因期限届满导致核心商业秘密被合法泄露，确保甲方核心知识产权的长期安全。",
+            "needs_human_review": true,
+            "clause_uid": "segment_5::5.3",
+            "display_clause_id": "5.3",
+            "clause_uids": [
+              "segment_5::5.3"
+            ],
+            "clause_id": "5.3",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_6::6",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_6::6",
+          "clause_id": "6",
+          "display_clause_id": "6",
+          "clause_title": "合同终止",
+          "clause_text": "在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。",
+          "segment_id": "segment_6",
+          "segment_title": "第六条 合同终止",
+          "numbering_confidence": "1",
+          "title_confidence": "1",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：6\n条款标题：合同终止\n条款正文：在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"termination_terminology_error\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"解除、终止与续约机制\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"“终止履行”表述错误，无法产生合同解除的法律后果\",\n      \"issue\": \"条款使用“终止本合同的履行”而非“解除合同”，法律性质界定不清，可能导致合同关系未消灭。\",\n      \"evidence_text\": \"即刻通知终止本合同的履行\",\n      \"anchor_text\": \"终止本合同的履行\",\n      \"factual_basis\": \"条款文本表述为“终止本合同的履行”，在法律术语中，“终止履行”通常指暂时中止或停止履行为动作，并不等同于“解除合同”这一消灭合同关系的法律行为。\",\n      \"reasoning_basis\": \"若仅“终止履行”而未“解除合同”，合同关系依然存续，甲方可能无法合法引入替代供应商，亦难以直接主张违约损害赔偿或返还已付款项，导致项目陷入僵局。\",\n      \"normative_basis\": {\n        \"basis_type\": \"legal_rule\",\n        \"basis_title\": \"合同解除权的行使与后果\",\n        \"basis_detail\": \"依据《民法典》第五百六十二条、第五百六十六条，当事人享有解除权时，应行使解除权才能终止合同权利义务关系，并有权主张恢复原状或赔偿损失。“终止履行”并非法定的合同终结方式。\",\n        \"citation_text\": \"《民法典》第五百六十二条、第五百六十六条\"\n      },\n      \"suggestion\": \"将“终止本合同的履行”修改为“解除本合同”，以明确法律后果。\",\n      \"suggestion_minimal\": \"将“终止本合同的履行”修改为“解除本合同”。\",\n      \"suggestion_optimized\": \"则另一方有权书面通知对方解除本合同，并要求其承担违约责任及赔偿损失。\",\n      \"suggestion_basis\": \"明确“解除”方能彻底切断合同关系，赋予甲方索赔和另寻供应商的法律基础。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_6::6\",\n      \"display_clause_id\": \"6\"\n    },\n    {\n      \"risk_code\": \"vague_trigger_immediate_termination\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"解除、终止与续约机制\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"“无力偿付”定义模糊且无前置通知，易引发乙方滥用单方解除权\",\n      \"issue\": \"触发条件“无力偿付”缺乏明确法律界定，且剥夺了对方的补救机会，可能导致合同被恶意解除。\",\n      \"evidence_text\": \"如一方出现破产、无力偿付...在不提前给对方发出任何通知的前提下，即刻通知终止\",\n      \"anchor_text\": \"无力偿付\",\n      \"factual_basis\": \"条款将“无力偿付”列为解除触发条件，但未界定其标准（如是否需经法院裁定、是否包含暂时性资金周转困难），且设定了“无通知即刻终止”的极端程序。\",\n      \"reasoning_basis\": \"甲方作为科研机构可能面临财政拨款延迟，若乙方单方认定甲方“无力偿付”并即刻停工，甲方将丧失解释或补救机会，导致科研项目中断、数据丢失等不可逆损失。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"重大违约解除权的程序正当性\",\n        \"basis_detail\": \"赋予一方无通知即刻解除权应当基于客观确定的触发条件（如法院受理破产申请），模糊的财务状态不应直接触发极端终止程序，否则有违公平原则。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"删除“无力偿付”或将其限定为“经法院裁定受理破产申请”；增加书面通知的前置程序。\",\n      \"suggestion_minimal\": \"删除“无力偿付”表述。\",\n      \"suggestion_optimized\": \"如一方出现破产、清算或公司解散的情况时，另一方有权提前3日书面通知对方解除本合同。\",\n      \"suggestion_basis\": \"限定为客观法律事实并恢复通知程序，避免乙方滥用权利导致项目意外停摆。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_6::6\",\n      \"display_clause_id\": \"6\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "termination_terminology_error",
+            "risk_source_type": "anchored",
+            "dimension": "解除、终止与续约机制",
+            "risk_level": "high",
+            "risk_label": "“终止履行”表述错误，无法产生合同解除的法律后果",
+            "issue": "条款使用“终止本合同的履行”而非“解除合同”，法律性质界定不清，可能导致合同关系未消灭。",
+            "evidence_text": "即刻通知终止本合同的履行",
+            "anchor_text": "在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。",
+            "factual_basis": "条款文本表述为“终止本合同的履行”，在法律术语中，“终止履行”通常指暂时中止或停止履行为动作，并不等同于“解除合同”这一消灭合同关系的法律行为。",
+            "reasoning_basis": "若仅“终止履行”而未“解除合同”，合同关系依然存续，甲方可能无法合法引入替代供应商，亦难以直接主张违约损害赔偿或返还已付款项，导致项目陷入僵局。",
+            "normative_basis": {
+              "basis_type": "legal_rule",
+              "basis_title": "合同解除权的行使与后果",
+              "basis_detail": "依据《民法典》第五百六十二条、第五百六十六条，当事人享有解除权时，应行使解除权才能终止合同权利义务关系，并有权主张恢复原状或赔偿损失。“终止履行”并非法定的合同终结方式。",
+              "citation_text": "《民法典》第五百六十二条、第五百六十六条"
+            },
+            "suggestion": "将“终止本合同的履行”修改为“解除本合同”，以明确法律后果。",
+            "suggestion_minimal": "将“终止本合同的履行”修改为“解除本合同”。",
+            "suggestion_optimized": "则另一方有权书面通知对方解除本合同，并要求其承担违约责任及赔偿损失。",
+            "suggestion_basis": "明确“解除”方能彻底切断合同关系，赋予甲方索赔和另寻供应商的法律基础。",
+            "needs_human_review": true,
+            "clause_uid": "segment_6::6",
+            "display_clause_id": "6",
+            "clause_uids": [
+              "segment_6::6"
+            ],
+            "clause_id": "6",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          },
+          {
+            "risk_code": "vague_trigger_immediate_termination",
+            "risk_source_type": "anchored",
+            "dimension": "解除、终止与续约机制",
+            "risk_level": "medium",
+            "risk_label": "“无力偿付”定义模糊且无前置通知，易引发乙方滥用单方解除权",
+            "issue": "触发条件“无力偿付”缺乏明确法律界定，且剥夺了对方的补救机会，可能导致合同被恶意解除。",
+            "evidence_text": "如一方出现破产、无力偿付...在不提前给对方发出任何通知的前提下，即刻通知终止",
+            "anchor_text": "在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。",
+            "factual_basis": "条款将“无力偿付”列为解除触发条件，但未界定其标准（如是否需经法院裁定、是否包含暂时性资金周转困难），且设定了“无通知即刻终止”的极端程序。",
+            "reasoning_basis": "甲方作为科研机构可能面临财政拨款延迟，若乙方单方认定甲方“无力偿付”并即刻停工，甲方将丧失解释或补救机会，导致科研项目中断、数据丢失等不可逆损失。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "重大违约解除权的程序正当性",
+              "basis_detail": "赋予一方无通知即刻解除权应当基于客观确定的触发条件（如法院受理破产申请），模糊的财务状态不应直接触发极端终止程序，否则有违公平原则。",
+              "citation_text": ""
+            },
+            "suggestion": "删除“无力偿付”或将其限定为“经法院裁定受理破产申请”；增加书面通知的前置程序。",
+            "suggestion_minimal": "删除“无力偿付”表述。",
+            "suggestion_optimized": "如一方出现破产、清算或公司解散的情况时，另一方有权提前3日书面通知对方解除本合同。",
+            "suggestion_basis": "限定为客观法律事实并恢复通知程序，避免乙方滥用权利导致项目意外停摆。",
+            "needs_human_review": true,
+            "clause_uid": "segment_6::6",
+            "display_clause_id": "6",
+            "clause_uids": [
+              "segment_6::6"
+            ],
+            "clause_id": "6",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_7::7",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_7::7",
+          "clause_id": "7",
+          "display_clause_id": "7",
+          "clause_title": "不可抗力",
+          "clause_text": "由于不可抗力（包括地震、台风、洪水、火灾、战争、罢工、政府禁令以及双方均不可预见、不能控制的事情或情况）导致本合同不能履行，任何一方均不会因此而承担违约责任。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "由于不可抗力（包括地震、台风、洪水、火灾、战争、罢工、政府禁令以及双方均不可预见、不能控制的事情或情况）导致本合同不能履行，任何一方均不会因此而承担违约责任。",
+          "segment_id": "segment_7",
+          "segment_title": "第七条 不可抗力",
+          "numbering_confidence": "1",
+          "title_confidence": "1",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：7\n条款标题：不可抗力\n条款正文：由于不可抗力（包括地震、台风、洪水、火灾、战争、罢工、政府禁令以及双方均不可预见、不能控制的事情或情况）导致本合同不能履行，任何一方均不会因此而承担违约责任。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"force_majeure_definition_diluted\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"违约责任与赔偿机制\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"不可抗力定义标准低于法定标准，不当扩大免责范围\",\n      \"issue\": \"条款将不可抗力定义为“不可预见、不能控制”，遗漏了《民法典》规定的“不能避免”和“不能克服”两个核心要件，大幅降低了乙方的免责门槛。\",\n      \"evidence_text\": \"以及双方均不可预见、不能控制的事情或情况\",\n      \"anchor_text\": \"不可预见、不能控制\",\n      \"factual_basis\": \"条款将不可抗力的兜底定义设定为“不可预见、不能控制”，缺少法律规定的“不能避免”和“不能克服”两个核心要件。\",\n      \"reasoning_basis\": \"依据《民法典》第一百八十条，不可抗力必须同时满足“不能预见、不能避免、不能克服”三个条件。仅“不能控制”标准过低，许多商业风险（如第三方供应商违约、供应链中断、成本暴涨）虽不能由乙方直接控制，但属于可预见或可克服的商业风险。按此条款，乙方极易将商业风险主张为不可抗力从而免责，导致甲方无法追究其违约责任。\",\n      \"normative_basis\": {\n        \"basis_type\": \"legal_rule\",\n        \"basis_title\": \"不可抗力的法定构成要件\",\n        \"basis_detail\": \"《民法典》第一百八十条规定，不可抗力是不能预见、不能避免且不能克服的客观情况。合同约定低于法定标准将导致责任认定混乱。\",\n        \"citation_text\": \"《民法典》第一百八十条\"\n      },\n      \"suggestion\": \"将“不可预见、不能控制”修改为“不能预见、不能避免且不能克服”，严格回归法定标准。\",\n      \"suggestion_minimal\": \"将“不可预见、不能控制”修改为“不能预见、不能避免且不能克服”。\",\n      \"suggestion_optimized\": \"将“不可预见、不能控制的事情或情况”修改为“不能预见、不能避免且不能克服的客观情况”，并增加“因市场供需变化、第三方违约、成本增加等商业风险不属于不可抗力”的排除性约定。\",\n      \"suggestion_basis\": \"通过补全法定要件，防止乙方将普通的履约困难或商业风险通过宽泛的定义条款转化为不可抗力免责事由，保障甲方的追责权利。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_7::7\",\n      \"display_clause_id\": \"7\"\n    },\n    {\n      \"risk_code\": \"force_majeure_scope_overbroad_strike\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"违约责任与赔偿机制\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"罢工范围未限定，乙方内部劳资风险可能被滥用为免责事由\",\n      \"issue\": \"条款将“罢工”笼统列入不可抗力，未排除乙方自身员工罢工或乙方可控的劳资纠纷，导致乙方可能以内部管理问题为由逃避违约责任。\",\n      \"evidence_text\": \"包括地震、台风、洪水、火灾、战争、罢工、政府禁令\",\n      \"anchor_text\": \"罢工\",\n      \"factual_basis\": \"条款在列举不可抗力情形时，直接列入“罢工”，未对其范围进行任何限定（如“非乙方员工罢工”或“全行业罢工”）。\",\n      \"reasoning_basis\": \"乙方员工的罢工通常属于乙方内部管理风险或劳资纠纷，属于乙方应当预见并自行承担的商业风险，而非客观障碍。若不排除，乙方可能因自身员工罢工导致履约延误，却依据此条款免除违约责任，导致甲方权益受损且无法追偿。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"风险归属与责任自负原则\",\n        \"basis_detail\": \"合同法理中，债务人自身组织内部的风险（如员工罢工、人员短缺）应由债务人自行承担，不应转嫁给债权人。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"在“罢工”前增加限定词，明确为“非因乙方原因造成的罢工”或“非乙方员工的罢工”。\",\n      \"suggestion_minimal\": \"将“罢工”修改为“非乙方原因造成的罢工”。\",\n      \"suggestion_optimized\": \"将“罢工”修改为“非乙方员工罢工或非因乙方原因造成的罢工”，并明确约定“乙方员工的罢工、怠工或劳资纠纷不视为不可抗力”。\",\n      \"suggestion_basis\": \"明确区分社会性罢工（不可抗力）与企业内部罢工（违约风险），防止乙方将内部管理失职转化为免责借口。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_7::7\",\n      \"display_clause_id\": \"7\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "force_majeure_definition_diluted",
+            "risk_source_type": "anchored",
+            "dimension": "违约责任与赔偿机制",
+            "risk_level": "high",
+            "risk_label": "不可抗力定义标准低于法定标准，不当扩大免责范围",
+            "issue": "条款将不可抗力定义为“不可预见、不能控制”，遗漏了《民法典》规定的“不能避免”和“不能克服”两个核心要件，大幅降低了乙方的免责门槛。",
+            "evidence_text": "以及双方均不可预见、不能控制的事情或情况",
+            "anchor_text": "由于不可抗力（包括地震、台风、洪水、火灾、战争、罢工、政府禁令以及双方均不可预见、不能控制的事情或情况）导致本合同不能履行，任何一方均不会因此而承担违约责任。",
+            "factual_basis": "条款将不可抗力的兜底定义设定为“不可预见、不能控制”，缺少法律规定的“不能避免”和“不能克服”两个核心要件。",
+            "reasoning_basis": "依据《民法典》第一百八十条，不可抗力必须同时满足“不能预见、不能避免、不能克服”三个条件。仅“不能控制”标准过低，许多商业风险（如第三方供应商违约、供应链中断、成本暴涨）虽不能由乙方直接控制，但属于可预见或可克服的商业风险。按此条款，乙方极易将商业风险主张为不可抗力从而免责，导致甲方无法追究其违约责任。",
+            "normative_basis": {
+              "basis_type": "legal_rule",
+              "basis_title": "不可抗力的法定构成要件",
+              "basis_detail": "《民法典》第一百八十条规定，不可抗力是不能预见、不能避免且不能克服的客观情况。合同约定低于法定标准将导致责任认定混乱。",
+              "citation_text": "《民法典》第一百八十条"
+            },
+            "suggestion": "将“不可预见、不能控制”修改为“不能预见、不能避免且不能克服”，严格回归法定标准。",
+            "suggestion_minimal": "将“不可预见、不能控制”修改为“不能预见、不能避免且不能克服”。",
+            "suggestion_optimized": "将“不可预见、不能控制的事情或情况”修改为“不能预见、不能避免且不能克服的客观情况”，并增加“因市场供需变化、第三方违约、成本增加等商业风险不属于不可抗力”的排除性约定。",
+            "suggestion_basis": "通过补全法定要件，防止乙方将普通的履约困难或商业风险通过宽泛的定义条款转化为不可抗力免责事由，保障甲方的追责权利。",
+            "needs_human_review": true,
+            "clause_uid": "segment_7::7",
+            "display_clause_id": "7",
+            "clause_uids": [
+              "segment_7::7"
+            ],
+            "clause_id": "7",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          },
+          {
+            "risk_code": "force_majeure_scope_overbroad_strike",
+            "risk_source_type": "anchored",
+            "dimension": "违约责任与赔偿机制",
+            "risk_level": "medium",
+            "risk_label": "罢工范围未限定，乙方内部劳资风险可能被滥用为免责事由",
+            "issue": "条款将“罢工”笼统列入不可抗力，未排除乙方自身员工罢工或乙方可控的劳资纠纷，导致乙方可能以内部管理问题为由逃避违约责任。",
+            "evidence_text": "包括地震、台风、洪水、火灾、战争、罢工、政府禁令",
+            "anchor_text": "由于不可抗力（包括地震、台风、洪水、火灾、战争、罢工、政府禁令以及双方均不可预见、不能控制的事情或情况）导致本合同不能履行，任何一方均不会因此而承担违约责任。",
+            "factual_basis": "条款在列举不可抗力情形时，直接列入“罢工”，未对其范围进行任何限定（如“非乙方员工罢工”或“全行业罢工”）。",
+            "reasoning_basis": "乙方员工的罢工通常属于乙方内部管理风险或劳资纠纷，属于乙方应当预见并自行承担的商业风险，而非客观障碍。若不排除，乙方可能因自身员工罢工导致履约延误，却依据此条款免除违约责任，导致甲方权益受损且无法追偿。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "风险归属与责任自负原则",
+              "basis_detail": "合同法理中，债务人自身组织内部的风险（如员工罢工、人员短缺）应由债务人自行承担，不应转嫁给债权人。",
+              "citation_text": ""
+            },
+            "suggestion": "在“罢工”前增加限定词，明确为“非因乙方原因造成的罢工”或“非乙方员工的罢工”。",
+            "suggestion_minimal": "将“罢工”修改为“非乙方原因造成的罢工”。",
+            "suggestion_optimized": "将“罢工”修改为“非乙方员工罢工或非因乙方原因造成的罢工”，并明确约定“乙方员工的罢工、怠工或劳资纠纷不视为不可抗力”。",
+            "suggestion_basis": "明确区分社会性罢工（不可抗力）与企业内部罢工（违约风险），防止乙方将内部管理失职转化为免责借口。",
+            "needs_human_review": true,
+            "clause_uid": "segment_7::7",
+            "display_clause_id": "7",
+            "clause_uids": [
+              "segment_7::7"
+            ],
+            "clause_id": "7",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_8::8.1",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_8::8.1",
+          "clause_id": "8.1",
+          "display_clause_id": "8.1",
+          "clause_title": "",
+          "clause_text": "甲方应当按照合同约定向乙方支付检测费用，如未按合同约定支付，每逾期一天应当以未付费用为基数，按每日万分之五向乙方支付违约金；逾期超过30天的，乙方有权书面通知甲方在规定期间内改正，甲方接到通知后仍未在乙方通知期限内改正的，乙方有权决定是否书面单方面通知甲方解除合同，乙方决定解除合同的，甲方除应支付未付款项本金外，仍应当向乙方支付违约金。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "1、甲方应当按照合同约定向乙方支付检测费用，如未按合同约定支付，每逾期一天应当以未付费用为基数，按每日万分之五向乙方支付违约金；逾期超过30天的，乙方有权书面通知甲方在规定期间内改正，甲方接到通知后仍未在乙方通知期限内改正的，乙方有权决定是否书面单方面通知甲方解除合同，乙方决定解除合同的，甲方除应支付未付款项本金外，仍应当向乙方支付违约金。",
+          "segment_id": "segment_8",
+          "segment_title": "第八条 违约责任",
+          "numbering_confidence": "0.9",
+          "title_confidence": "0",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：8.1\n条款标题：\n条款正文：甲方应当按照合同约定向乙方支付检测费用，如未按合同约定支付，每逾期一天应当以未付费用为基数，按每日万分之五向乙方支付违约金；逾期超过30天的，乙方有权书面通知甲方在规定期间内改正，甲方接到通知后仍未在乙方通知期限内改正的，乙方有权决定是否书面单方面通知甲方解除合同，乙方决定解除合同的，甲方除应支付未付款项本金外，仍应当向乙方支付违约金。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"termination_trigger_undefined_period\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"解除、终止与续约机制\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"整改宽限期约定不明，乙方有权设置极短期限陷阱\",\n      \"issue\": \"条款约定乙方通知甲方在“规定期间内”改正，但未明确具体天数，乙方有权设定极短的整改期限（如1天），导致甲方因内部审批流程无法及时付款而被动触发合同解除权。\",\n      \"evidence_text\": \"乙方有权书面通知甲方在规定期间内改正\",\n      \"anchor_text\": \"规定期间\",\n      \"factual_basis\": \"条款中仅表述为“规定期间”，未明确具体的日历天数或工作日天数，该期限的长短完全由乙方单方决定。\",\n      \"reasoning_basis\": \"在甲方逾期付款超过30天后，乙方若意图解除合同，可利用该漏洞设定一个不合理的极短期限（如24小时），甲方作为机构用户受制于财务审批流程，客观上难以在极短期内完成付款，从而导致“未在期限内改正”的后果，进而触发乙方的单方解除权，破坏交易的稳定性。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"期限约定明确原则\",\n        \"basis_detail\": \"涉及合同解除权的行使，应当设定明确、可执行的期限，避免一方利用期限不明滥用权利。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将“规定期间”修改为具体的合理期限，例如“不少于15个工作日”。\",\n      \"suggestion_minimal\": \"将“规定期间”修改为“15个工作日”。\",\n      \"suggestion_optimized\": \"逾期超过30天的，乙方有权书面通知甲方在【15个工作日】内改正，甲方接到通知后仍未在上述期限内改正的，乙方方有权解除合同。\",\n      \"suggestion_basis\": \"明确具体的宽限期天数，确保甲方有足够的时间走完内部付款审批流程，避免因程序瑕疵被恶意解约。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_8::8.1\",\n      \"display_clause_id\": \"8.1\"\n    },\n    {\n      \"risk_code\": \"termination_contradiction_forced_performance\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"解除、终止与续约机制\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"解除后果逻辑矛盾，强制甲方接受违约方继续履行\",\n      \"issue\": \"条款规定甲方解除合同后，乙方仍需“完成未完成检测”，这混淆了“解除”与“继续履行”的法律后果，导致甲方在乙方严重违约时无法彻底止损并另寻供应商。\",\n      \"evidence_text\": \"甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。\",\n      \"anchor_text\": \"除乙方应完成未完成检测外\",\n      \"factual_basis\": \"条款在赋予甲方解除权的同时，又设定了“乙方应完成未完成检测”的义务，构成了逻辑上的自相矛盾。\",\n      \"reasoning_basis\": \"根据法律规定，合同解除后尚未履行的终止履行。若甲方因乙方严重逾期而选择解除合同，通常意味着项目紧迫或已丧失信任，意图另寻供应商。该条款强行要求乙方继续履行，导致甲方被迫接受一个已严重违约且无合作信任基础的供应商继续工作，不仅无法实现“及时止损”的解约目的，反而可能因乙方的消极怠工导致项目进一步延误。\",\n      \"normative_basis\": {\n        \"basis_type\": \"legal_rule\",\n        \"basis_title\": \"合同解除的法律后果\",\n        \"basis_detail\": \"合同解除后，尚未履行的，终止履行，而非强制继续履行。\",\n        \"citation_text\": \"《民法典》第五百六十六条\"\n      },\n      \"suggestion\": \"删除“除乙方应完成未完成检测外”的表述，改为“甲方决定解除合同的，乙方除应返还甲方已支付的款项（如有）外，仍应当向甲方支付违约金并赔偿损失”。\",\n      \"suggestion_minimal\": \"删除“除乙方应完成未完成检测外”。\",\n      \"suggestion_optimized\": \"甲方决定解除合同的，有权要求乙方返还已支付的款项，乙方仍应当向甲方支付违约金并赔偿甲方因另行采购替代服务产生的差价损失。\",\n      \"suggestion_basis\": \"确保解除权能真正实现“终止交易、及时止损”的功能，让甲方在乙方严重违约时能够脱身并寻找替代方案。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_8::8.2\",\n      \"display_clause_id\": \"8.2\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "termination_trigger_undefined_period",
+            "risk_source_type": "anchored",
+            "dimension": "解除、终止与续约机制",
+            "risk_level": "medium",
+            "risk_label": "整改宽限期约定不明，乙方有权设置极短期限陷阱",
+            "issue": "条款约定乙方通知甲方在“规定期间内”改正，但未明确具体天数，乙方有权设定极短的整改期限（如1天），导致甲方因内部审批流程无法及时付款而被动触发合同解除权。",
+            "evidence_text": "乙方有权书面通知甲方在规定期间内改正",
+            "anchor_text": "1、甲方应当按照合同约定向乙方支付检测费用，如未按合同约定支付，每逾期一天应当以未付费用为基数，按每日万分之五向乙方支付违约金；逾期超过30天的，乙方有权书面通知甲方在规定期间内改正，甲方接到通知后仍未在乙方通知期限内改正的，乙方有权决定是否书面单方面通知甲方解除合同，乙方决定解除合同的，甲方除应支付未付款项本金外，仍应当向乙方支付违约金。",
+            "factual_basis": "条款中仅表述为“规定期间”，未明确具体的日历天数或工作日天数，该期限的长短完全由乙方单方决定。",
+            "reasoning_basis": "在甲方逾期付款超过30天后，乙方若意图解除合同，可利用该漏洞设定一个不合理的极短期限（如24小时），甲方作为机构用户受制于财务审批流程，客观上难以在极短期内完成付款，从而导致“未在期限内改正”的后果，进而触发乙方的单方解除权，破坏交易的稳定性。",
+            "normative_basis": {
+              "basis_type": "contract_logic_rule",
+              "basis_title": "期限约定明确原则",
+              "basis_detail": "涉及合同解除权的行使，应当设定明确、可执行的期限，避免一方利用期限不明滥用权利。",
+              "citation_text": ""
+            },
+            "suggestion": "将“规定期间”修改为具体的合理期限，例如“不少于15个工作日”。",
+            "suggestion_minimal": "将“规定期间”修改为“15个工作日”。",
+            "suggestion_optimized": "逾期超过30天的，乙方有权书面通知甲方在【15个工作日】内改正，甲方接到通知后仍未在上述期限内改正的，乙方方有权解除合同。",
+            "suggestion_basis": "明确具体的宽限期天数，确保甲方有足够的时间走完内部付款审批流程，避免因程序瑕疵被恶意解约。",
+            "needs_human_review": true,
+            "clause_uid": "segment_8::8.1",
+            "display_clause_id": "8.1",
+            "clause_uids": [
+              "segment_8::8.1"
+            ],
+            "clause_id": "8.1",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_8::8.2",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_8::8.2",
+          "clause_id": "8.2",
+          "display_clause_id": "8.2",
+          "clause_title": "",
+          "clause_text": "乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "2 、乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+          "segment_id": "segment_8",
+          "segment_title": "第八条 违约责任",
+          "numbering_confidence": "0.9",
+          "title_confidence": "0",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：8.2\n条款标题：\n条款正文：乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"termination_trigger_undefined_period\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"解除、终止与续约机制\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"整改宽限期约定不明，乙方有权设置极短期限陷阱\",\n      \"issue\": \"条款约定乙方通知甲方在“规定期间内”改正，但未明确具体天数，乙方有权设定极短的整改期限（如1天），导致甲方因内部审批流程无法及时付款而被动触发合同解除权。\",\n      \"evidence_text\": \"乙方有权书面通知甲方在规定期间内改正\",\n      \"anchor_text\": \"规定期间\",\n      \"factual_basis\": \"条款中仅表述为“规定期间”，未明确具体的日历天数或工作日天数，该期限的长短完全由乙方单方决定。\",\n      \"reasoning_basis\": \"在甲方逾期付款超过30天后，乙方若意图解除合同，可利用该漏洞设定一个不合理的极短期限（如24小时），甲方作为机构用户受制于财务审批流程，客观上难以在极短期内完成付款，从而导致“未在期限内改正”的后果，进而触发乙方的单方解除权，破坏交易的稳定性。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"期限约定明确原则\",\n        \"basis_detail\": \"涉及合同解除权的行使，应当设定明确、可执行的期限，避免一方利用期限不明滥用权利。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将“规定期间”修改为具体的合理期限，例如“不少于15个工作日”。\",\n      \"suggestion_minimal\": \"将“规定期间”修改为“15个工作日”。\",\n      \"suggestion_optimized\": \"逾期超过30天的，乙方有权书面通知甲方在【15个工作日】内改正，甲方接到通知后仍未在上述期限内改正的，乙方方有权解除合同。\",\n      \"suggestion_basis\": \"明确具体的宽限期天数，确保甲方有足够的时间走完内部付款审批流程，避免因程序瑕疵被恶意解约。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_8::8.1\",\n      \"display_clause_id\": \"8.1\"\n    },\n    {\n      \"risk_code\": \"termination_contradiction_forced_performance\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"解除、终止与续约机制\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"解除后果逻辑矛盾，强制甲方接受违约方继续履行\",\n      \"issue\": \"条款规定甲方解除合同后，乙方仍需“完成未完成检测”，这混淆了“解除”与“继续履行”的法律后果，导致甲方在乙方严重违约时无法彻底止损并另寻供应商。\",\n      \"evidence_text\": \"甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。\",\n      \"anchor_text\": \"除乙方应完成未完成检测外\",\n      \"factual_basis\": \"条款在赋予甲方解除权的同时，又设定了“乙方应完成未完成检测”的义务，构成了逻辑上的自相矛盾。\",\n      \"reasoning_basis\": \"根据法律规定，合同解除后尚未履行的终止履行。若甲方因乙方严重逾期而选择解除合同，通常意味着项目紧迫或已丧失信任，意图另寻供应商。该条款强行要求乙方继续履行，导致甲方被迫接受一个已严重违约且无合作信任基础的供应商继续工作，不仅无法实现“及时止损”的解约目的，反而可能因乙方的消极怠工导致项目进一步延误。\",\n      \"normative_basis\": {\n        \"basis_type\": \"legal_rule\",\n        \"basis_title\": \"合同解除的法律后果\",\n        \"basis_detail\": \"合同解除后，尚未履行的，终止履行，而非强制继续履行。\",\n        \"citation_text\": \"《民法典》第五百六十六条\"\n      },\n      \"suggestion\": \"删除“除乙方应完成未完成检测外”的表述，改为“甲方决定解除合同的，乙方除应返还甲方已支付的款项（如有）外，仍应当向甲方支付违约金并赔偿损失”。\",\n      \"suggestion_minimal\": \"删除“除乙方应完成未完成检测外”。\",\n      \"suggestion_optimized\": \"甲方决定解除合同的，有权要求乙方返还已支付的款项，乙方仍应当向甲方支付违约金并赔偿甲方因另行采购替代服务产生的差价损失。\",\n      \"suggestion_basis\": \"确保解除权能真正实现“终止交易、及时止损”的功能，让甲方在乙方严重违约时能够脱身并寻找替代方案。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_8::8.2\",\n      \"display_clause_id\": \"8.2\"\n    }\n  ]\n}"
+        },
+        "normalized_items": [
+          {
+            "risk_code": "termination_contradiction_forced_performance",
+            "risk_source_type": "anchored",
+            "dimension": "解除、终止与续约机制",
+            "risk_level": "high",
+            "risk_label": "解除后果逻辑矛盾，强制甲方接受违约方继续履行",
+            "issue": "条款规定甲方解除合同后，乙方仍需“完成未完成检测”，这混淆了“解除”与“继续履行”的法律后果，导致甲方在乙方严重违约时无法彻底止损并另寻供应商。",
+            "evidence_text": "甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+            "anchor_text": "2 、乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+            "factual_basis": "条款在赋予甲方解除权的同时，又设定了“乙方应完成未完成检测”的义务，构成了逻辑上的自相矛盾。",
+            "reasoning_basis": "根据法律规定，合同解除后尚未履行的终止履行。若甲方因乙方严重逾期而选择解除合同，通常意味着项目紧迫或已丧失信任，意图另寻供应商。该条款强行要求乙方继续履行，导致甲方被迫接受一个已严重违约且无合作信任基础的供应商继续工作，不仅无法实现“及时止损”的解约目的，反而可能因乙方的消极怠工导致项目进一步延误。",
+            "normative_basis": {
+              "basis_type": "legal_rule",
+              "basis_title": "合同解除的法律后果",
+              "basis_detail": "合同解除后，尚未履行的，终止履行，而非强制继续履行。",
+              "citation_text": "《民法典》第五百六十六条"
+            },
+            "suggestion": "删除“除乙方应完成未完成检测外”的表述，改为“甲方决定解除合同的，乙方除应返还甲方已支付的款项（如有）外，仍应当向甲方支付违约金并赔偿损失”。",
+            "suggestion_minimal": "删除“除乙方应完成未完成检测外”。",
+            "suggestion_optimized": "甲方决定解除合同的，有权要求乙方返还已支付的款项，乙方仍应当向甲方支付违约金并赔偿甲方因另行采购替代服务产生的差价损失。",
+            "suggestion_basis": "确保解除权能真正实现“终止交易、及时止损”的功能，让甲方在乙方严重违约时能够脱身并寻找替代方案。",
+            "needs_human_review": true,
+            "clause_uid": "segment_8::8.2",
+            "display_clause_id": "8.2",
+            "clause_uids": [
+              "segment_8::8.2"
+            ],
+            "clause_id": "8.2",
+            "related_clause_ids": [],
+            "related_clause_uids": [],
+            "quality_flags": []
+          }
+        ],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_9::9.u1",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_9::9.u1",
+          "clause_id": "9.u1",
+          "display_clause_id": "9.u1",
+          "clause_title": "",
+          "clause_text": "因合同产生的争议由甲乙双方协商解决。必要时可通过法律途径诉讼解决。双方一致同意，若履行产生争议，应当将争议提交至甲方所在地有管辖权的法院诉讼处理。没有争议的条款，双方应当继续履行。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "因合同产生的争议由甲乙双方协商解决。必要时可通过法律途径诉讼解决。双方一致同意，若履行产生争议，应当将争议提交至甲方所在地有管辖权的法院诉讼处理。没有争议的条款，双方应当继续履行。",
+          "segment_id": "segment_9",
+          "segment_title": "第九条 诉讼",
+          "numbering_confidence": "0",
+          "title_confidence": "0",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：9.u1\n条款标题：\n条款正文：因合同产生的争议由甲乙双方协商解决。必要时可通过法律途径诉讼解决。双方一致同意，若履行产生争议，应当将争议提交至甲方所在地有管辖权的法院诉讼处理。没有争议的条款，双方应当继续履行。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": []\n}"
+        },
+        "normalized_items": [],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_10::10",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_10::10",
+          "clause_id": "10",
+          "display_clause_id": "10",
+          "clause_title": "其他",
+          "clause_text": "本合同经双方法定代表人或授权代表签署并加盖单位公章（或合同专用章）后生效。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "本合同经双方法定代表人或授权代表签署并加盖单位公章（或合同专用章）后生效。",
+          "segment_id": "segment_10",
+          "segment_title": "第十条 其他",
+          "numbering_confidence": "1",
+          "title_confidence": "1",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：10\n条款标题：其他\n条款正文：本合同经双方法定代表人或授权代表签署并加盖单位公章（或合同专用章）后生效。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": []\n}"
+        },
+        "normalized_items": [],
+        "dropped_items": [],
+        "validation_errors": []
+      },
+      {
+        "clause_uid": "segment_10::10::8cfa28ef2d::2",
+        "input_payload": {
+          "review_side": "甲方",
+          "contract_type_hint": "service_agreement",
+          "clause_uid": "segment_10::10::8cfa28ef2d::2",
+          "clause_id": "10",
+          "display_clause_id": "10",
+          "clause_title": "其他",
+          "clause_text": "未尽事宜由双方协商解决。本合同一式陆份，由甲、乙双方各执叁份。",
+          "clause_kind": "contract_clause",
+          "source_excerpt": "未尽事宜由双方协商解决。本合同一式陆份，由甲、乙双方各执叁份。",
+          "segment_id": "segment_10",
+          "segment_title": "第十条 其他",
+          "numbering_confidence": "1",
+          "title_confidence": "1",
+          "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：10\n条款标题：其他\n条款正文：未尽事宜由双方协商解决。本合同一式陆份，由甲、乙双方各执叁份。"
+        },
+        "outputs": {
+          "text": "{\n  \"risk_items\": []\n}"
+        },
+        "normalized_items": [],
+        "dropped_items": [],
+        "validation_errors": []
+      }
+    ],
+    "skipped": [
+      {
+        "clause_uid": "segment_10::10.u3",
+        "skip_reason": "placeholder_clause"
+      },
+      {
+        "clause_uid": "segment_10::10.u4",
+        "skip_reason": "placeholder_clause"
+      },
+      {
+        "clause_uid": "segment_10::10.u5",
+        "skip_reason": "note_clause"
+      },
+      {
+        "clause_uid": "segment_10::10.u6",
+        "skip_reason": "note_clause"
+      },
+      {
+        "clause_uid": "segment_10::10.(1)",
+        "skip_reason": "note_clause"
+      },
+      {
+        "clause_uid": "segment_10::10.u8",
+        "skip_reason": "note_clause"
+      },
+      {
+        "clause_uid": "segment_10::10.u9",
+        "skip_reason": "note_clause"
+      }
+    ]
+  },
+  "missing_multi": {
+    "input_payload": {
+      "clauses_json": "[{\"clause_uid\": \"segment_1::1\", \"segment_id\": \"segment_1\", \"segment_title\": \"第一条 测试周期\", \"clause_id\": \"1\", \"display_clause_id\": \"1\", \"clause_title\": \"测试周期\", \"clause_text\": \"第一条 测试周期\\n\\n自受测件接收开始起 30 天完成。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"第一条 测试周期\\n\\n自受测件接收开始起 30 天完成。\", \"numbering_confidence\": 1.0, \"title_confidence\": 1.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_2::2.u2\", \"segment_id\": \"segment_2\", \"segment_title\": \"第二条 检测和咨询内容\", \"clause_id\": \"2.u2\", \"display_clause_id\": \"2.u2\", \"clause_title\": \"\", \"clause_text\": \"甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_2::2.u3\", \"segment_id\": \"segment_2\", \"segment_title\": \"第二条 检测和咨询内容\", \"clause_id\": \"2.u3\", \"display_clause_id\": \"2.u3\", \"clause_title\": \"\", \"clause_text\": \"课题及对应测试对象如下：\\n\\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\\n| --- | --- | --- | --- |\\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"课题及对应测试对象如下：\\n\\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\\n| --- | --- | --- | --- |\\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_3::3.u4\", \"segment_id\": \"segment_3\", \"segment_title\": \"第三条 检测经费及付款方式\", \"clause_id\": \"3.u4\", \"display_clause_id\": \"3.u4\", \"clause_title\": \"\", \"clause_text\": \"甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_3::3.u5\", \"segment_id\": \"segment_3\", \"segment_title\": \"第三条 检测经费及付款方式\", \"clause_id\": \"3.u5\", \"display_clause_id\": \"3.u5\", \"clause_title\": \"\", \"clause_text\": \"合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_3::3.u6\", \"segment_id\": \"segment_3\", \"segment_title\": \"第三条 检测经费及付款方式\", \"clause_id\": \"3.u6\", \"display_clause_id\": \"3.u6\", \"clause_title\": \"甲方发票信息：\", \"clause_text\": \"单位名称：南湖实验室\\n\\n统一社会信用代码：12330400MB1D62272G\\n\\n开户银行：嘉兴银行股份有限公司科技支行\\n\\n银行账号：109101201900080105\\n\\n开票地址：嘉兴市南湖区七星街道香湖别墅29幢\\n\\n电 话：0573-82866610\\n\\n纳税人身份：☑增值税一般纳税人 □非增值税一般纳税人\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"甲方发票信息：\\n\\n单位名称：南湖实验室\\n\\n统一社会信用代码：12330400MB1D62272G\\n\\n开户银行：嘉兴银行股份有限公司科技支行\\n\\n银行账号：109101201900080105\\n\\n开票地址：嘉兴市南湖区七星街道香湖别墅29幢\\n\\n电 话：0573-82866610\\n\\n纳税人身份：☑增值税一般纳税人 □非增值税一般纳税人\", \"numbering_confidence\": 0.0, \"title_confidence\": 1.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_3::3.u7\", \"segment_id\": \"segment_3\", \"segment_title\": \"第三条 检测经费及付款方式\", \"clause_id\": \"3.u7\", \"display_clause_id\": \"3.u7\", \"clause_title\": \"乙方账户信息：\", \"clause_text\": \"开户银行：工行北京北新桥支行\\n\\n开 户 名：中国电子技术标准化研究院\\n\\n账 户：0200 0043 0908 8116 710\\n\\n税 号： 12100000400002195R\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"乙方账户信息：\\n\\n开户银行：工行北京北新桥支行\\n\\n开 户 名：中国电子技术标准化研究院\\n\\n账 户：0200 0043 0908 8116 710\\n\\n税 号： 12100000400002195R\", \"numbering_confidence\": 0.0, \"title_confidence\": 1.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_4::4\", \"segment_id\": \"segment_4\", \"segment_title\": \"第四条 检测方式\", \"clause_id\": \"4\", \"display_clause_id\": \"4\", \"clause_title\": \"检测方式\", \"clause_text\": \"甲方向乙方提供“机密计算与可信执行环境关键技术和应用研究项目”所研发的“可信执行环境和同态加密混合国产异构系统”中的“基于可信执行环境的同态加密计算加速系统”系统/产品样品、乙方所要求的技术资料、辅助工具和设备，由乙方独立对送检样品进行验收检测。测试过程中受测样品会进行破拆和存档，检测样品不会退换，大型设备在检测完成后退还。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"甲方向乙方提供“机密计算与可信执行环境关键技术和应用研究项目”所研发的“可信执行环境和同态加密混合国产异构系统”中的“基于可信执行环境的同态加密计算加速系统”系统/产品样品、乙方所要求的技术资料、辅助工具和设备，由乙方独立对送检样品进行验收检测。测试过程中受测样品会进行破拆和存档，检测样品不会退换，大型设备在检测完成后退还。\", \"numbering_confidence\": 1.0, \"title_confidence\": 1.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_5::5.1\", \"segment_id\": \"segment_5\", \"segment_title\": \"第五条 保密要求\", \"clause_id\": \"5.1\", \"display_clause_id\": \"5.1\", \"clause_title\": \"\", \"clause_text\": \"双方应共同遵守保密条款，本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"1、双方应共同遵守保密条款，本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。\", \"numbering_confidence\": 0.9, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_5::5.2\", \"segment_id\": \"segment_5\", \"segment_title\": \"第五条 保密要求\", \"clause_id\": \"5.2\", \"display_clause_id\": \"5.2\", \"clause_title\": \"\", \"clause_text\": \"双方应互相保守对方的商业机密。除本专项规定可公开发布信息外、双方保证对方的业务活动、技术资料等其他信息不得公开泄露。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"2、双方应互相保守对方的商业机密。除本专项规定可公开发布信息外、双方保证对方的业务活动、技术资料等其他信息不得公开泄露。\", \"numbering_confidence\": 0.9, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_5::5.3\", \"segment_id\": \"segment_5\", \"segment_title\": \"第五条 保密要求\", \"clause_id\": \"5.3\", \"display_clause_id\": \"5.3\", \"clause_title\": \"\", \"clause_text\": \"本保密条款在本合同书到期后3年内继续保持有效。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"3、本保密条款在本合同书到期后3年内继续保持有效。\", \"numbering_confidence\": 0.9, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_6::6\", \"segment_id\": \"segment_6\", \"segment_title\": \"第六条 合同终止\", \"clause_id\": \"6\", \"display_clause_id\": \"6\", \"clause_title\": \"合同终止\", \"clause_text\": \"在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。\", \"numbering_confidence\": 1.0, \"title_confidence\": 1.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_7::7\", \"segment_id\": \"segment_7\", \"segment_title\": \"第七条 不可抗力\", \"clause_id\": \"7\", \"display_clause_id\": \"7\", \"clause_title\": \"不可抗力\", \"clause_text\": \"由于不可抗力（包括地震、台风、洪水、火灾、战争、罢工、政府禁令以及双方均不可预见、不能控制的事情或情况）导致本合同不能履行，任何一方均不会因此而承担违约责任。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"由于不可抗力（包括地震、台风、洪水、火灾、战争、罢工、政府禁令以及双方均不可预见、不能控制的事情或情况）导致本合同不能履行，任何一方均不会因此而承担违约责任。\", \"numbering_confidence\": 1.0, \"title_confidence\": 1.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_8::8.1\", \"segment_id\": \"segment_8\", \"segment_title\": \"第八条 违约责任\", \"clause_id\": \"8.1\", \"display_clause_id\": \"8.1\", \"clause_title\": \"\", \"clause_text\": \"甲方应当按照合同约定向乙方支付检测费用，如未按合同约定支付，每逾期一天应当以未付费用为基数，按每日万分之五向乙方支付违约金；逾期超过30天的，乙方有权书面通知甲方在规定期间内改正，甲方接到通知后仍未在乙方通知期限内改正的，乙方有权决定是否书面单方面通知甲方解除合同，乙方决定解除合同的，甲方除应支付未付款项本金外，仍应当向乙方支付违约金。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"1、甲方应当按照合同约定向乙方支付检测费用，如未按合同约定支付，每逾期一天应当以未付费用为基数，按每日万分之五向乙方支付违约金；逾期超过30天的，乙方有权书面通知甲方在规定期间内改正，甲方接到通知后仍未在乙方通知期限内改正的，乙方有权决定是否书面单方面通知甲方解除合同，乙方决定解除合同的，甲方除应支付未付款项本金外，仍应当向乙方支付违约金。\", \"numbering_confidence\": 0.9, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_8::8.2\", \"segment_id\": \"segment_8\", \"segment_title\": \"第八条 违约责任\", \"clause_id\": \"8.2\", \"display_clause_id\": \"8.2\", \"clause_title\": \"\", \"clause_text\": \"乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"2 、乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。\", \"numbering_confidence\": 0.9, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_9::9.u16\", \"segment_id\": \"segment_9\", \"segment_title\": \"第九条 诉讼\", \"clause_id\": \"9.u16\", \"display_clause_id\": \"9.u16\", \"clause_title\": \"\", \"clause_text\": \"因合同产生的争议由甲乙双方协商解决。必要时可通过法律途径诉讼解决。双方一致同意，若履行产生争议，应当将争议提交至甲方所在地有管辖权的法院诉讼处理。没有争议的条款，双方应当继续履行。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"因合同产生的争议由甲乙双方协商解决。必要时可通过法律途径诉讼解决。双方一致同意，若履行产生争议，应当将争议提交至甲方所在地有管辖权的法院诉讼处理。没有争议的条款，双方应当继续履行。\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_10::10\", \"segment_id\": \"segment_10\", \"segment_title\": \"第十条 其他\", \"clause_id\": \"10\", \"display_clause_id\": \"10\", \"clause_title\": \"其他\", \"clause_text\": \"本合同经双方法定代表人或授权代表签署并加盖单位公章（或合同专用章）后生效。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"本合同经双方法定代表人或授权代表签署并加盖单位公章（或合同专用章）后生效。\", \"numbering_confidence\": 1.0, \"title_confidence\": 1.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_10::10::8cfa28ef2d::2\", \"segment_id\": \"segment_10\", \"segment_title\": \"第十条 其他\", \"clause_id\": \"10\", \"display_clause_id\": \"10\", \"clause_title\": \"其他\", \"clause_text\": \"未尽事宜由双方协商解决。本合同一式陆份，由甲、乙双方各执叁份。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"未尽事宜由双方协商解决。本合同一式陆份，由甲、乙双方各执叁份。\", \"numbering_confidence\": 1.0, \"title_confidence\": 1.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_10::10.u19\", \"segment_id\": \"segment_10\", \"segment_title\": \"第十条 其他\", \"clause_id\": \"10.u19\", \"display_clause_id\": \"10.u19\", \"clause_title\": \"\", \"clause_text\": \"甲方：南湖实验室\\n\\n代表：\\n\\n2026年 月 日\", \"clause_kind\": \"placeholder_clause\", \"source_excerpt\": \"甲方：南湖实验室\\n\\n代表：\\n\\n2026年 月 日\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_10::10.u20\", \"segment_id\": \"segment_10\", \"segment_title\": \"第十条 其他\", \"clause_id\": \"10.u20\", \"display_clause_id\": \"10.u20\", \"clause_title\": \"\", \"clause_text\": \"乙方：中国电子技术标准化研究院\\n\\n代表：\\n\\n2026年 月 日\", \"clause_kind\": \"placeholder_clause\", \"source_excerpt\": \"乙方：中国电子技术标准化研究院\\n\\n代表：\\n\\n2026年 月 日\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_10::10.u21\", \"segment_id\": \"segment_10\", \"segment_title\": \"第十条 其他\", \"clause_id\": \"10.u21\", \"display_clause_id\": \"10.u21\", \"clause_title\": \"\", \"clause_text\": \"附件\\n\\n检测内容“机密计算与可信执行环境关键技术和应用研究项目”关联的考核指标表如下所示：\\n\\n| 序号 | 系统名称 | 指标名称 | 任务书结题考核指标（完成时指标值） | 考核方式（方法）及评价手段 |\\n| --- | --- | --- | --- | --- |\\n| | 可信执行环境和同态加密混合国产异构系统 | 指标2.6：基于可信执行环境的同态加密计算加速系统 | 基于可信执行环境的同态加密计算加速子系统，提升同态加密方法的自适应性，减少同态加密计算时间及内存消耗，对比于不采用可信执行环境的同态加密计算，整体加速系统性能提升 3 个数量级，其中TEE 由海光第三代 CPU服务器支持；\\n基于 TEE 的同态加密加速技术研究报告 1 份 | 第三方测试报告（测试方须具有CNAS或CMA等测试资质） |\", \"clause_kind\": \"note_clause\", \"source_excerpt\": \"附件\\n\\n检测内容“机密计算与可信执行环境关键技术和应用研究项目”关联的考核指标表如下所示：\\n\\n| 序号 | 系统名称 | 指标名称 | 任务书结题考核指标（完成时指标值） | 考核方式（方法）及评价手段 |\\n| --- | --- | --- | --- | --- |\\n| | 可信执行环境和同态加密混合国产异构系统 | 指标2.6：基于可信执行环境的同态加密计算加速系统 | 基于可信执行环境的同态加密计算加速子系统，提升同态加密方法的自适应性，减少同态加密计算时间及内存消耗，对比于不采用可信执行环境的同态加密计算，整体加速系统性能提升 3 个数量级，其中TEE 由海光第三代 CPU服务器支持；\\n基于 TEE 的同态加密加速技术研究报告 1 份 | 第三方测试报告（测试方须具有CNAS或CMA等测试资质） |\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_10::10.u22\", \"segment_id\": \"segment_10\", \"segment_title\": \"第十条 其他\", \"clause_id\": \"10.u22\", \"display_clause_id\": \"10.u22\", \"clause_title\": \"\", \"clause_text\": \"关联的任务书研究内容：\\n\\n机密计算与可信执行环境关键技术和应用研究项目所研发的系统包括：可信执行环境与软硬件协同防护系统、可信执行环境和同态加密混合国产异构系统、基于可信执行环境的实用型可搜索加密系统以及异构多层次技术融合机密计算应用系统。\", \"clause_kind\": \"note_clause\", \"source_excerpt\": \"关联的任务书研究内容：\\n\\n机密计算与可信执行环境关键技术和应用研究项目所研发的系统包括：可信执行环境与软硬件协同防护系统、可信执行环境和同态加密混合国产异构系统、基于可信执行环境的实用型可搜索加密系统以及异构多层次技术融合机密计算应用系统。\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_10::10.(1)\", \"segment_id\": \"segment_10\", \"segment_title\": \"第十条 其他\", \"clause_id\": \"10.(1)\", \"display_clause_id\": \"10.(1)\", \"clause_title\": \"\", \"clause_text\": \"（1）可信执行环境和同态加密混合国产异构系统\\n\\n可信执行环境与软硬件协同防护系统的研制包含了基于异构计算的同态加密计算加速子系统和基于可信执行环境的同态加密计算加速系统。\", \"clause_kind\": \"note_clause\", \"source_excerpt\": \"（1）可信执行环境和同态加密混合国产异构系统\\n\\n可信执行环境与软硬件协同防护系统的研制包含了基于异构计算的同态加密计算加速子系统和基于可信执行环境的同态加密计算加速系统。\", \"numbering_confidence\": 0.9, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_10::10.u24\", \"segment_id\": \"segment_10\", \"segment_title\": \"第十条 其他\", \"clause_id\": \"10.u24\", \"display_clause_id\": \"10.u24\", \"clause_title\": \"\", \"clause_text\": \"基于可信执行环境的同态加密计算加速系统。基于可信执行环境的同态加密计算加速系统由客户端与同态计算服务器组成，其中客户端在执行基于TEE的同态加密计算时，主要完成数据加密秘钥生成、用户数据加密/计算结果解密、计算任务生成、与同态计算服务器的交互。同态计算服务器提供基于TEE的同态加密计算服务，根据用户计算任务配置对同态加密计算任务进行优化，实现高效、可靠的加密计算，保护使用中的数据安全。同态计算服务器支持基于TEE技术对部署的同态加密计算应用进行性能优化，显著降低同态加密计算的计算时间与内存消耗。\", \"clause_kind\": \"note_clause\", \"source_excerpt\": \"基于可信执行环境的同态加密计算加速系统。基于可信执行环境的同态加密计算加速系统由客户端与同态计算服务器组成，其中客户端在执行基于TEE的同态加密计算时，主要完成数据加密秘钥生成、用户数据加密/计算结果解密、计算任务生成、与同态计算服务器的交互。同态计算服务器提供基于TEE的同态加密计算服务，根据用户计算任务配置对同态加密计算任务进行优化，实现高效、可靠的加密计算，保护使用中的数据安全。同态计算服务器支持基于TEE技术对部署的同态加密计算应用进行性能优化，显著降低同态加密计算的计算时间与内存消耗。\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}, {\"clause_uid\": \"segment_10::10.u25\", \"segment_id\": \"segment_10\", \"segment_title\": \"第十条 其他\", \"clause_id\": \"10.u25\", \"display_clause_id\": \"10.u25\", \"clause_title\": \"\", \"clause_text\": \"具体指标：提升同态加密方法的自适应性，减少同态加密计算时间及内存消耗，对比于不采用可信执行环境的同态加密计算，整体加速系统性能提升 3 个数量级，其中TEE 由海光第三代 CPU服务器支持。评测手段/方法：第三方测试报告（测试方须具有CNAS或CMA等测试资质）。\", \"clause_kind\": \"note_clause\", \"source_excerpt\": \"具体指标：提升同态加密方法的自适应性，减少同态加密计算时间及内存消耗，对比于不采用可信执行环境的同态加密计算，整体加速系统性能提升 3 个数量级，其中TEE 由海光第三代 CPU服务器支持。评测手段/方法：第三方测试报告（测试方须具有CNAS或CMA等测试资质）。\", \"numbering_confidence\": 0.0, \"title_confidence\": 0.0, \"is_boilerplate_instruction\": false}]",
+      "review_side": "甲方",
+      "contract_type_hint": "service_agreement",
+      "contract_outline": "1 | 测试周期 | 第一条 测试周期\n\n自受测件接收开始起 30 天完成。\n2.u2 | 甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（…\n2.u3 | 课题及对应测试对象如下：\n\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\n| --- | --- | --- | --- |\n| 1 | 基…\n3.u4 | 甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。\n3.u5 | 合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子…\n3.u6 | 甲方发票信息： | 甲方发票信息：\n\n单位名称：南湖实验室\n\n统一社会信用代码：12330400MB1D62272G\n\n开户银行：嘉兴银行股份有限公司科技支行\n\n银行账号：1091…\n3.u7 | 乙方账户信息： | 乙方账户信息：\n\n开户银行：工行北京北新桥支行\n\n开 户 名：中国电子技术标准化研究院\n\n账 户：0200 0043 0908 8116 710\n\n税 号： 1…\n4 | 检测方式 | 甲方向乙方提供“机密计算与可信执行环境关键技术和应用研究项目”所研发的“可信执行环境和同态加密混合国产异构系统”中的“基于可信执行环境的同态加密计算加速系统”系…\n5.1 | 1、双方应共同遵守保密条款，本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。\n5.2 | 2、双方应互相保守对方的商业机密。除本专项规定可公开发布信息外、双方保证对方的业务活动、技术资料等其他信息不得公开泄露。\n5.3 | 3、本保密条款在本合同书到期后3年内继续保持有效。\n6 | 合同终止 | 在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。",
+      "clause_count": "25",
+      "risk_stream": "missing_multi"
+    },
+    "outputs": {
+      "text": "\n\n{\"risk_items\":[{\"risk_code\":\"acceptance_procedure_missing\",\"risk_source_type\":\"missing_clause\",\"risk_label\":\"缺少验收程序及异议处理机制\",\"dimension\":\"服务范围与交付内容\",\"risk_level\":\"medium\",\"issue\":\"合同约定了乙方向甲方出具检测报告，但未约定甲方对报告的验收程序、异议提出期限及整改机制。\",\"evidence_text\":\"条款 2.u2 约定“向甲方出具1份检测报告”；条款 8.2 仅约定了逾期交付的违约责任。\",\"factual_basis\":\"合同条款 2.u2 明确了交付物为检测报告，条款 8.2 约定了逾期交付责任，但全合同中未见关于甲方如何进行验收确认、验收不通过时的异议提出流程、以及乙方整改义务的约定。\",\"reasoning_basis\":\"若检测报告存在数据错误、结论偏差等质量瑕疵（但非逾期交付），甲方缺乏明确的合同依据要求乙方免费修改或重做。这可能导致甲方被迫接受有瑕疵的交付成果，或需额外付费协商修改，直接影响甲方项目验收及使用目的。\",\"normative_basis\":{\"basis_type\":\"contract_logic_rule\",\"basis_title\":\"责任边界应明确且可控制\",\"basis_detail\":\"服务类合同中，委托方对交付成果的验收确认程序是核心权利条款。缺少验收程序意味着甲方无法依据合同对报告质量提出异议，乙方也缺乏明确的整改义务依据，导致责任分配失衡。\"},\"suggestion_minimal\":\"在合同中增加验收程序条款，约定甲方收到检测报告后应在一定期限内（如15个工作日内）完成验收确认，逾期未提出书面异议视为验收通过；甲方提出异议后，乙方应在约定期限内免费修改或补充。\",\"suggestion_optimized\":\"进一步约定验收标准与异议情形：明确检测报告应符合合同约定的验收指标（附件中的考核指标），甲方可基于报告数据与指标的符合性提出异议；约定多次修改后仍不符合要求时甲方有权解除合同或要求部分退款。\",\"suggestion_basis\":\"通过明确验收程序、异议期限和整改机制，使甲方的验收确认权从被动等待变为主动可执行的控制手段，确保检测报告质量符合项目验收要求，形成完整的交付-验收-整改闭环。\",\"related_clause_ids\":[\"2.u2\",\"8.2\"],\"related_clause_uids\":[\"segment_2::2.u2\",\"segment_8::8.2\"],\"needs_human_review\":true},{\"risk_code\":\"full_prepayment_before_delivery\",\"risk_source_type\":\"multi_clause\",\"risk_label\":\"付款进度与交付进度错配风险\",\"dimension\":\"付款结算、发票与税费\",\"risk_level\":\"medium\",\"issue\":\"合同约定甲方需在签约后30日内支付全款，而测试周期长达30天，导致甲方需在交付前支付全部费用。\",\"evidence_text\":\"条款 3.5 约定“合同签订后30日内，甲方一次性向乙方支付检测费用”；条款 1 约定“自受测件接收开始起 30 天完成”。\",\"factual_basis\":\"条款 3.5（实际为3.u5）设定了签约后30日内付清全款的义务，条款 1 设定了接收后30天的测试周期。考虑到受测件接收通常晚于或等于签约日，甲方付款截止时间早于或等同于乙方交付时间。\",\"reasoning_basis\":\"甲方在尚未收到或验证检测报告质量前即需支付100%款项，丧失了通过付款进度控制服务质量的核心筹码。若后续报告存在质量问题或乙方履约不力，甲方已支付全款，追回款项或索赔的成本和难度显著增加，处于被动地位。\",\"normative_basis\":{\"basis_type\":\"deal_practice_rule\",\"basis_title\":\"验收与付款条件应形成可执行闭环\",\"basis_detail\":\"服务合同中，付款进度通常应与交付进度挂钩，确保委托方在确认服务成果符合要求后再支付相应款项。一次性全额预付会使委托方失去对服务质量的控制力，违背交易实践中风险与对价平衡的基本原则。\"},\"suggestion_minimal\":\"调整付款进度，约定合同签订后支付部分款项（如50%）作为预付款，余款在乙方交付检测报告且甲方验收通过后支付。\",\"suggestion_optimized\":\"进一步约定付款与验收的联动条件：明确首付款用于覆盖乙方测试成本，尾款支付以甲方书面验收通过为前提；若验收不通过且乙方未在整改期限内完成修改，甲方有权暂停支付尾款或按比例扣减。\",\"suggestion_basis\":\"通过分阶段付款，将甲方付款义务与乙方交付质量挂钩，使甲方在支付尾款前有机会验证报告是否符合验收指标要求。若报告存在质量问题，甲方可依据合同暂停支付或扣减尾款，形成有效的履约激励和风险控制机制。\",\"related_clause_ids\":[\"3.5\",\"1\"],\"related_clause_uids\":[\"segment_3::3.u5\",\"segment_1::1\"],\"needs_human_review\":true},{\"risk_code\":\"ip_ownership_missing\",\"risk_source_type\":\"missing_clause\",\"risk_label\":\"检测报告知识产权归属不明\",\"dimension\":\"知识产权归属与使用权\",\"risk_level\":\"low\",\"issue\":\"合同未约定检测报告及相关成果的知识产权归属。\",\"evidence_text\":\"条款 2.u2 约定“向甲方出具1份检测报告”；条款 5 约定了保密义务。\",\"factual_basis\":\"合同条款 2.u2 明确了交付物为检测报告，条款 5 约定了保密义务，但全合同中未见关于检测报告知识产权归属的约定。\",\"reasoning_basis\":\"在无明确约定的情况下，检测报告的著作权可能默认归受托方（乙方）所有。甲方作为委托方，虽持有报告，但在用于项目结题验收、公开宣传或商业用途时可能面临权利限制，不利于甲方对成果的自由处置和权益保护。\",\"normative_basis\":{\"basis_type\":\"legal_rule\",\"basis_title\":\"知识产权与保密边界应区分清楚\",\"basis_detail\":\"根据《著作权法》相关规定，受委托创作的作品，著作权的归属由委托人和受托人通过合同约定；合同未作明确约定或者没有订立合同的，著作权归受托人所有。本案中检测报告属于受托创作成果，若未明确约定归属，甲方仅享有使用权而非完整著作权。\",\"citation_text\":\"《中华人民共和国著作权法》第十九条：受委托创作的作品，著作权的归属由委托人和受托人通过合同约定。合同未作明确约定或者没有订立合同的，著作权属于受托人。\"},\"suggestion_minimal\":\"在合同中增加知识产权归属条款，明确约定检测报告的著作权归甲方所有，乙方仅保留署名权。\",\"suggestion_optimized\":\"进一步约定乙方应配合甲方进行著作权登记或办理必要的权属证明，并明确报告可用于甲方项目结题验收、科研成果申报、商业推广等用途，乙方不得以任何理由主张限制。\",\"suggestion_basis\":\"明确著作权归属甲方后，甲方可自由使用检测报告用于项目结题验收、公开宣传或商业用途，无需担心乙方事后主张权利。这保障了甲方作为委托方对检测成果的完整支配权，避免因权属不明导致的法律风险和使用障碍。\",\"related_clause_ids\":[\"2.u2\",\"5.1\",\"5.2\",\"5.3\"],\"related_clause_uids\":[\"segment_2::2.u2\",\"segment_5::5.1\",\"segment_5::5.2\",\"segment_5::5.3\"],\"needs_human_review\":true}]}"
+    },
+    "normalized_items": [
+      {
+        "risk_code": "acceptance_procedure_missing",
+        "risk_source_type": "missing_clause",
+        "risk_label": "缺少验收程序及异议处理机制",
+        "dimension": "服务范围与交付内容",
+        "risk_level": "medium",
+        "issue": "合同约定了乙方向甲方出具检测报告，但未约定甲方对报告的验收程序、异议提出期限及整改机制。",
+        "evidence_text": "条款 2.u2 约定“向甲方出具1份检测报告”；条款 8.2 仅约定了逾期交付的违约责任。",
+        "factual_basis": "合同条款 2.u2 明确了交付物为检测报告，条款 8.2 约定了逾期交付责任，但全合同中未见关于甲方如何进行验收确认、验收不通过时的异议提出流程、以及乙方整改义务的约定。",
+        "reasoning_basis": "若检测报告存在数据错误、结论偏差等质量瑕疵（但非逾期交付），甲方缺乏明确的合同依据要求乙方免费修改或重做。这可能导致甲方被迫接受有瑕疵的交付成果，或需额外付费协商修改，直接影响甲方项目验收及使用目的。",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "责任边界应明确且可控制",
+          "basis_detail": "服务类合同中，委托方对交付成果的验收确认程序是核心权利条款。缺少验收程序意味着甲方无法依据合同对报告质量提出异议，乙方也缺乏明确的整改义务依据，导致责任分配失衡。"
+        },
+        "suggestion_minimal": "在合同中增加验收程序条款，约定甲方收到检测报告后应在一定期限内（如15个工作日内）完成验收确认，逾期未提出书面异议视为验收通过；甲方提出异议后，乙方应在约定期限内免费修改或补充。",
+        "suggestion_optimized": "进一步约定验收标准与异议情形：明确检测报告应符合合同约定的验收指标（附件中的考核指标），甲方可基于报告数据与指标的符合性提出异议；约定多次修改后仍不符合要求时甲方有权解除合同或要求部分退款。",
+        "suggestion_basis": "通过明确验收程序、异议期限和整改机制，使甲方的验收确认权从被动等待变为主动可执行的控制手段，确保检测报告质量符合项目验收要求，形成完整的交付-验收-整改闭环。",
+        "related_clause_ids": [
+          "2.u2",
+          "8.2"
+        ],
+        "related_clause_uids": [
+          "segment_2::2.u2",
+          "segment_8::8.2"
+        ],
+        "needs_human_review": true
+      },
+      {
+        "risk_code": "full_prepayment_before_delivery",
+        "risk_source_type": "multi_clause",
+        "risk_label": "付款进度与交付进度错配风险",
+        "dimension": "付款结算、发票与税费",
+        "risk_level": "medium",
+        "issue": "合同约定甲方需在签约后30日内支付全款，而测试周期长达30天，导致甲方需在交付前支付全部费用。",
+        "evidence_text": "条款 3.5 约定“合同签订后30日内，甲方一次性向乙方支付检测费用”；条款 1 约定“自受测件接收开始起 30 天完成”。",
+        "factual_basis": "条款 3.5（实际为3.u5）设定了签约后30日内付清全款的义务，条款 1 设定了接收后30天的测试周期。考虑到受测件接收通常晚于或等于签约日，甲方付款截止时间早于或等同于乙方交付时间。",
+        "reasoning_basis": "甲方在尚未收到或验证检测报告质量前即需支付100%款项，丧失了通过付款进度控制服务质量的核心筹码。若后续报告存在质量问题或乙方履约不力，甲方已支付全款，追回款项或索赔的成本和难度显著增加，处于被动地位。",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "验收与付款条件应形成可执行闭环",
+          "basis_detail": "服务合同中，付款进度通常应与交付进度挂钩，确保委托方在确认服务成果符合要求后再支付相应款项。一次性全额预付会使委托方失去对服务质量的控制力，违背交易实践中风险与对价平衡的基本原则。"
+        },
+        "suggestion_minimal": "调整付款进度，约定合同签订后支付部分款项（如50%）作为预付款，余款在乙方交付检测报告且甲方验收通过后支付。",
+        "suggestion_optimized": "进一步约定付款与验收的联动条件：明确首付款用于覆盖乙方测试成本，尾款支付以甲方书面验收通过为前提；若验收不通过且乙方未在整改期限内完成修改，甲方有权暂停支付尾款或按比例扣减。",
+        "suggestion_basis": "通过分阶段付款，将甲方付款义务与乙方交付质量挂钩，使甲方在支付尾款前有机会验证报告是否符合验收指标要求。若报告存在质量问题，甲方可依据合同暂停支付或扣减尾款，形成有效的履约激励和风险控制机制。",
+        "related_clause_ids": [
+          "3.5",
+          "1"
+        ],
+        "related_clause_uids": [
+          "segment_3::3.u5",
+          "segment_1::1"
+        ],
+        "needs_human_review": true
+      },
+      {
+        "risk_code": "ip_ownership_missing",
+        "risk_source_type": "missing_clause",
+        "risk_label": "检测报告知识产权归属不明",
+        "dimension": "知识产权归属与使用权",
+        "risk_level": "low",
+        "issue": "合同未约定检测报告及相关成果的知识产权归属。",
+        "evidence_text": "条款 2.u2 约定“向甲方出具1份检测报告”；条款 5 约定了保密义务。",
+        "factual_basis": "合同条款 2.u2 明确了交付物为检测报告，条款 5 约定了保密义务，但全合同中未见关于检测报告知识产权归属的约定。",
+        "reasoning_basis": "在无明确约定的情况下，检测报告的著作权可能默认归受托方（乙方）所有。甲方作为委托方，虽持有报告，但在用于项目结题验收、公开宣传或商业用途时可能面临权利限制，不利于甲方对成果的自由处置和权益保护。",
+        "normative_basis": {
+          "basis_type": "legal_rule",
+          "basis_title": "知识产权与保密边界应区分清楚",
+          "basis_detail": "根据《著作权法》相关规定，受委托创作的作品，著作权的归属由委托人和受托人通过合同约定；合同未作明确约定或者没有订立合同的，著作权归受托人所有。本案中检测报告属于受托创作成果，若未明确约定归属，甲方仅享有使用权而非完整著作权。",
+          "citation_text": "《中华人民共和国著作权法》第十九条：受委托创作的作品，著作权的归属由委托人和受托人通过合同约定。合同未作明确约定或者没有订立合同的，著作权属于受托人。"
+        },
+        "suggestion_minimal": "在合同中增加知识产权归属条款，明确约定检测报告的著作权归甲方所有，乙方仅保留署名权。",
+        "suggestion_optimized": "进一步约定乙方应配合甲方进行著作权登记或办理必要的权属证明，并明确报告可用于甲方项目结题验收、科研成果申报、商业推广等用途，乙方不得以任何理由主张限制。",
+        "suggestion_basis": "明确著作权归属甲方后，甲方可自由使用检测报告用于项目结题验收、公开宣传或商业用途，无需担心乙方事后主张权利。这保障了甲方作为委托方对检测成果的完整支配权，避免因权属不明导致的法律风险和使用障碍。",
+        "related_clause_ids": [
+          "2.u2",
+          "5.1",
+          "5.2",
+          "5.3"
+        ],
+        "related_clause_uids": [
+          "segment_2::2.u2",
+          "segment_5::5.1",
+          "segment_5::5.2",
+          "segment_5::5.3"
+        ],
+        "needs_human_review": true
+      }
+    ],
+    "dropped_items": [],
+    "validation_errors": []
+  }
+}

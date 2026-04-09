@@ -1,0 +1,11 @@
+{
+  "status": "completed",
+  "file_name": "2.docx",
+  "review_side": "supplier",
+  "contract_type_hint": "service_agreement",
+  "step": "审查与 DOCX 批注导出已完成",
+  "progress": 100,
+  "run_id": "web_20260320_123935_9c64c1",
+  "updated_at": "2026-03-20T04:44:15.384803Z",
+  "run_dir": "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/data/runs/web_20260320_123935_9c64c1"
+}

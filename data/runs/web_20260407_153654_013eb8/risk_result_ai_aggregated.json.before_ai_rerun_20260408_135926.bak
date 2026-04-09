@@ -1,0 +1,306 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-08T05:39:36Z",
+  "groups": [
+    {
+      "aggregate_id": "agg_segment_1::1_1",
+      "aggregate_type": "anchored_multi_clause",
+      "host_risk_id": "1",
+      "host_clause_uid": "segment_1::1",
+      "host_clause_id": "1",
+      "source_risk_ids": [
+        "1",
+        "13"
+      ],
+      "multi_clause_risk_ids": [
+        "13"
+      ],
+      "anchored_risk": {
+        "risk_code": "test_completion_condition_missing",
+        "risk_source_type": "anchored",
+        "dimension": "服务期限、里程碑与验收标准",
+        "risk_level": "high",
+        "risk_label": "测试周期届满标准不明，可能导致未合格即视为验收",
+        "issue": "条款仅规定“30天完成”，未明确“完成”是指完成测试动作还是验收合格，缺乏对测试结果的实质性约束。",
+        "evidence_text": "自受测件接收开始起 30 天完成。",
+        "anchor_text": "第一条 测试周期 自受测件接收开始起 30 天完成。",
+        "factual_basis": "条款表述“30天完成”，仅设定了时间终点，未将测试周期的结束与“测试合格”或“验收通过”这一实质性结果进行绑定。",
+        "reasoning_basis": "若测试周期条款未明确以“合格”为终点，乙方可能主张30天期满即视为测试结束或默示验收通过，导致甲方在测试未通过时丧失要求整改或拒付的权利，被迫接受不合格成果。",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "验收期限应与验收结果挂钩",
+          "basis_detail": "技术服务合同的验收应当以成果符合约定标准为核心，单纯的时间经过不能替代质量验收，否则违反等价有偿原则。",
+          "citation_text": ""
+        },
+        "suggestion": "将“完成”修改为“完成测试工作”，并补充“若测试结果不合格，测试周期顺延至整改合格为止”。",
+        "suggestion_minimal": "将“完成”修改为“完成测试工作”，并补充“若测试结果不合格，测试周期顺延至整改合格为止”。",
+        "suggestion_optimized": "明确测试周期仅为工作周期，不构成验收通过依据；约定测试不通过时的整改期限及重新测试的启动条件，确保甲方在成果不合格时的拒绝权。",
+        "suggestion_basis": "通过将时间终点与质量结果挂钩，防止乙方利用时间条款逃避质量责任，保障甲方的实质性验收权利。",
+        "needs_human_review": true,
+        "clause_uid": "segment_1::1",
+        "display_clause_id": "1",
+        "clause_uids": [
+          "segment_1::1"
+        ],
+        "clause_id": "1",
+        "related_clause_ids": [
+          "1"
+        ],
+        "related_clause_uids": [
+          "segment_1::1"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "1"
+        ],
+        "clause_ids": [
+          "1"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_ACCEPTANCE_FB8D",
+        "basis_summary": "条款表述“30天完成”，仅设定了时间终点，未将测试周期的结束与“测试合格”或“验收通过”这一实质性结果进行绑定。；验收期限应与验收结果挂钩",
+        "basis": "[RULE_ACCEPTANCE_FB8D] 条款表述“30天完成”，仅设定了时间终点，未将测试周期的结束与“测试合格”或“验收通过”这一实质性结果进行绑定。；若测试周期条款未明确以“合格”为终点，乙方可能主张30天期满即视为测试结束或默示验收通过，导致甲方在测试未通过时丧失要求整改或拒付的权利，被迫接受不合格成果。；验收期限应与验收结果挂钩；技术服务合同的验收应当以成果符合约定标准为核心，单纯的时间经过不能替代质量验收，否则违反等价有偿原则。",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 1
+      },
+      "multi_clause_risks": [
+        {
+          "risk_code": "payment_delivery_timing_mismatch",
+          "risk_source_type": "multi_clause",
+          "risk_label": "付款时间早于成果交付时间",
+          "dimension": "付款结算、发票与税费",
+          "risk_level": "medium",
+          "issue": "合同约定签订后30日内付款，但测试周期为受测件接收后30天，导致甲方需在乙方交付检测报告前支付全款，丧失付款环节的履约担保功能。",
+          "evidence_text": "条款 1：自受测件接收开始起 30 天完成。\n条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用……",
+          "main_text": "自受测件接收开始起 30 天完成。",
+          "factual_basis": "条款1约定测试周期为“自受测件接收开始起 30 天完成”，条款3.u5约定付款时间为“合同签订后30日内”。由于受测件接收时间通常晚于或等于合同签订时间，且测试需要过程，导致甲方付款时间早于或重合于乙方交付成果时间。",
+          "reasoning_basis": "甲方在未见到检测报告成果前即需支付全款，若后续报告质量不合格或存在瑕疵，甲方已丧失付款作为制约乙方的手段，追回款项难度大，处于被动地位。",
+          "normative_basis": {
+            "basis_type": "contract_logic_rule",
+            "basis_title": "付款与成果交付的时序逻辑应保障甲方制衡权利",
+            "basis_detail": "服务合同中，付款条件与成果交付应形成合理的制约关系。若甲方在成果交付前即支付全款，则丧失了对乙方履约质量的制衡手段，一旦成果不合格，甲方维权成本高、难度大。"
+          },
+          "suggestion_minimal": "约定分阶段付款：合同签订后支付部分款项（如50%），剩余款项在检测报告交付并经甲方验收通过后支付。",
+          "suggestion_optimized": "约定分期付款并设置验收付款条件：合同签订后支付首付款（建议不超过合同金额的50%），在乙方交付检测报告且甲方书面确认验收通过后支付尾款；若报告验收不合格，乙方需免费整改直至合格后再支付尾款。",
+          "suggestion_basis": "分阶段付款并设置验收通过条件，使甲方在支付尾款前保有对乙方交付成果质量的审查权和制衡权，降低因成果不合格导致的损失风险，形成付款与验收的可执行闭环。",
+          "related_clause_ids": [
+            "1",
+            "3.u5"
+          ],
+          "related_clause_uids": [
+            "segment_1::1",
+            "segment_3::3.u5"
+          ],
+          "needs_human_review": true,
+          "workflow_sources": [
+            "missing_multi"
+          ],
+          "suggestion": "约定分阶段付款：合同签订后支付部分款项（如50%），剩余款项在检测报告交付并经甲方验收通过后支付。",
+          "evidence_confidence": null,
+          "quality_flags": [],
+          "clause_uid": "",
+          "display_clause_id": "",
+          "clause_id": "",
+          "clause_uids": [],
+          "display_clause_ids": [],
+          "clause_ids": [],
+          "is_multi_clause_risk": true,
+          "status": "pending",
+          "auto_apply_allowed": false,
+          "mapping_conflict": false,
+          "anchor_text": "条款 1：自受测件接收开始起 30 天完成。 条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用……",
+          "basis_rule_id": "RULE_PAYMENT_BB78",
+          "basis_summary": "条款1约定测试周期为“自受测件接收开始起 30 天完成”，条款3.u5约定付款时间为“合同签订后30日内”。由于受测件接收时间通常晚于或等于合同签订时间，且测试需要过程，导致甲方付款时间早于或重合于乙方交付成果时间。；付款与成果交付的时序逻辑应保障甲方制衡权利",
+          "basis": "[RULE_PAYMENT_BB78] 条款1约定测试周期为“自受测件接收开始起 30 天完成”，条款3.u5约定付款时间为“合同签订后30日内”。由于受测件接收时间通常晚于或等于合同签订时间，且测试需要过程，导致甲方付款时间早于或重合于乙方交付成果时间。；甲方在未见到检测报告成果前即需支付全款，若后续报告质量不合格或存在瑕疵，甲方已丧失付款作为制约乙方的手段，追回款项难度大，处于被动地位。；付款与成果交付的时序逻辑应保障甲方制衡权利；服务合同中，付款条件与成果交付应形成合理的制约关系。若甲方在成果交付前即支付全款，则丧失了对乙方履约质量的制衡手段，一旦成果不合格，甲方维权成本高、难度大。",
+          "review_required_reason": [
+            "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+          ],
+          "is_boilerplate_related": false,
+          "merged_from_risk_ids": [
+            null
+          ],
+          "risk_id": 13
+        }
+      ],
+      "target_text": "第一条 测试周期\n\n自受测件接收开始起 30 天完成。",
+      "target_text_source": "host_clause_text",
+      "clause_text": "第一条 测试周期\n\n自受测件接收开始起 30 天完成。",
+      "status": "pending",
+      "ai_rewrite": {
+        "state": "succeeded",
+        "target_text": "自受测件接收开始起 30 天完成。",
+        "revised_text": "第一条 测试周期\n\n自受测件接收开始起 30 天完成测试工作，若测试结果不合格，测试周期顺延至整改合格为止。",
+        "comment_text": "将“自受测件接收开始起 30 天完成”修改为“第一条 测试周期\n\n自受测件接收开始起 30 天完成测试工作，若测试结果不合格，测试周期顺延至整改合格为止”。",
+        "rationale": "将“完成”修改为“完成测试工作”以明确时间终点的行为内容，并补充“若测试结果不合格，测试周期顺延至整改合格为止”将测试周期与测试结果挂钩，防止30天期满即视为验收通过，保障甲方的实质性验收权利。",
+        "edit_type": "replace",
+        "workflow_kind": "aggregate",
+        "created_at": "2026-04-08T05:10:47Z"
+      },
+      "ai_rewrite_decision": "proposed"
+    },
+    {
+      "aggregate_id": "agg_segment_3::3.u5_3",
+      "aggregate_type": "anchored_multi_clause",
+      "host_risk_id": "3",
+      "host_clause_uid": "segment_3::3.u5",
+      "host_clause_id": "3.u5",
+      "source_risk_ids": [
+        "3",
+        "13"
+      ],
+      "multi_clause_risk_ids": [
+        "13"
+      ],
+      "anchored_risk": {
+        "risk_code": "full_prepayment_without_acceptance_anchor",
+        "risk_source_type": "anchored",
+        "dimension": "付款结算、发票与税费",
+        "risk_level": "high",
+        "risk_label": "签约后一次性全额付款导致履约失控",
+        "issue": "条款约定合同签订后甲方即需一次性支付全额检测费用，未将付款进度与乙方履约进度、交付成果或验收结果挂钩。",
+        "evidence_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）",
+        "anchor_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+        "factual_basis": "条款明确要求甲方在合同签订后30日内一次性支付全部检测费用，未设置任何以乙方提交成果、验收合格或服务进度为前提的付款条件。",
+        "reasoning_basis": "在服务合同中，若甲方在乙方未开始服务或未交付成果前即支付全额款项，将丧失对乙方履约行为的核心资金制约手段。一旦乙方收款后出现拒绝履约、迟延交付或服务质量不达标，甲方将陷入被动，需通过诉讼追回款项，面临资金占用、维权成本增加及财政资金合规性审计风险。",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "付款节点应与履约进度挂钩以保障资金安全",
+          "basis_detail": "依据合同履行抗辩权原理及财政资金使用效益原则，付款节点的设置应确保资金安全与服务质量可控，避免“先款后货”导致的履约风险。",
+          "citation_text": ""
+        },
+        "suggestion": "将“一次性向乙方支付”修改为“支付合同总额的XX%作为预付款，剩余XX%于验收合格后支付”。",
+        "suggestion_minimal": "将“一次性向乙方支付”修改为“支付合同总额的XX%作为预付款，剩余XX%于验收合格后支付”。",
+        "suggestion_optimized": "合同签订后__日内，甲方向乙方支付合同总额__%的预付款；乙方完成检测服务并提交合格报告，经甲方验收合格后__日内，甲方向乙方支付剩余__%款项。",
+        "suggestion_basis": "通过分期付款和验收后付款机制，确保甲方掌握履约主动权，降低资金风险。",
+        "needs_human_review": true,
+        "clause_uid": "segment_3::3.u5",
+        "display_clause_id": "3.u5",
+        "clause_uids": [
+          "segment_3::3.u5"
+        ],
+        "clause_id": "3.u5",
+        "related_clause_ids": [
+          "3.u5"
+        ],
+        "related_clause_uids": [
+          "segment_3::3.u5"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "3.u5"
+        ],
+        "clause_ids": [
+          "3.u5"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_PAYMENT_D0CE",
+        "basis_summary": "条款明确要求甲方在合同签订后30日内一次性支付全部检测费用，未设置任何以乙方提交成果、验收合格或服务进度为前提的付款条件。；付款节点应与履约进度挂钩以保障资金安全",
+        "basis": "[RULE_PAYMENT_D0CE] 条款明确要求甲方在合同签订后30日内一次性支付全部检测费用，未设置任何以乙方提交成果、验收合格或服务进度为前提的付款条件。；在服务合同中，若甲方在乙方未开始服务或未交付成果前即支付全额款项，将丧失对乙方履约行为的核心资金制约手段。一旦乙方收款后出现拒绝履约、迟延交付或服务质量不达标，甲方将陷入被动，需通过诉讼追回款项，面临资金占用、维权成本增加及财政资金合规性审计风险。；付款节点应与履约进度挂钩以保障资金安全；依据合同履行抗辩权原理及财政资金使用效益原则，付款节点的设置应确保资金安全与服务质量可控，避免“先款后货”导致的履约风险。",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 3
+      },
+      "multi_clause_risks": [
+        {
+          "risk_code": "payment_delivery_timing_mismatch",
+          "risk_source_type": "multi_clause",
+          "risk_label": "付款时间早于成果交付时间",
+          "dimension": "付款结算、发票与税费",
+          "risk_level": "medium",
+          "issue": "合同约定签订后30日内付款，但测试周期为受测件接收后30天，导致甲方需在乙方交付检测报告前支付全款，丧失付款环节的履约担保功能。",
+          "evidence_text": "条款 1：自受测件接收开始起 30 天完成。\n条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用……",
+          "main_text": "自受测件接收开始起 30 天完成。",
+          "factual_basis": "条款1约定测试周期为“自受测件接收开始起 30 天完成”，条款3.u5约定付款时间为“合同签订后30日内”。由于受测件接收时间通常晚于或等于合同签订时间，且测试需要过程，导致甲方付款时间早于或重合于乙方交付成果时间。",
+          "reasoning_basis": "甲方在未见到检测报告成果前即需支付全款，若后续报告质量不合格或存在瑕疵，甲方已丧失付款作为制约乙方的手段，追回款项难度大，处于被动地位。",
+          "normative_basis": {
+            "basis_type": "contract_logic_rule",
+            "basis_title": "付款与成果交付的时序逻辑应保障甲方制衡权利",
+            "basis_detail": "服务合同中，付款条件与成果交付应形成合理的制约关系。若甲方在成果交付前即支付全款，则丧失了对乙方履约质量的制衡手段，一旦成果不合格，甲方维权成本高、难度大。"
+          },
+          "suggestion_minimal": "约定分阶段付款：合同签订后支付部分款项（如50%），剩余款项在检测报告交付并经甲方验收通过后支付。",
+          "suggestion_optimized": "约定分期付款并设置验收付款条件：合同签订后支付首付款（建议不超过合同金额的50%），在乙方交付检测报告且甲方书面确认验收通过后支付尾款；若报告验收不合格，乙方需免费整改直至合格后再支付尾款。",
+          "suggestion_basis": "分阶段付款并设置验收通过条件，使甲方在支付尾款前保有对乙方交付成果质量的审查权和制衡权，降低因成果不合格导致的损失风险，形成付款与验收的可执行闭环。",
+          "related_clause_ids": [
+            "1",
+            "3.u5"
+          ],
+          "related_clause_uids": [
+            "segment_1::1",
+            "segment_3::3.u5"
+          ],
+          "needs_human_review": true,
+          "workflow_sources": [
+            "missing_multi"
+          ],
+          "suggestion": "约定分阶段付款：合同签订后支付部分款项（如50%），剩余款项在检测报告交付并经甲方验收通过后支付。",
+          "evidence_confidence": null,
+          "quality_flags": [],
+          "clause_uid": "",
+          "display_clause_id": "",
+          "clause_id": "",
+          "clause_uids": [],
+          "display_clause_ids": [],
+          "clause_ids": [],
+          "is_multi_clause_risk": true,
+          "status": "pending",
+          "auto_apply_allowed": false,
+          "mapping_conflict": false,
+          "anchor_text": "条款 1：自受测件接收开始起 30 天完成。 条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用……",
+          "basis_rule_id": "RULE_PAYMENT_BB78",
+          "basis_summary": "条款1约定测试周期为“自受测件接收开始起 30 天完成”，条款3.u5约定付款时间为“合同签订后30日内”。由于受测件接收时间通常晚于或等于合同签订时间，且测试需要过程，导致甲方付款时间早于或重合于乙方交付成果时间。；付款与成果交付的时序逻辑应保障甲方制衡权利",
+          "basis": "[RULE_PAYMENT_BB78] 条款1约定测试周期为“自受测件接收开始起 30 天完成”，条款3.u5约定付款时间为“合同签订后30日内”。由于受测件接收时间通常晚于或等于合同签订时间，且测试需要过程，导致甲方付款时间早于或重合于乙方交付成果时间。；甲方在未见到检测报告成果前即需支付全款，若后续报告质量不合格或存在瑕疵，甲方已丧失付款作为制约乙方的手段，追回款项难度大，处于被动地位。；付款与成果交付的时序逻辑应保障甲方制衡权利；服务合同中，付款条件与成果交付应形成合理的制约关系。若甲方在成果交付前即支付全款，则丧失了对乙方履约质量的制衡手段，一旦成果不合格，甲方维权成本高、难度大。",
+          "review_required_reason": [
+            "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+          ],
+          "is_boilerplate_related": false,
+          "merged_from_risk_ids": [
+            null
+          ],
+          "risk_id": 13
+        }
+      ],
+      "target_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+      "target_text_source": "host_clause_text",
+      "clause_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+      "status": "pending",
+      "ai_rewrite": {
+        "state": "succeeded",
+        "target_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）",
+        "revised_text": "合同签订后30日内，甲方向乙方支付合同总额的XX%作为预付款，剩余XX%于验收合格后支付，检测费用人民币：人民币贰万伍仟元整（￥25,000.00）",
+        "comment_text": "将“一次性向乙方支付”修改为“向乙方支付合同总额的XX%作为预付款，剩余XX%于验收合格后支付，”。",
+        "rationale": "将一次性全额付款改为分阶段付款（预付款+验收后付款），将付款进度与乙方履约成果挂钩，降低甲方因提前全额付款导致的履约失控风险，对齐修改建议要求。",
+        "edit_type": "replace",
+        "workflow_kind": "default",
+        "created_at": "2026-04-08T05:10:48Z"
+      },
+      "ai_rewrite_decision": "proposed"
+    }
+  ]
+}

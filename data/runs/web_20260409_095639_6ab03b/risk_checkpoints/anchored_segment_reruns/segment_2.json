@@ -1,0 +1,130 @@
+{
+  "segment_id": "segment_2",
+  "segment_start_idx": 1,
+  "segment_end_idx": 1,
+  "outputs": {
+    "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"weak_reference_for_acceptance\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"服务期限、里程碑与验收标准\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"验收标准引用措辞约束力不足\",\n      \"issue\": \"条款使用“参照”一词引用验收指标，而非“依据”或“符合”，弱化了验收标准的强制约束力，可能导致乙方交付成果未达标时甲方无法拒收。\",\n      \"evidence_text\": \"参照“甲方提供的验收指标”\",\n      \"anchor_text\": \"参照\",\n      \"factual_basis\": \"条款文本表述为“参照‘甲方提供的验收指标’”，使用了“参照”一词而非“依据”或“应当符合”。\",\n      \"reasoning_basis\": \"在技术服务合同纠纷中，“参照”通常被理解为一种参考性或建议性的指引，而非必须严格遵守的强制性义务。若乙方未完全达到指标，可能以“已参照执行”为由抗辩，导致甲方无法以指标未达标为由拒绝验收或追究违约责任，增加了验收结果的不确定性。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"验收标准应当具有强制约束力\",\n        \"basis_detail\": \"验收标准是判断交付物是否合格的核心依据，应当使用“依据”、“符合”等确定性措辞，确保乙方交付成果必须满足特定要求，而非仅作为参考。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将“参照”修改为“依据”或“应当符合”，明确验收指标具有强制约束力。\",\n      \"suggestion_minimal\": \"将“参照‘甲方提供的验收指标’”修改为“依据‘甲方提供的验收指标’”。\",\n      \"suggestion_optimized\": \"修改为：“乙方应当依据‘甲方提供的验收指标’（详见附件）进行测试，测试结果必须完全符合上述指标要求，否则视为验收不合格。”\",\n      \"suggestion_basis\": \"将“参照”改为“依据”或“符合”，确立了验收指标的强制性地位，消除了乙方通过文字游戏逃避质量责任的空间，确保甲方验收权的有效行使。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_2::2.u2\",\n      \"display_clause_id\": \"2.u2\"\n    }\n  ]\n}"
+  },
+  "by_clause_records": [
+    {
+      "clause_uid": "segment_2::2.u2",
+      "input_payload": {
+        "review_side": "甲方",
+        "contract_type_hint": "service_agreement",
+        "clause_uid": "segment_2::2.u2",
+        "clause_id": "2.u2",
+        "display_clause_id": "2.u2",
+        "clause_title": "",
+        "clause_text": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+        "clause_kind": "contract_clause",
+        "source_excerpt": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+        "segment_id": "segment_2",
+        "segment_title": "第二条 检测和咨询内容",
+        "numbering_confidence": "0",
+        "title_confidence": "0",
+        "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：2.u2\n条款标题：\n条款正文：甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。"
+      },
+      "outputs": {
+        "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"weak_reference_for_acceptance\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"服务期限、里程碑与验收标准\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"验收标准引用措辞约束力不足\",\n      \"issue\": \"条款使用“参照”一词引用验收指标，而非“依据”或“符合”，弱化了验收标准的强制约束力，可能导致乙方交付成果未达标时甲方无法拒收。\",\n      \"evidence_text\": \"参照“甲方提供的验收指标”\",\n      \"anchor_text\": \"参照\",\n      \"factual_basis\": \"条款文本表述为“参照‘甲方提供的验收指标’”，使用了“参照”一词而非“依据”或“应当符合”。\",\n      \"reasoning_basis\": \"在技术服务合同纠纷中，“参照”通常被理解为一种参考性或建议性的指引，而非必须严格遵守的强制性义务。若乙方未完全达到指标，可能以“已参照执行”为由抗辩，导致甲方无法以指标未达标为由拒绝验收或追究违约责任，增加了验收结果的不确定性。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"验收标准应当具有强制约束力\",\n        \"basis_detail\": \"验收标准是判断交付物是否合格的核心依据，应当使用“依据”、“符合”等确定性措辞，确保乙方交付成果必须满足特定要求，而非仅作为参考。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将“参照”修改为“依据”或“应当符合”，明确验收指标具有强制约束力。\",\n      \"suggestion_minimal\": \"将“参照‘甲方提供的验收指标’”修改为“依据‘甲方提供的验收指标’”。\",\n      \"suggestion_optimized\": \"修改为：“乙方应当依据‘甲方提供的验收指标’（详见附件）进行测试，测试结果必须完全符合上述指标要求，否则视为验收不合格。”\",\n      \"suggestion_basis\": \"将“参照”改为“依据”或“符合”，确立了验收指标的强制性地位，消除了乙方通过文字游戏逃避质量责任的空间，确保甲方验收权的有效行使。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_2::2.u2\",\n      \"display_clause_id\": \"2.u2\"\n    }\n  ]\n}"
+      },
+      "normalized_items": [
+        {
+          "risk_code": "weak_reference_for_acceptance",
+          "risk_source_type": "anchored",
+          "dimension": "服务期限、里程碑与验收标准",
+          "risk_level": "medium",
+          "risk_label": "验收标准引用措辞约束力不足",
+          "issue": "条款使用“参照”一词引用验收指标，而非“依据”或“符合”，弱化了验收标准的强制约束力，可能导致乙方交付成果未达标时甲方无法拒收。",
+          "evidence_text": "参照“甲方提供的验收指标”",
+          "anchor_text": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+          "factual_basis": "条款文本表述为“参照‘甲方提供的验收指标’”，使用了“参照”一词而非“依据”或“应当符合”。",
+          "reasoning_basis": "在技术服务合同纠纷中，“参照”通常被理解为一种参考性或建议性的指引，而非必须严格遵守的强制性义务。若乙方未完全达到指标，可能以“已参照执行”为由抗辩，导致甲方无法以指标未达标为由拒绝验收或追究违约责任，增加了验收结果的不确定性。",
+          "normative_basis": {
+            "basis_type": "contract_logic_rule",
+            "basis_title": "验收标准应当具有强制约束力",
+            "basis_detail": "验收标准是判断交付物是否合格的核心依据，应当使用“依据”、“符合”等确定性措辞，确保乙方交付成果必须满足特定要求，而非仅作为参考。",
+            "citation_text": ""
+          },
+          "suggestion": "将“参照”修改为“依据”或“应当符合”，明确验收指标具有强制约束力。",
+          "suggestion_minimal": "将“参照‘甲方提供的验收指标’”修改为“依据‘甲方提供的验收指标’”。",
+          "suggestion_optimized": "修改为：“乙方应当依据‘甲方提供的验收指标’（详见附件）进行测试，测试结果必须完全符合上述指标要求，否则视为验收不合格。”",
+          "suggestion_basis": "将“参照”改为“依据”或“符合”，确立了验收指标的强制性地位，消除了乙方通过文字游戏逃避质量责任的空间，确保甲方验收权的有效行使。",
+          "needs_human_review": true,
+          "clause_uid": "segment_2::2.u2",
+          "display_clause_id": "2.u2",
+          "clause_uids": [
+            "segment_2::2.u2"
+          ],
+          "clause_id": "2.u2",
+          "related_clause_ids": [],
+          "related_clause_uids": [],
+          "quality_flags": []
+        }
+      ],
+      "dropped_items": [],
+      "validation_errors": []
+    },
+    {
+      "clause_uid": "segment_2::2.u3",
+      "input_payload": {
+        "review_side": "甲方",
+        "contract_type_hint": "service_agreement",
+        "clause_uid": "segment_2::2.u3",
+        "clause_id": "2.u3",
+        "display_clause_id": "2.u3",
+        "clause_title": "",
+        "clause_text": "课题及对应测试对象如下：\n\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\n| --- | --- | --- | --- |\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |",
+        "clause_kind": "contract_clause",
+        "source_excerpt": "课题及对应测试对象如下：\n\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\n| --- | --- | --- | --- |\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |",
+        "segment_id": "segment_2",
+        "segment_title": "第二条 检测和咨询内容",
+        "numbering_confidence": "0",
+        "title_confidence": "0",
+        "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：2.u3\n条款标题：\n条款正文：课题及对应测试对象如下：\n\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\n| --- | --- | --- | --- |\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |"
+      },
+      "outputs": {
+        "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"weak_reference_for_acceptance\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"服务期限、里程碑与验收标准\",\n      \"risk_level\": \"medium\",\n      \"risk_label\": \"验收标准引用措辞约束力不足\",\n      \"issue\": \"条款使用“参照”一词引用验收指标，而非“依据”或“符合”，弱化了验收标准的强制约束力，可能导致乙方交付成果未达标时甲方无法拒收。\",\n      \"evidence_text\": \"参照“甲方提供的验收指标”\",\n      \"anchor_text\": \"参照\",\n      \"factual_basis\": \"条款文本表述为“参照‘甲方提供的验收指标’”，使用了“参照”一词而非“依据”或“应当符合”。\",\n      \"reasoning_basis\": \"在技术服务合同纠纷中，“参照”通常被理解为一种参考性或建议性的指引，而非必须严格遵守的强制性义务。若乙方未完全达到指标，可能以“已参照执行”为由抗辩，导致甲方无法以指标未达标为由拒绝验收或追究违约责任，增加了验收结果的不确定性。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"验收标准应当具有强制约束力\",\n        \"basis_detail\": \"验收标准是判断交付物是否合格的核心依据，应当使用“依据”、“符合”等确定性措辞，确保乙方交付成果必须满足特定要求，而非仅作为参考。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"将“参照”修改为“依据”或“应当符合”，明确验收指标具有强制约束力。\",\n      \"suggestion_minimal\": \"将“参照‘甲方提供的验收指标’”修改为“依据‘甲方提供的验收指标’”。\",\n      \"suggestion_optimized\": \"修改为：“乙方应当依据‘甲方提供的验收指标’（详见附件）进行测试，测试结果必须完全符合上述指标要求，否则视为验收不合格。”\",\n      \"suggestion_basis\": \"将“参照”改为“依据”或“符合”，确立了验收指标的强制性地位，消除了乙方通过文字游戏逃避质量责任的空间，确保甲方验收权的有效行使。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_2::2.u2\",\n      \"display_clause_id\": \"2.u2\"\n    }\n  ]\n}"
+      },
+      "normalized_items": [],
+      "dropped_items": [],
+      "validation_errors": []
+    }
+  ],
+  "accepted_items": [
+    {
+      "risk_code": "weak_reference_for_acceptance",
+      "risk_source_type": "anchored",
+      "dimension": "服务期限、里程碑与验收标准",
+      "risk_level": "medium",
+      "risk_label": "验收标准引用措辞约束力不足",
+      "issue": "条款使用“参照”一词引用验收指标，而非“依据”或“符合”，弱化了验收标准的强制约束力，可能导致乙方交付成果未达标时甲方无法拒收。",
+      "evidence_text": "参照“甲方提供的验收指标”",
+      "anchor_text": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+      "factual_basis": "条款文本表述为“参照‘甲方提供的验收指标’”，使用了“参照”一词而非“依据”或“应当符合”。",
+      "reasoning_basis": "在技术服务合同纠纷中，“参照”通常被理解为一种参考性或建议性的指引，而非必须严格遵守的强制性义务。若乙方未完全达到指标，可能以“已参照执行”为由抗辩，导致甲方无法以指标未达标为由拒绝验收或追究违约责任，增加了验收结果的不确定性。",
+      "normative_basis": {
+        "basis_type": "contract_logic_rule",
+        "basis_title": "验收标准应当具有强制约束力",
+        "basis_detail": "验收标准是判断交付物是否合格的核心依据，应当使用“依据”、“符合”等确定性措辞，确保乙方交付成果必须满足特定要求，而非仅作为参考。",
+        "citation_text": ""
+      },
+      "suggestion": "将“参照”修改为“依据”或“应当符合”，明确验收指标具有强制约束力。",
+      "suggestion_minimal": "将“参照‘甲方提供的验收指标’”修改为“依据‘甲方提供的验收指标’”。",
+      "suggestion_optimized": "修改为：“乙方应当依据‘甲方提供的验收指标’（详见附件）进行测试，测试结果必须完全符合上述指标要求，否则视为验收不合格。”",
+      "suggestion_basis": "将“参照”改为“依据”或“符合”，确立了验收指标的强制性地位，消除了乙方通过文字游戏逃避质量责任的空间，确保甲方验收权的有效行使。",
+      "needs_human_review": true,
+      "clause_uid": "segment_2::2.u2",
+      "display_clause_id": "2.u2",
+      "clause_uids": [
+        "segment_2::2.u2"
+      ],
+      "clause_id": "2.u2",
+      "related_clause_ids": [],
+      "related_clause_uids": [],
+      "quality_flags": []
+    }
+  ],
+  "error": null,
+  "duration_seconds": 127.99325008317828,
+  "skipped": []
+}

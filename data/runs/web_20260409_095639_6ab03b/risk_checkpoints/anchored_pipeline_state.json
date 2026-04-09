@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "clause_split_max_concurrency": 3,
+  "dify_max_concurrency": 5,
+  "segment_results_summary": [
+    {
+      "segment_id": "segment_1",
+      "segment_start_idx": 0,
+      "status": "ok",
+      "duration_seconds": 183.53051595762372,
+      "risk_item_count": 0,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_2",
+      "segment_start_idx": 1,
+      "status": "error",
+      "duration_seconds": 288.31051975116134,
+      "risk_item_count": 0,
+      "by_clause_count": 0
+    },
+    {
+      "segment_id": "segment_3",
+      "segment_start_idx": 2,
+      "status": "ok",
+      "duration_seconds": 156.43070308305323,
+      "risk_item_count": 1,
+      "by_clause_count": 4
+    },
+    {
+      "segment_id": "segment_4",
+      "segment_start_idx": 3,
+      "status": "ok",
+      "duration_seconds": 169.73010095581412,
+      "risk_item_count": 2,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_5",
+      "segment_start_idx": 4,
+      "status": "ok",
+      "duration_seconds": 185.82405937463045,
+      "risk_item_count": 2,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_6",
+      "segment_start_idx": 5,
+      "status": "ok",
+      "duration_seconds": 366.23873579129577,
+      "risk_item_count": 1,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_7",
+      "segment_start_idx": 6,
+      "status": "ok",
+      "duration_seconds": 205.18718112446368,
+      "risk_item_count": 2,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_8",
+      "segment_start_idx": 7,
+      "status": "ok",
+      "duration_seconds": 205.5787936653942,
+      "risk_item_count": 2,
+      "by_clause_count": 2
+    },
+    {
+      "segment_id": "segment_9",
+      "segment_start_idx": 8,
+      "status": "ok",
+      "duration_seconds": 207.3982232902199,
+      "risk_item_count": 2,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_10",
+      "segment_start_idx": 9,
+      "status": "ok",
+      "duration_seconds": 69.46246037632227,
+      "risk_item_count": 0,
+      "by_clause_count": 1
+    }
+  ],
+  "errors": [
+    {
+      "segment_id": "segment_2",
+      "segment_start_idx": 1,
+      "error_type": "ValueError",
+      "error_message": "Risk payload is not a JSON object. raw_preview=",
+      "inputs": {
+        "review_side": "甲方",
+        "contract_type_hint": "service_agreement",
+        "segment_id": "segment_2",
+        "segment_title": "第二条 检测和咨询内容",
+        "clauses_json": "[{\"review_side\": \"甲方\", \"contract_type_hint\": \"service_agreement\", \"clause_uid\": \"segment_2::2.u1\", \"clause_id\": \"2.u1\", \"display_clause_id\": \"2.u1\", \"clause_title\": \"\", \"clause_text\": \"甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。\", \"segment_id\": \"segment_2\", \"segment_title\": \"第二条 检测和咨询内容\", \"numbering_confidence\": \"0\", \"title_confidence\": \"0\", \"clause_context\": \"审查视角：甲方\\n合同类型：service_agreement\\n条款编号：2.u1\\n条款标题：\\n条款正文：甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。\"}, {\"review_side\": \"甲方\", \"contract_type_hint\": \"service_agreement\", \"clause_uid\": \"segment_2::2.u2\", \"clause_id\": \"2.u2\", \"display_clause_id\": \"2.u2\", \"clause_title\": \"\", \"clause_text\": \"课题及对应测试对象如下：\\n\\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\\n| --- | --- | --- | --- |\\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"课题及对应测试对象如下：\\n\\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\\n| --- | --- | --- | --- |\\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |\", \"segment_id\": \"segment_2\", \"segment_title\": \"第二条 检测和咨询内容\", \"numbering_confidence\": \"0\", \"title_confidence\": \"0\", \"clause_context\": \"审查视角：甲方\\n合同类型：service_agreement\\n条款编号：2.u2\\n条款标题：\\n条款正文：课题及对应测试对象如下：\\n\\n| 编号 | 项目/课题名称 | 对应测试大纲 | 测试对象 |\\n| --- | --- | --- | --- |\\n| 1 | 基于 TEE 和异构计算的同态加密加速技术 | 1.4.3.2. 基于可信执行环境的同态加密计算加速系统（指标2.6） | 基于可信执行环境的同态加密计算加速系统 |\"}]",
+        "clause_count": "2",
+        "risk_stream": "anchored"
+      },
+      "raw_preview": "{'text': ''}"
+    }
+  ]
+}

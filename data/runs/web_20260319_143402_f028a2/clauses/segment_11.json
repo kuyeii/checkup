@@ -1,0 +1,79 @@
+[
+  {
+    "clause_id": "1",
+    "clause_title": "",
+    "clause_text": "本合同未经双方另行书面同意，不得修改。未尽事宜，双方另行签订补充协议。",
+    "segment_id": "segment_11",
+    "segment_title": "十一、合同生效及其他",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "本合同未经双方另行书面同意，不得修改。未尽事宜，双方另行签订补充协议。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "2",
+    "clause_title": "",
+    "clause_text": "本合同之附件均为合同有效组成部分。本合同及其附件内，空格部分填写的文字与打印文字具有同等效力。",
+    "segment_id": "segment_11",
+    "segment_title": "十一、合同生效及其他",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "本合同之附件均为合同有效组成部分。本合同及其附件内，空格部分填写的文字与打印文字具有同等效力。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "3",
+    "clause_title": "",
+    "clause_text": "未经甲方事先书面许可，乙方不得擅自转让本合同项下的全部或部分权利义务。",
+    "segment_id": "segment_11",
+    "segment_title": "十一、合同生效及其他",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "未经甲方事先书面许可，乙方不得擅自转让本合同项下的全部或部分权利义务。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "4",
+    "clause_title": "",
+    "clause_text": "本合同中所约定的损失包括但不限于诉讼费/仲裁费、律师费、调查费、差旅费等维权成本和费用。",
+    "segment_id": "segment_11",
+    "segment_title": "十一、合同生效及其他",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "本合同中所约定的损失包括但不限于诉讼费/仲裁费、律师费、调查费、差旅费等维权成本和费用。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "5",
+    "clause_title": "",
+    "clause_text": "本合同履行重要事项的通知，双方同意采用书面形式，按照本合同首部双方预留联系方式发出。通过传真、电子邮件等即时方式发出的，自通知发出之日起视为送达；通过邮政特快专递、挂号信等可跟踪查询邮寄情况的方式发出的，自交寄之日起 7 天视为送达。任何一方变更联系方式的，应提前 7 天书面通知对方，否则对方按本合同约定地址发出通知视为有效送达。",
+    "segment_id": "segment_11",
+    "segment_title": "十一、合同生效及其他",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "本合同履行重要事项的通知，双方同意采用书面形式，按照本合同首部双方预留联系方式发出。通过传真、电子邮件等即时方式发出的，自通知发出之日起视为送达；通过邮政特快专递、挂号信等可跟踪查询邮寄情况的方式发出的，自交寄之日起 7 天视为送达。任何一方变更联系方式的，应提前 7 天书面通知对方，否则对方按本合同约定地址发出通知视为有效送达。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "6",
+    "clause_title": "",
+    "clause_text": "在合同履行过程中，实际情况发生根本性变化，直接导致乙方不能全部或部分执行项目时，乙方应当立即通知甲方。双方应在甲方收到通知后_7 日内进行协商，协商不成的，甲方有权解除本合同并要求乙方退还全部已付款项。\n\n除本合同另有约定外，当事人一方要求变更或解除合同时，应当提前_7 天前通知对方，因变更或解除合同使一方遭受损失的，除依法可以免除责任的外，应由责任方负责赔偿。变更或解除合同的通知或协议应当采取书面形式，协议未达成之前，原合同仍然有效。\n\n本合同终止后，除另行签订书面协议，双方应在 7天内完成本项目的交接工作，期满未完成交接的，责任方应按照本合同总价每日万分之 1 的标准支付对方赔偿金。",
+    "segment_id": "segment_11",
+    "segment_title": "十一、合同生效及其他",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "在合同履行过程中，实际情况发生根本性变化，直接导致乙方不能全部或部分执行项目时，乙方应当立即通知甲方。双方应在甲方收到通知后_7 日内进行协商，协商不成的，甲方有权解除本合同并要求乙方退还全部已付款项。\n\n除本合同另有约定外，当事人一方要求变更或解除合同时，应当提前_7 天前通知对方，因变更或解除合同使一方遭受损失的，除依法可以免除责任的外，应由责任方负责赔偿。变更或解除合同的通知或协议应当采取书面形式，协议未达成之前，原合同仍然有效。\n\n本合同终止后，除另行签订书面协议，双方应在 7天内完成本项目的交接工作，期满未完成交接的，责任方应按照本合同总价每日万分之 1 的标准支付对方赔偿金。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "7",
+    "clause_title": "",
+    "clause_text": "本合同一式 贰 份，双方各执 壹 份，具有同等法律效力，自合同双方盖章后生效。",
+    "segment_id": "segment_11",
+    "segment_title": "十一、合同生效及其他",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "本合同一式 贰 份，双方各执 壹 份，具有同等法律效力，自合同双方盖章后生效。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  }
+]

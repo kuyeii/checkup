@@ -1,0 +1,41 @@
+[1/6] Extracting DOCX text...
+[2/6] Cleaning text...
+[3/6] Splitting top-level segments...
+Segments: 11 | heading_style=chinese
+[4/6] Running clause splitter in parallel with anchored pipeline...
+  - clause done segment_3 (4 clauses), submit anchored
+[anchored-parallel] start segment_3
+  - clause done segment_2 (4 clauses), submit anchored
+[anchored-parallel] start segment_2
+  - clause done segment_5 (4 clauses), submit anchored
+[anchored-parallel] start segment_5
+  - clause done segment_4 (4 clauses), submit anchored
+[anchored-parallel] start segment_4
+  - clause done segment_8 (1 clauses), submit anchored
+[anchored-parallel] start segment_8
+  - clause done segment_10 (4 clauses), submit anchored
+  - clause done segment_6 (4 clauses), submit anchored
+  - clause done segment_7 (5 clauses), submit anchored
+  - clause done segment_9 (4 clauses), submit anchored
+  - clause done segment_1 (6 clauses), submit anchored
+  - clause done segment_11 (7 clauses), submit anchored
+[anchored-parallel] end segment_2
+[anchored-parallel] start segment_10
+[anchored-parallel] end segment_10
+[anchored-parallel] start segment_6
+[anchored-parallel] end segment_6
+[anchored-parallel] start segment_7
+[anchored-parallel] end segment_7
+[anchored-parallel] start segment_9
+[anchored-parallel] end segment_3
+[anchored-parallel] start segment_1
+[anchored-parallel] end segment_1
+[anchored-parallel] start segment_11
+[anchored-parallel] end segment_5
+[anchored-parallel] end segment_4
+[anchored-parallel] end segment_11
+[anchored-parallel] end segment_8
+[anchored-parallel] end segment_9
+4 anchored segments failed in pipeline
+Merged clauses: 47
+[5/6] Running risk reviewer workflow...

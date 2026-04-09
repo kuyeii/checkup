@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "clause_split_max_concurrency": 3,
+  "dify_max_concurrency": 5,
+  "segment_results_summary": [
+    {
+      "segment_id": "segment_1",
+      "segment_start_idx": 0,
+      "status": "ok",
+      "duration_seconds": 88.48682608269155,
+      "risk_item_count": 2,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_2",
+      "segment_start_idx": 1,
+      "status": "ok",
+      "duration_seconds": 89.32900933548808,
+      "risk_item_count": 1,
+      "by_clause_count": 2
+    },
+    {
+      "segment_id": "segment_3",
+      "segment_start_idx": 2,
+      "status": "error",
+      "duration_seconds": 39.701981373131275,
+      "risk_item_count": 0,
+      "by_clause_count": 0
+    },
+    {
+      "segment_id": "segment_4",
+      "segment_start_idx": 3,
+      "status": "ok",
+      "duration_seconds": 701.8912546671927,
+      "risk_item_count": 2,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_5",
+      "segment_start_idx": 4,
+      "status": "ok",
+      "duration_seconds": 95.44709129072726,
+      "risk_item_count": 4,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_6",
+      "segment_start_idx": 5,
+      "status": "ok",
+      "duration_seconds": 124.96196562610567,
+      "risk_item_count": 1,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_7",
+      "segment_start_idx": 6,
+      "status": "ok",
+      "duration_seconds": 114.07633383385837,
+      "risk_item_count": 2,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_8",
+      "segment_start_idx": 7,
+      "status": "ok",
+      "duration_seconds": 58.87853345833719,
+      "risk_item_count": 1,
+      "by_clause_count": 2
+    },
+    {
+      "segment_id": "segment_9",
+      "segment_start_idx": 8,
+      "status": "ok",
+      "duration_seconds": 538.8889274578542,
+      "risk_item_count": 0,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_10",
+      "segment_start_idx": 9,
+      "status": "ok",
+      "duration_seconds": 23.865445040166378,
+      "risk_item_count": 0,
+      "by_clause_count": 1
+    }
+  ],
+  "errors": [
+    {
+      "segment_id": "segment_3",
+      "segment_start_idx": 2,
+      "error_type": "ValueError",
+      "error_message": "Risk payload is not a JSON object. raw_preview=导-auto-auto新新商业,新，分国家数据数据\\n\\n，新,用商业新新汽车汽车--商业, -企业企业排名公司\\n分\t\t新新新-导导约可关于\t-新新新车企出口\\n\\n\\n新新新新新新新新--户用户新-新新导数据\\n新新新新导导导新新下载下下新出口出口表格数据数据新的企业企业\\n\\n，新新下载下载下载表格商业商业导下载新，表格新汽车企业各下\\n新新新出口商业新-auto新新保存\t -关于新下11企业本地本地\\n\\n\t\t\t新户\t新新-10：1010长新可，新功能出口，\\n下载下载下载202新本本新功能新省</think>，",
+      "inputs": {
+        "review_side": "supplier",
+        "contract_type_hint": "service_agreement",
+        "segment_id": "segment_3",
+        "segment_title": "第三条 检测经费及付款方式",
+        "clauses_json": "[{\"review_side\": \"supplier\", \"contract_type_hint\": \"service_agreement\", \"clause_uid\": \"segment_3::3.u1\", \"clause_id\": \"3.u1\", \"display_clause_id\": \"3.u1\", \"clause_title\": \"\", \"clause_text\": \"甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。\", \"segment_id\": \"segment_3\", \"segment_title\": \"第三条 检测经费及付款方式\", \"numbering_confidence\": \"0\", \"title_confidence\": \"0\", \"clause_context\": \"审查视角：supplier\\n合同类型：service_agreement\\n条款编号：3.u1\\n条款标题：\\n条款正文：甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。\"}, {\"review_side\": \"supplier\", \"contract_type_hint\": \"service_agreement\", \"clause_uid\": \"segment_3::3.u2\", \"clause_id\": \"3.u2\", \"display_clause_id\": \"3.u2\", \"clause_title\": \"\", \"clause_text\": \"合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。\", \"segment_id\": \"segment_3\", \"segment_title\": \"第三条 检测经费及付款方式\", \"numbering_confidence\": \"0\", \"title_confidence\": \"0\", \"clause_context\": \"审查视角：supplier\\n合同类型：service_agreement\\n条款编号：3.u2\\n条款标题：\\n条款正文：合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。\"}, {\"review_side\": \"supplier\", \"contract_type_hint\": \"service_agreement\", \"clause_uid\": \"segment_3::3.u3\", \"clause_id\": \"3.u3\", \"display_clause_id\": \"3.u3\", \"clause_title\": \"甲方发票信息\", \"clause_text\": \"单位名称：南湖实验室\\n\\n统一社会信用代码：12330400MB1D62272G\\n\\n开户银行：嘉兴银行股份有限公司科技支行\\n\\n银行账号：109101201900080105\\n\\n开票地址：嘉兴市南湖区七星街道香湖别墅29幢\\n\\n电 话：0573-82866610\\n\\n纳税人身份：☑增值税一般纳税人 □非增值税一般纳税人\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"单位名称：南湖实验室\\n\\n统一社会信用代码：12330400MB1D62272G\\n\\n开户银行：嘉兴银行股份有限公司科技支行\\n\\n银行账号：109101201900080105\\n\\n开票地址：嘉兴市南湖区七星街道香湖别墅29幢\\n\\n电 话：0573-82866610\\n\\n纳税人身份：☑增值税一般纳税人 □非增值税一般纳税人\", \"segment_id\": \"segment_3\", \"segment_title\": \"第三条 检测经费及付款方式\", \"numbering_confidence\": \"0\", \"title_confidence\": \"1\", \"clause_context\": \"审查视角：supplier\\n合同类型：service_agreement\\n条款编号：3.u3\\n条款标题：甲方发票信息\\n条款正文：单位名称：南湖实验室\\n\\n统一社会信用代码：12330400MB1D62272G\\n\\n开户银行：嘉兴银行股份有限公司科技支行\\n\\n银行账号：109101201900080105\\n\\n开票地址：嘉兴市南湖区七星街道香湖别墅29幢\\n\\n电 话：0573-82866610\\n\\n纳税人身份：☑增值税一般纳税人 □非增值税一般纳税人\"}, {\"review_side\": \"supplier\", \"contract_type_hint\": \"service_agreement\", \"clause_uid\": \"segment_3::3.u4\", \"clause_id\": \"3.u4\", \"display_clause_id\": \"3.u4\", \"clause_title\": \"乙方账户信息\", \"clause_text\": \"开户银行：工行北京北新桥支行\\n\\n开 户 名：中国电子技术标准化研究院\\n\\n账 户：0200 0043 0908 8116 710\\n\\n税 号： 12100000400002195R\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"开户银行：工行北京北新桥支行\\n\\n开 户 名：中国电子技术标准化研究院\\n\\n账 户：0200 0043 0908 8116 710\\n\\n税 号： 12100000400002195R\", \"segment_id\": \"segment_3\", \"segment_title\": \"第三条 检测经费及付款方式\", \"numbering_confidence\": \"0\", \"title_confidence\": \"1\", \"clause_context\": \"审查视角：supplier\\n合同类型：service_agreement\\n条款编号：3.u4\\n条款标题：乙方账户信息\\n条款正文：开户银行：工行北京北新桥支行\\n\\n开 户 名：中国电子技术标准化研究院\\n\\n账 户：0200 0043 0908 8116 710\\n\\n税 号： 12100000400002195R\"}]",
+        "clause_count": "4",
+        "risk_stream": "anchored"
+      },
+      "raw_preview": "{'text': '导-auto-auto新新商业,新，分国家数据数据\\n\\n，新,用商业新新汽车汽车--商业, -企业企业排名公司\\n分\\t\\t新新新-导导约可关于\\t-新新新车企出口\\n\\n\\n新新新新新新新新--户用户新-新新导数据\\n新新新新导导导新新下载下下新出口出口表格数据数据新的企业企业\\n\\n，新新下载下载下载表格商业商业导下载新，表格新汽车企业各下\\n新新新出口商业新-auto新新保存\\t -关于新下11企业本地本地\\n\\n\\t\\t\\t新户\\t新新-10：1010长新可，新功能出口，\\n下载下载下载202新本本新功能新省</think>，'}"
+    }
+  ]
+}

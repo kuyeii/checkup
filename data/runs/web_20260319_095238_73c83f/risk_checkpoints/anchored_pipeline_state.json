@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "clause_split_max_concurrency": 3,
+  "dify_max_concurrency": 5,
+  "segment_results_summary": [
+    {
+      "segment_id": "segment_1",
+      "segment_start_idx": 0,
+      "status": "ok",
+      "duration_seconds": 40.777436915785074,
+      "risk_item_count": 2,
+      "by_clause_count": 6
+    },
+    {
+      "segment_id": "segment_2",
+      "segment_start_idx": 1,
+      "status": "ok",
+      "duration_seconds": 28.82060358300805,
+      "risk_item_count": 1,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_3",
+      "segment_start_idx": 2,
+      "status": "ok",
+      "duration_seconds": 31.353169249370694,
+      "risk_item_count": 1,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_4",
+      "segment_start_idx": 3,
+      "status": "ok",
+      "duration_seconds": 50.690414832904935,
+      "risk_item_count": 2,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_5",
+      "segment_start_idx": 4,
+      "status": "ok",
+      "duration_seconds": 44.473996710032225,
+      "risk_item_count": 2,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_6",
+      "segment_start_idx": 5,
+      "status": "ok",
+      "duration_seconds": 44.84792208299041,
+      "risk_item_count": 3,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_7",
+      "segment_start_idx": 6,
+      "status": "ok",
+      "duration_seconds": 45.510226460173726,
+      "risk_item_count": 3,
+      "by_clause_count": 5
+    },
+    {
+      "segment_id": "segment_8",
+      "segment_start_idx": 7,
+      "status": "ok",
+      "duration_seconds": 46.01072712615132,
+      "risk_item_count": 2,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_9",
+      "segment_start_idx": 8,
+      "status": "ok",
+      "duration_seconds": 23.691600624471903,
+      "risk_item_count": 1,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_10",
+      "segment_start_idx": 9,
+      "status": "ok",
+      "duration_seconds": 30.174952710047364,
+      "risk_item_count": 2,
+      "by_clause_count": 4
+    },
+    {
+      "segment_id": "segment_11",
+      "segment_start_idx": 10,
+      "status": "ok",
+      "duration_seconds": 19.89912291802466,
+      "risk_item_count": 0,
+      "by_clause_count": 6
+    }
+  ],
+  "errors": []
+}

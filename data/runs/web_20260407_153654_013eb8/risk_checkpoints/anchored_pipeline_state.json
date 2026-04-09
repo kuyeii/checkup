@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "clause_split_max_concurrency": 3,
+  "dify_max_concurrency": 5,
+  "segment_results_summary": [
+    {
+      "segment_id": "segment_1",
+      "segment_start_idx": 0,
+      "status": "ok",
+      "duration_seconds": 98.05090670660138,
+      "risk_item_count": 1,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_2",
+      "segment_start_idx": 1,
+      "status": "ok",
+      "duration_seconds": 79.53943887352943,
+      "risk_item_count": 1,
+      "by_clause_count": 2
+    },
+    {
+      "segment_id": "segment_3",
+      "segment_start_idx": 2,
+      "status": "ok",
+      "duration_seconds": 51.18612470664084,
+      "risk_item_count": 1,
+      "by_clause_count": 4
+    },
+    {
+      "segment_id": "segment_4",
+      "segment_start_idx": 3,
+      "status": "ok",
+      "duration_seconds": 117.65963295847178,
+      "risk_item_count": 2,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_5",
+      "segment_start_idx": 4,
+      "status": "ok",
+      "duration_seconds": 223.4743413347751,
+      "risk_item_count": 2,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_6",
+      "segment_start_idx": 5,
+      "status": "ok",
+      "duration_seconds": 124.9226640406996,
+      "risk_item_count": 1,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_7",
+      "segment_start_idx": 6,
+      "status": "ok",
+      "duration_seconds": 694.457882585004,
+      "risk_item_count": 1,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_8",
+      "segment_start_idx": 7,
+      "status": "ok",
+      "duration_seconds": 135.67204649932683,
+      "risk_item_count": 2,
+      "by_clause_count": 2
+    },
+    {
+      "segment_id": "segment_9",
+      "segment_start_idx": 8,
+      "status": "ok",
+      "duration_seconds": 136.24000903964043,
+      "risk_item_count": 1,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_10",
+      "segment_start_idx": 9,
+      "status": "ok",
+      "duration_seconds": 34.68724366649985,
+      "risk_item_count": 0,
+      "by_clause_count": 1
+    }
+  ],
+  "errors": []
+}

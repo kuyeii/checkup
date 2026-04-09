@@ -1,0 +1,587 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body, #root { height: 100%; }
+  body { overflow: hidden; }
+}
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer components {
+  /* App Shell */
+  .appShell {
+    @apply flex h-screen bg-[#f9fafb] overflow-hidden text-sm text-gray-800 font-sans;
+  }
+  .contentShell {
+    /* Allow page-level scrolling so inner cards keep rounded corners (no inner scrollbars). */
+    @apply flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden;
+  }
+  .contentShell--noScroll {
+    overflow: hidden !important;
+  }
+
+  /* SideNav */
+  .sideNav {
+    @apply w-72 bg-transparent flex flex-col shrink-0;
+  }
+  .sideNavTop {
+    /* IMPORTANT: do NOT flex-1 here, otherwise it will push the "工作台" group down */
+    @apply shrink-0;
+  }
+  .brandPanel {
+    @apply h-14 flex items-center px-6;
+  }
+  .brandLogo {
+    @apply w-8 h-8 bg-[#00b365] text-white rounded-full flex items-center justify-center font-bold mr-3;
+  }
+  .navList {
+    @apply flex-1 overflow-y-auto py-4 px-4 space-y-1;
+  }
+  .navItem {
+    @apply flex items-center px-4 py-2.5 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer w-full text-left;
+  }
+  .navItem--active {
+    @apply bg-gray-200/60 text-gray-900 font-medium;
+  }
+  .navIconWrap {
+    @apply mr-3 text-gray-500 flex items-center justify-center;
+  }
+  .navGroupLabel {
+    @apply text-xs font-medium text-gray-400 mt-6 mb-2 px-4;
+  }
+
+  /* TopBar */
+  .globalTopBar {
+    /* Keep the top bar visible while the page scrolls */
+    @apply h-14 bg-transparent flex items-center justify-between px-6 shrink-0 sticky top-0 z-20;
+  }
+  .topBarUser {
+    @apply flex items-center gap-3 ml-auto text-gray-600 font-medium;
+  }
+  .avatar {
+    @apply w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 overflow-hidden;
+  }
+
+  /* Upload Dashboard */
+  .dashboardPage {
+    @apply flex-1 bg-white m-2 md:m-4 mt-0 rounded-xl md:rounded-2xl shadow-sm border border-gray-100 flex flex-col;
+    /* Make the card fit the viewport (minus the global top bar). This avoids the whole page scrolling. */
+    height: calc(100dvh - 56px - 16px);
+    max-height: calc(100dvh - 56px - 16px);
+    overflow: hidden;
+  }
+  .dashboardScroll {
+    /* Homepage must not scroll. Use responsive spacing instead of zoom/scale. */
+    height: 100%;
+    padding: clamp(12px, 2.4vh, 28px) clamp(12px, 3vw, 32px);
+  }
+  .uploadHero {
+    @apply max-w-3xl mx-auto text-center;
+    margin-top: clamp(8px, 1.6vh, 18px);
+    margin-bottom: clamp(10px, 2vh, 22px);
+  }
+  .uploadHeroLogo {
+    @apply flex justify-center items-center mb-2 md:mb-4;
+  }
+  .uploadHeroSubtitle {
+    color: rgb(107 114 128);
+    font-size: clamp(14px, 2.1vh, 18px);
+    margin-top: 6px;
+  }
+  .uploadCardContainer {
+    @apply max-w-3xl mx-auto rounded-xl md:rounded-2xl overflow-hidden border-2 border-dashed border-[#a7f3d0] bg-white relative;
+    margin-top: clamp(10px, 2vh, 22px);
+  }
+  .uploadCard {
+    @apply flex flex-col items-center justify-center cursor-pointer transition-colors hover:bg-green-50/30 relative;
+    padding: clamp(18px, 3.2vh, 52px) clamp(16px, 4vw, 64px);
+    min-height: clamp(190px, 28vh, 260px);
+  }
+  .uploadCard--active {
+    @apply bg-green-50/50;
+  }
+  .hiddenInput {
+    /*
+      Keep the native file input out of the layout.
+      We trigger it via ref.click() on the upload card.
+      If we overlay an invisible input (absolute inset-0), some browsers will open the file picker twice
+      (input click + parent click bubbling).
+    */
+    @apply hidden;
+  }
+  .uploadCardText {
+    @apply text-sm md:text-base font-medium text-gray-600 mb-2 md:mb-3;
+  }
+  .uploadCardHint {
+    @apply text-xs md:text-sm text-gray-400 flex items-center justify-center gap-2;
+  }
+  .uploadIconWrap {
+    width: clamp(44px, 7vh, 64px);
+    height: clamp(44px, 7vh, 64px);
+    border-radius: 999px;
+    background: rgb(240 253 244);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: clamp(10px, 2.2vh, 18px);
+    flex: 0 0 auto;
+  }
+  .selectedFilePill {
+    margin-top: clamp(10px, 2vh, 16px);
+    padding: 8px 14px;
+    background: rgb(240 253 244);
+    color: rgb(0 179 101);
+    border-radius: 999px;
+    font-size: clamp(12px, 1.7vh, 14px);
+    font-weight: 600;
+    border: 1px solid rgb(220 252 231);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fileTypePill {
+    @apply inline-flex items-center gap-1 bg-gray-50 px-2 py-1 rounded border border-gray-200 text-[10px] md:text-xs font-medium mx-1;
+  }
+  .quickReviewBtnWrap {
+    @apply absolute bottom-3 md:bottom-4 left-3 md:left-4;
+  }
+  .quickReviewBtn {
+    @apply flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-white border border-gray-200 rounded-full text-xs md:text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 z-10 relative;
+  }
+  .uploadCardFooter {
+    @apply bg-[#d1fae5] py-1.5 md:py-2 px-3 md:px-4 text-[10px] md:text-xs text-[#047857] flex justify-between items-center;
+  }
+  .upgradeLink {
+    @apply font-semibold underline;
+  }
+  .uploadActions {
+    @apply max-w-3xl mx-auto flex flex-col items-center;
+    margin-top: clamp(10px, 2vh, 20px);
+  }
+  .reviewModeTabs {
+    @apply flex items-center gap-3 md:gap-4;
+  }
+  .reviewModeBtn {
+    @apply px-4 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-medium text-gray-600 rounded-full bg-gray-100 hover:bg-gray-200 transition-all flex items-center gap-2;
+  }
+  .reviewModeBtn--active {
+    @apply bg-gray-200 text-gray-900;
+  }
+  .startReviewBtn {
+    @apply bg-[#6ee7b7] text-white rounded-lg font-medium hover:bg-[#34d399] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm;
+    width: clamp(160px, 18vw, 220px);
+    padding: clamp(10px, 1.6vh, 14px) clamp(22px, 3vw, 40px);
+    font-size: clamp(14px, 2vh, 18px);
+  }
+
+  /* Core matrix section (must fit without scroll on common desktop heights like 768px) */
+  .matrixSection {
+    width: 100%;
+    max-width: 1100px;
+    margin-top: clamp(14px, 2.6vh, 28px);
+    margin-bottom: clamp(8px, 1.6vh, 18px);
+    padding-inline: clamp(10px, 2.6vw, 20px);
+  }
+  .matrixHeader {
+    text-align: center;
+    margin-bottom: clamp(10px, 2vh, 18px);
+  }
+  .matrixTitle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 800;
+    color: rgb(17 24 39);
+    font-size: clamp(16px, 2.2vh, 20px);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .matrixSubtitle {
+    color: rgb(107 114 128);
+    font-size: clamp(12px, 1.7vh, 14px);
+  }
+  .matrixGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(10px, 1.8vh, 18px);
+  }
+  @media (max-width: 980px) {
+    .matrixGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .matrixGrid { grid-template-columns: 1fr; }
+  }
+  .matrixCard {
+    background: #fff;
+    border: 1px solid rgb(243 244 246);
+    border-radius: 18px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+    padding: clamp(14px, 2vh, 22px);
+    transition: box-shadow 160ms ease, transform 160ms ease;
+    min-height: clamp(150px, 18vh, 190px);
+  }
+  .matrixCard:hover {
+    box-shadow: 0 12px 26px rgba(16, 24, 40, 0.08);
+    transform: translateY(-1px);
+  }
+  .matrixIcon {
+    width: clamp(40px, 5.2vh, 48px);
+    height: clamp(40px, 5.2vh, 48px);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: clamp(10px, 1.6vh, 14px);
+  }
+  .matrixIcon--blue { background: rgb(239 246 255); color: rgb(37 99 235); }
+  .matrixIcon--amber { background: rgb(255 251 235); color: rgb(245 158 11); }
+  .matrixIcon--purple { background: rgb(250 245 255); color: rgb(147 51 234); }
+  .matrixCardTitle {
+    font-weight: 800;
+    color: rgb(17 24 39);
+    font-size: clamp(13px, 1.9vh, 16px);
+    margin-bottom: clamp(8px, 1.4vh, 12px);
+  }
+  .matrixList {
+    display: grid;
+    gap: clamp(6px, 1.2vh, 10px);
+  }
+
+  /* Short screens: tighten spacing aggressively (still no zoom/scale, just smaller tokens) */
+  @media (max-height: 820px) {
+    .dashboardScroll { padding: 12px 16px; }
+    .uploadHero { margin-top: 6px; margin-bottom: 10px; }
+    .uploadCard { min-height: 180px; padding: 16px 18px; }
+    .matrixSection { margin-top: 12px; }
+    .matrixCard { padding: 12px; min-height: 140px; }
+  }
+
+  /* History Page */
+  .historyPage {
+    @apply flex-1 bg-white m-2 md:m-4 mt-0 rounded-xl md:rounded-2xl shadow-sm border border-gray-100 flex flex-col;
+  }
+  .historyHeader {
+    @apply w-full max-w-[1200px] mx-auto;
+  }
+  .historyTable {
+    @apply w-full text-left border-collapse bg-white;
+  }
+  .historyTable th {
+    @apply py-3 px-6 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200;
+  }
+  .historyTable td {
+    @apply py-4 px-6 border-b border-gray-100;
+  }
+  .historyRow {
+    @apply hover:bg-gray-50 cursor-pointer transition-colors;
+  }
+  .fileNameCell {
+    @apply font-medium text-gray-900 flex items-center gap-2;
+  }
+  .statusDot {
+    @apply inline-block w-2 h-2 rounded-full;
+  }
+  .statusDot--completed {
+    @apply bg-green-500;
+  }
+  .statusDot--running {
+    @apply bg-yellow-500;
+  }
+  .statusDot--failed {
+    @apply bg-red-500;
+  }
+  .statusDot--queued {
+    @apply bg-gray-400;
+  }
+
+  /* Review Workspace */
+  .reviewWorkspace {
+    /* Workspace uses its own top bar; no global TopBar when active, so keep normal margins on all sides */
+    @apply flex-1 flex flex-col h-full overflow-hidden bg-white m-2 md:m-4 rounded-xl md:rounded-2xl shadow-sm border border-gray-100;
+  }
+  .workspaceTopBar {
+    @apply h-14 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-6 shrink-0 z-10;
+  }
+  .workspaceTopBarLeft {
+    @apply flex items-center gap-3;
+  }
+  .backBtn {
+    @apply inline-flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition-colors shrink-0;
+  }
+  .workspaceTopBarRight {
+    @apply flex items-center gap-3;
+  }
+  .workspaceTitle {
+    @apply text-sm md:text-base font-semibold text-gray-900 max-w-[420px] truncate;
+  }
+  .workspacePill {
+    @apply inline-flex items-center gap-2 text-xs font-medium px-2.5 py-1 rounded-full border;
+  }
+  .workspacePill--queued {
+    @apply bg-gray-50 text-gray-600 border-gray-200;
+  }
+  .workspacePill--running {
+    @apply bg-amber-50 text-amber-700 border-amber-200;
+  }
+  .workspacePill--completed {
+    @apply bg-emerald-50 text-emerald-700 border-emerald-200;
+  }
+  .workspacePill--failed {
+    @apply bg-rose-50 text-rose-700 border-rose-200;
+  }
+  .workspaceStep {
+    @apply text-xs text-gray-400 truncate max-w-[520px];
+  }
+  .exportBtn {
+    @apply inline-flex items-center justify-center gap-2 h-9 px-4 rounded-lg text-sm font-medium border transition-colors;
+  }
+  .exportBtn--primary {
+    @apply bg-[#00b365] text-white border-[#00b365] hover:bg-[#00a35a];
+  }
+  .exportBtn--disabled {
+    @apply bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed;
+  }
+  .mainGrid {
+    /* Inset panels like Figma surfaces: outer card stays clean, inner panes get their own radius/border. */
+    @apply flex-1 flex overflow-hidden p-3 md:p-4 gap-4 bg-white min-h-0;
+  }
+  .docPane {
+    @apply flex-1 flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden relative min-w-0;
+  }
+  .riskPane {
+    @apply w-[420px] flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden shrink-0;
+  }
+
+  /* Risk Panel */
+  .riskRoot {
+    @apply flex-1 flex flex-col h-full min-h-0;
+  }
+  .riskTabs {
+    @apply flex border-b border-gray-200 bg-white shrink-0;
+  }
+  .riskTab {
+    @apply px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent cursor-pointer transition-colors whitespace-nowrap;
+  }
+  .riskTab--active {
+    @apply text-[#00b365] border-[#00b365];
+  }
+  .riskList {
+    @apply flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0;
+  }
+  .riskCard {
+    @apply bg-white border border-gray-200 rounded-lg p-4 shadow-sm;
+  }
+  .riskCardTitle {
+    @apply font-medium text-gray-900 mb-3 flex items-center gap-2;
+  }
+  .riskCardSection {
+    @apply mb-3;
+  }
+  .riskCardSectionTitle {
+    @apply text-xs font-medium text-gray-500 mb-1;
+  }
+  .riskCardSectionBody {
+    @apply text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-100;
+  }
+  .riskCardActions {
+    @apply flex items-center gap-2 mt-4 pt-3 border-t border-gray-100;
+  }
+  .btnSmall {
+    @apply px-3 py-1.5 text-xs font-medium rounded border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer;
+  }
+  .btnSmall--primary {
+    @apply bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100;
+  }
+
+  /* AI rewrite (新版 AI 改写交互) */
+  .aiRewriteBox {
+    @apply mt-2 rounded-lg border border-emerald-100 bg-emerald-50/40 p-3;
+  }
+  .aiRewriteRow {
+    @apply flex gap-3 py-1;
+  }
+  .aiRewriteLabel {
+    @apply w-12 shrink-0 text-xs text-gray-500;
+  }
+  .aiRewriteText {
+    @apply flex-1 text-sm text-gray-800 whitespace-pre-wrap break-words;
+  }
+  .diffDel {
+    @apply bg-red-100 text-red-700 line-through decoration-red-400 decoration-2 rounded px-1;
+  }
+  .diffIns {
+    @apply bg-emerald-100 text-emerald-700 rounded px-1;
+  }
+  .aiRewriteDetails {
+    @apply mt-2;
+  }
+  .aiRewriteDetails summary {
+    @apply cursor-pointer text-xs text-emerald-700;
+  }
+  .aiRewriteFull {
+    @apply mt-2 rounded-md bg-white border border-gray-100 p-2;
+  }
+
+  .editorOverlay {
+    @apply fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4;
+  }
+  .editorSheet {
+    @apply w-full max-w-2xl rounded-2xl bg-white shadow-xl border border-gray-100 overflow-hidden;
+  }
+  .editorHeader {
+    @apply flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gray-50;
+  }
+  .editorTitle {
+    @apply font-semibold text-gray-900;
+  }
+  .editorActions {
+    @apply flex items-center gap-2;
+  }
+  .editorBody {
+    @apply p-5 space-y-4;
+  }
+  .editorField {
+    @apply space-y-2;
+  }
+  .editorLabel {
+    @apply text-xs text-gray-500;
+  }
+  .editorReadonly {
+    @apply rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap;
+  }
+  .editorTextarea {
+    @apply w-full min-h-40 rounded-lg border border-gray-200 p-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-300;
+  }
+  .editorHelper {
+    @apply text-xs text-gray-500;
+  }
+  .editorCounter {
+    @apply text-xs text-gray-400 text-right;
+  }
+
+  .btnGhost {
+    @apply px-3 py-1.5 text-xs font-medium rounded border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors;
+  }
+  .btnPrimarySolid {
+    @apply px-3 py-1.5 text-xs font-medium rounded bg-emerald-600 text-white hover:bg-emerald-700 transition-colors;
+  }
+
+  /* Document Editor */
+  .docEditor {
+    @apply flex-1 flex flex-col h-full relative min-h-0;
+  }
+  .docToolbar {
+    @apply h-10 border-b border-gray-200 bg-gray-50 flex items-center px-4 shrink-0;
+  }
+  .docToolbarLeft {
+    @apply flex items-center gap-2;
+  }
+  .toolbarLabel {
+    @apply text-xs text-gray-500;
+  }
+  .iconBtn {
+    @apply p-1 text-gray-500 hover:bg-gray-200 rounded cursor-pointer transition-colors;
+  }
+  .zoomText {
+    @apply text-xs font-medium w-12 text-center;
+  }
+  .docScroll {
+    /*
+      We hide horizontal overflow to avoid layout shift / horizontal scroll.
+      The comment gutter is overlayed INSIDE the scroll area, so it will remain visible.
+    */
+    @apply flex-1 overflow-y-auto overflow-x-hidden bg-gray-100 p-6 md:p-8 relative min-h-0;
+  }
+  .emptyState {
+    @apply absolute inset-0 flex items-center justify-center text-gray-400;
+  }
+  .docRow {
+    /* Keep the DOCX canvas centered. The comment gutter is OVERLAYED and will NOT affect layout width. */
+    @apply relative w-full;
+  }
+  .docRow--compact {
+  }
+  .docRow--withComments {
+    /* Presence flag only; layout does not change to avoid page shifting. */
+  }
+  .docCanvas {
+    /* Wrap the rendered docx pages. We keep it centered and measure page edge from .docx-wrapper. */
+    @apply relative mx-auto;
+    width: fit-content;
+    padding: 48px;
+  }
+  .changeOverlay {
+    @apply absolute inset-0 pointer-events-none z-10;
+  }
+  .changeHighlight {
+    @apply absolute mix-blend-multiply rounded-sm;
+  }
+  .changeHighlight--insert {
+    @apply bg-green-200/50 border-b-2 border-green-400;
+  }
+  .changeHighlight--delete {
+    @apply bg-red-200/50 line-through decoration-red-500 decoration-2;
+  }
+  .changeHighlight--replace {
+    @apply bg-blue-200/50 border-b-2 border-blue-400;
+  }
+  .changeDeleteMarker {
+    @apply absolute w-1 h-full -left-2 bg-red-400;
+  }
+  .commentLines {
+    @apply absolute inset-0 w-full h-full pointer-events-none z-0;
+  }
+  .commentPolyline {
+    @apply fill-none stroke-gray-300/70 stroke-[1.25];
+  }
+  .commentTrunk {
+    @apply stroke-gray-400 stroke-2;
+  }
+  .commentGutter {
+    /* Overlay gutter: positioned near the document right edge; does not affect layout width. */
+    @apply absolute top-0 w-80 transition-all duration-200 opacity-0;
+    pointer-events: none;
+  }
+  .commentGutter--open {
+    @apply opacity-100 translate-x-0;
+  }
+  .commentGutterInner {
+    @apply absolute top-0 left-0 w-full h-full;
+    pointer-events: none;
+  }
+  .commentBalloon {
+    @apply absolute w-full bg-white border border-gray-200 rounded-lg shadow-sm p-3 text-sm z-10;
+    pointer-events: auto;
+  }
+  .commentBalloon--insert {
+    @apply border-l-4 border-l-green-500;
+  }
+  .commentBalloon--delete {
+    @apply border-l-4 border-l-red-500;
+  }
+  .commentBalloon--replace {
+    @apply border-l-4 border-l-blue-500;
+  }
+  .commentBalloonHead {
+    @apply flex items-center justify-between mb-2;
+  }
+  .commentTag {
+    @apply text-xs font-medium px-2 py-0.5 rounded bg-gray-100 text-gray-600;
+  }
+  .commentTime {
+    @apply text-xs text-gray-400;
+  }
+  .commentText {
+    @apply text-sm mt-1;
+  }
+  .commentDel {
+    @apply text-red-600 line-through;
+  }
+  .commentIns {
+    @apply text-green-600;
+  }
+}

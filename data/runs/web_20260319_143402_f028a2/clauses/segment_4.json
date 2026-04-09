@@ -1,0 +1,46 @@
+[
+  {
+    "clause_id": "1",
+    "clause_title": "",
+    "clause_text": "乙方应指定专职人员做好系统运维服务。",
+    "segment_id": "segment_4",
+    "segment_title": "四、乙方权利义务",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "乙方应指定专职人员做好系统运维服务。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "2",
+    "clause_title": "",
+    "clause_text": "乙方应独立完成本合同项下的全部服务，未经甲方书面同意不得分包；甲方同意分包的服务部分，由乙方和分包方就分包部分对甲方承担连带责任。",
+    "segment_id": "segment_4",
+    "segment_title": "四、乙方权利义务",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "乙方应独立完成本合同项下的全部服务，未经甲方书面同意不得分包；甲方同意分包的服务部分，由乙方和分包方就分包部分对甲方承担连带责任。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "3",
+    "clause_title": "",
+    "clause_text": "乙方必须积极配合甲方的日常监控和临时抽检，不得以任何理由拒绝检查或在检查中弄虚作假。",
+    "segment_id": "segment_4",
+    "segment_title": "四、乙方权利义务",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "乙方必须积极配合甲方的日常监控和临时抽检，不得以任何理由拒绝检查或在检查中弄虚作假。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "4",
+    "clause_title": "",
+    "clause_text": "_乙方需按相关规定使用资金，并将经费使用预算报甲方。",
+    "segment_id": "segment_4",
+    "segment_title": "四、乙方权利义务",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "_乙方需按相关规定使用资金，并将经费使用预算报甲方。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  }
+]

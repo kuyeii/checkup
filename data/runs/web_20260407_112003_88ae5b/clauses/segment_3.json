@@ -1,0 +1,46 @@
+[
+  {
+    "clause_id": "",
+    "clause_title": "",
+    "clause_text": "甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。",
+    "segment_id": "segment_3",
+    "segment_title": "第三条 检测经费及付款方式",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "甲方向乙方支付检测费用总计人民币（大写）：人民币贰万伍仟元整（￥25,000.00）。",
+    "numbering_confidence": 0.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "",
+    "clause_title": "",
+    "clause_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+    "segment_id": "segment_3",
+    "segment_title": "第三条 检测经费及付款方式",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+    "numbering_confidence": 0.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "",
+    "clause_title": "甲方发票信息",
+    "clause_text": "单位名称：南湖实验室\n\n统一社会信用代码：12330400MB1D62272G\n\n开户银行：嘉兴银行股份有限公司科技支行\n\n银行账号：109101201900080105\n\n开票地址：嘉兴市南湖区七星街道香湖别墅29幢\n\n电 话：0573-82866610\n\n纳税人身份：☑增值税一般纳税人 □非增值税一般纳税人",
+    "segment_id": "segment_3",
+    "segment_title": "第三条 检测经费及付款方式",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "单位名称：南湖实验室\n\n统一社会信用代码：12330400MB1D62272G\n\n开户银行：嘉兴银行股份有限公司科技支行\n\n银行账号：109101201900080105\n\n开票地址：嘉兴市南湖区七星街道香湖别墅29幢\n\n电 话：0573-82866610\n\n纳税人身份：☑增值税一般纳税人 □非增值税一般纳税人",
+    "numbering_confidence": 0.0,
+    "title_confidence": 1.0
+  },
+  {
+    "clause_id": "",
+    "clause_title": "乙方账户信息",
+    "clause_text": "开户银行：工行北京北新桥支行\n\n开 户 名：中国电子技术标准化研究院\n\n账 户：0200 0043 0908 8116 710\n\n税 号： 12100000400002195R",
+    "segment_id": "segment_3",
+    "segment_title": "第三条 检测经费及付款方式",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "开户银行：工行北京北新桥支行\n\n开 户 名：中国电子技术标准化研究院\n\n账 户：0200 0043 0908 8116 710\n\n税 号： 12100000400002195R",
+    "numbering_confidence": 0.0,
+    "title_confidence": 1.0
+  }
+]

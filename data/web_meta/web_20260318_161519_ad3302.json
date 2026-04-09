@@ -1,0 +1,11 @@
+{
+  "status": "running",
+  "file_name": "2.docx",
+  "review_side": "supplier",
+  "contract_type_hint": "service_agreement",
+  "step": "正在解析与拆分合同",
+  "progress": 35,
+  "run_id": "web_20260318_161519_ad3302",
+  "updated_at": "2026-03-18T08:15:19.729411Z",
+  "run_dir": "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/data/runs/web_20260318_161519_ad3302"
+}

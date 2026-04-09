@@ -1,0 +1,619 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-09T03:11:06Z",
+  "groups": [
+    {
+      "aggregate_id": "agg_segment_1::1_1",
+      "aggregate_type": "anchored_multi_clause",
+      "host_risk_id": "1",
+      "host_clause_uid": "segment_1::1",
+      "host_clause_id": "1",
+      "source_risk_ids": [
+        "1",
+        "13"
+      ],
+      "multi_clause_risk_ids": [
+        "13"
+      ],
+      "anchored_risk": {
+        "risk_code": "test_completion_condition_missing",
+        "risk_source_type": "anchored",
+        "dimension": "服务期限、里程碑与验收标准",
+        "risk_level": "high",
+        "risk_label": "测试周期届满标准不明，可能导致未合格即视为验收",
+        "issue": "条款仅规定“30天完成”，未明确“完成”是指完成测试动作还是验收合格，缺乏对测试结果的实质性约束。",
+        "evidence_text": "自受测件接收开始起 30 天完成。",
+        "anchor_text": "第一条 测试周期 自受测件接收开始起 30 天完成。",
+        "factual_basis": "条款表述“30天完成”，仅设定了时间终点，未将测试周期的结束与“测试合格”或“验收通过”这一实质性结果进行绑定。",
+        "reasoning_basis": "若测试周期条款未明确以“合格”为终点，乙方可能主张30天期满即视为测试结束或默示验收通过，导致甲方在测试未通过时丧失要求整改或拒付的权利，被迫接受不合格成果。",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "验收期限应与验收结果挂钩",
+          "basis_detail": "技术服务合同的验收应当以成果符合约定标准为核心，单纯的时间经过不能替代质量验收，否则违反等价有偿原则。",
+          "citation_text": ""
+        },
+        "suggestion": "将“完成”修改为“完成测试工作”，并补充“若测试结果不合格，测试周期顺延至整改合格为止”。",
+        "suggestion_minimal": "将“完成”修改为“完成测试工作”，并补充“若测试结果不合格，测试周期顺延至整改合格为止”。",
+        "suggestion_optimized": "明确测试周期仅为工作周期，不构成验收通过依据；约定测试不通过时的整改期限及重新测试的启动条件，确保甲方在成果不合格时的拒绝权。",
+        "suggestion_basis": "通过将时间终点与质量结果挂钩，防止乙方利用时间条款逃避质量责任，保障甲方的实质性验收权利。",
+        "needs_human_review": true,
+        "clause_uid": "segment_1::1",
+        "display_clause_id": "1",
+        "clause_uids": [
+          "segment_1::1"
+        ],
+        "clause_id": "1",
+        "related_clause_ids": [
+          "1"
+        ],
+        "related_clause_uids": [
+          "segment_1::1"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "1"
+        ],
+        "clause_ids": [
+          "1"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_ACCEPTANCE_FB8D",
+        "basis_summary": "条款表述“30天完成”，仅设定了时间终点，未将测试周期的结束与“测试合格”或“验收通过”这一实质性结果进行绑定。；验收期限应与验收结果挂钩",
+        "basis": "[RULE_ACCEPTANCE_FB8D] 条款表述“30天完成”，仅设定了时间终点，未将测试周期的结束与“测试合格”或“验收通过”这一实质性结果进行绑定。；若测试周期条款未明确以“合格”为终点，乙方可能主张30天期满即视为测试结束或默示验收通过，导致甲方在测试未通过时丧失要求整改或拒付的权利，被迫接受不合格成果。；验收期限应与验收结果挂钩；技术服务合同的验收应当以成果符合约定标准为核心，单纯的时间经过不能替代质量验收，否则违反等价有偿原则。",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 1
+      },
+      "multi_clause_risks": [
+        {
+          "risk_code": "prepayment_timing_vs_delivery_risk",
+          "risk_source_type": "multi_clause",
+          "risk_label": "付款进度与服务交付进度错配",
+          "dimension": "付款结算、发票与税费",
+          "risk_level": "high",
+          "issue": "合同约定甲方需在签订后30日内一次性支付全款，而测试周期长达30天且起算点可能晚于签约时间，导致甲方在未获得任何服务成果前即需全额付款，资金风险敞口大。",
+          "evidence_text": "条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）...\n条款 1：自受测件接收开始起 30 天完成。",
+          "main_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+          "factual_basis": "条款 3.u5 约定付款期限为“合同签订后30日内”，且为“一次性”支付；条款 1 约定测试周期为“自受测件接收开始起 30 天”。两者结合显示，付款截止时间可能早于或重合于测试完成时间，且付款节点不挂钩任何交付成果。",
+          "reasoning_basis": "甲方在签约后即需支付全款，而此时测试工作可能尚未开始或正在进行，甲方无法通过付款节点控制服务质量。若乙方后续交付的成果存在质量问题或无法通过验收，甲方已丧失付款进度的主动控制权，追回款项难度大，处于被动地位。",
+          "normative_basis": {
+            "basis_type": "deal_practice_rule",
+            "basis_title": "付款进度应与服务交付进度形成可执行闭环",
+            "basis_detail": "服务合同中，付款节点通常应与关键交付成果挂钩，使甲方能够在关键节点控制风险。本合同一次性预付全款的安排，将全部资金风险集中于合同早期，违背了服务合同中风险分担的基本原则。"
+          },
+          "suggestion_minimal": "增加分阶段付款机制，约定合同签订后支付部分预付款，剩余款项在检测报告交付并经甲方确认后支付。",
+          "suggestion_optimized": "设置付款与交付成果挂钩的里程碑节点：合同签订后支付不超过30%作为预付款，乙方向甲方出具检测报告且甲方确认接收后支付剩余款项，同时约定质量保证金条款。",
+          "suggestion_basis": "通过分阶段付款和成果确认节点，使甲方能够在关键节点控制风险，避免在未获得任何交付成果前即支付全款。若乙方后续交付成果不合格，甲方可拒绝支付尾款并主张权利，形成有效的风险控制闭环。",
+          "related_clause_ids": [
+            "3.u5",
+            "1"
+          ],
+          "related_clause_uids": [
+            "segment_3::3.u5",
+            "segment_1::1"
+          ],
+          "needs_human_review": true,
+          "workflow_sources": [
+            "missing_multi"
+          ],
+          "suggestion": "增加分阶段付款机制，约定合同签订后支付部分预付款，剩余款项在检测报告交付并经甲方确认后支付。",
+          "evidence_confidence": null,
+          "quality_flags": [],
+          "clause_uid": "segment_1::1",
+          "display_clause_id": "1",
+          "clause_id": "1",
+          "clause_uids": [
+            "segment_1::1"
+          ],
+          "display_clause_ids": [
+            "1"
+          ],
+          "clause_ids": [
+            "1"
+          ],
+          "is_multi_clause_risk": true,
+          "status": "pending",
+          "auto_apply_allowed": false,
+          "mapping_conflict": false,
+          "anchor_text": "条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）... 条款 1：自受测件接收开始起 30 天完成。",
+          "basis_rule_id": "RULE_PAYMENT_D391",
+          "basis_summary": "条款 3.u5 约定付款期限为“合同签订后30日内”，且为“一次性”支付；条款 1 约定测试周期为“自受测件接收开始起 30 天”。两者结合显示，付款截止时间可能早于或重合于测试完成时间，且付款节点不挂钩任何交付成果。；付款进度应与服务交付进度形成可执行闭环",
+          "basis": "[RULE_PAYMENT_D391] 条款 3.u5 约定付款期限为“合同签订后30日内”，且为“一次性”支付；条款 1 约定测试周期为“自受测件接收开始起 30 天”。两者结合显示，付款截止时间可能早于或重合于测试完成时间，且付款节点不挂钩任何交付成果。；甲方在签约后即需支付全款，而此时测试工作可能尚未开始或正在进行，甲方无法通过付款节点控制服务质量。若乙方后续交付的成果存在质量问题或无法通过验收，甲方已丧失付款进度的主动控制权，追回款项难度大，处于被动地位。；付款进度应与服务交付进度形成可执行闭环；服务合同中，付款节点通常应与关键交付成果挂钩，使甲方能够在关键节点控制风险。本合同一次性预付全款的安排，将全部资金风险集中于合同早期，违背了服务合同中风险分担的基本原则。",
+          "review_required_reason": [
+            "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+            "高风险项默认进入人工复核。"
+          ],
+          "is_boilerplate_related": false,
+          "merged_from_risk_ids": [
+            null
+          ],
+          "risk_id": 13
+        }
+      ],
+      "target_text": "自受测件接收开始起 30 天完成。",
+      "target_text_source": "host_clause_text",
+      "clause_text": "自受测件接收开始起 30 天完成。",
+      "status": "pending",
+      "ai_rewrite": {
+        "state": "succeeded",
+        "target_text": "自受测件接收开始起 30 天完成。",
+        "revised_text": "自受测件接收开始起 30 天完成测试工作，若测试结果不合格，测试周期顺延至整改合格为止。",
+        "comment_text": "将“自受测件接收开始起 30 天完成。”修改为“测试工作，若测试结果不合格，测试周期顺延至整改合格为止”。",
+        "rationale": "将'完成'明确为'完成测试工作'，并补充测试结果不合格时测试周期顺延的约定，对齐修改建议，防止30天期满即视为验收的风险。",
+        "edit_type": "replace",
+        "workflow_kind": "aggregate",
+        "created_at": "2026-04-08T07:10:59Z"
+      },
+      "ai_rewrite_decision": "proposed"
+    },
+    {
+      "aggregate_id": "agg_segment_2::2.u2_2",
+      "aggregate_type": "anchored_multi_clause",
+      "host_risk_id": "2",
+      "host_clause_uid": "segment_2::2.u2",
+      "host_clause_id": "2.u2",
+      "source_risk_ids": [
+        "2",
+        "14"
+      ],
+      "multi_clause_risk_ids": [
+        "14"
+      ],
+      "anchored_risk": {
+        "risk_code": "acceptance_criteria_reference_weak",
+        "risk_source_type": "anchored",
+        "dimension": "服务期限、里程碑与验收标准",
+        "risk_level": "medium",
+        "risk_label": "验收标准引用措辞约束力不足",
+        "issue": "条款使用“参照”一词引入验收指标，而非“依据”或“按照”，导致验收标准对乙方的约束力减弱，存在乙方未达标仍主张合规的风险。",
+        "evidence_text": "参照“甲方提供的验收指标”",
+        "anchor_text": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+        "factual_basis": "条款文本表述为“参照”验收指标，而非“依据”或“按照”验收指标。",
+        "reasoning_basis": "“参照”在法律解释上通常具有非强制性，意指参考、借鉴，允许一定程度的偏离。若乙方交付的成果未完全达到指标要求但主张已“参照”执行，甲方将难以直接认定其违约，导致验收标准落空，增加争议解决成本及科研项目验收风险。",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "合同义务表述应当明确具体且具有强制约束力",
+          "basis_detail": "技术服务合同中，验收标准是判断交付成果是否合格的核心依据。使用“参照”一词模糊了义务的强制性，不符合合同严守原则，易引发履行争议。",
+          "citation_text": ""
+        },
+        "suggestion": "将“参照”修改为“依据”。",
+        "suggestion_minimal": "将“参照”修改为“依据”。",
+        "suggestion_optimized": "甲方委托乙方，依据“甲方提供的验收指标”（详见附件一）……",
+        "suggestion_basis": "修改为强制性措辞可消除歧义，确保乙方交付成果必须符合指标要求，保障甲方验收权益。",
+        "needs_human_review": true,
+        "clause_uid": "segment_2::2.u2",
+        "display_clause_id": "2.u2",
+        "clause_uids": [
+          "segment_2::2.u2"
+        ],
+        "clause_id": "2.u2",
+        "related_clause_ids": [
+          "2.u2"
+        ],
+        "related_clause_uids": [
+          "segment_2::2.u2"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "2.u2"
+        ],
+        "clause_ids": [
+          "2.u2"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_ACCEPTANCE_5BA2",
+        "basis_summary": "条款文本表述为“参照”验收指标，而非“依据”或“按照”验收指标。；合同义务表述应当明确具体且具有强制约束力",
+        "basis": "[RULE_ACCEPTANCE_5BA2] 条款文本表述为“参照”验收指标，而非“依据”或“按照”验收指标。；“参照”在法律解释上通常具有非强制性，意指参考、借鉴，允许一定程度的偏离。若乙方交付的成果未完全达到指标要求但主张已“参照”执行，甲方将难以直接认定其违约，导致验收标准落空，增加争议解决成本及科研项目验收风险。；合同义务表述应当明确具体且具有强制约束力；技术服务合同中，验收标准是判断交付成果是否合格的核心依据。使用“参照”一词模糊了义务的强制性，不符合合同严守原则，易引发履行争议。",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 2
+      },
+      "multi_clause_risks": [
+        {
+          "risk_code": "quality_nonconformity_liability_gap",
+          "risk_source_type": "multi_clause",
+          "risk_label": "质量违约责任缺失",
+          "dimension": "违约责任与赔偿机制",
+          "risk_level": "medium",
+          "issue": "违约责任条款仅覆盖逾期交付情形，未覆盖交付成果质量不符合约定的情形，导致甲方在收到不符合要求的检测报告时缺乏直接的违约金索赔依据。",
+          "evidence_text": "条款 2.u2：...并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。\n条款 8.2：...如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金...",
+          "main_text": "乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+          "factual_basis": "条款 2.u2 明确约定交付成果需“加盖CNAS测试章”等具体质量要求；但条款 8.2 仅约定“如未按合同约定交付...每逾期一天...支付违约金”，将违约责任限定在“逾期”维度，未对交付成果不符合质量标准（如无CNAS章、数据错误）设定违约责任。",
+          "reasoning_basis": "条款 2.u2 设定了质量交付标准，但条款 8.2 仅将违约责任与“逾期”挂钩。若乙方按时交付了一份缺少CNAS章或内容错误的报告，甲方无法直接依据条款 8.2 要求支付违约金，只能要求整改或重做，缺乏对乙方质量违约的制约手段，增加了甲方的维权成本。",
+          "normative_basis": {
+            "basis_type": "contract_logic_rule",
+            "basis_title": "责任边界应明确且可控制",
+            "basis_detail": "合同中设定了具体质量要求的交付成果，对应的违约责任条款应当覆盖该质量要求。若违约责任仅与时间维度挂钩而忽视质量维度，将导致质量要求形同虚设，无法有效约束乙方按约履行。"
+          },
+          "suggestion_minimal": "在违约责任条款中增加质量违约情形，约定乙方交付的检测报告不符合约定标准（如未加盖CNAS章、内容错误等）时，应承担违约金或免费重测义务。",
+          "suggestion_optimized": "明确质量违约责任：检测报告未按约定加盖CNAS章、数据存在重大错误或遗漏的，甲方有权拒绝接受报告并要求乙方在规定期限内免费重新出具报告；若乙方拒绝或重测后仍不合格，应向甲方支付合同金额一定比例的违约金。",
+          "suggestion_basis": "将违约责任从单一的逾期维度扩展至质量维度，使乙方在交付成果不符合质量标准时承担明确的违约金或重测义务，增强甲方对交付成果质量的控制力，确保条款 2.u2 中的质量要求具有可执行的约束力。",
+          "related_clause_ids": [
+            "2.u2",
+            "8.2"
+          ],
+          "related_clause_uids": [
+            "segment_2::2.u2",
+            "segment_8::8.2"
+          ],
+          "needs_human_review": true,
+          "workflow_sources": [
+            "missing_multi"
+          ],
+          "suggestion": "在违约责任条款中增加质量违约情形，约定乙方交付的检测报告不符合约定标准（如未加盖CNAS章、内容错误等）时，应承担违约金或免费重测义务。",
+          "evidence_confidence": null,
+          "quality_flags": [],
+          "clause_uid": "",
+          "display_clause_id": "",
+          "clause_id": "",
+          "clause_uids": [],
+          "display_clause_ids": [],
+          "clause_ids": [],
+          "is_multi_clause_risk": true,
+          "status": "pending",
+          "auto_apply_allowed": false,
+          "mapping_conflict": false,
+          "anchor_text": "条款 2.u2：...并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。 条款 8.2：...如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金...",
+          "basis_rule_id": "RULE_LIABILITY_AC19",
+          "basis_summary": "条款 2.u2 明确约定交付成果需“加盖CNAS测试章”等具体质量要求；但条款 8.2 仅约定“如未按合同约定交付...每逾期一天...支付违约金”，将违约责任限定在“逾期”维度，未对交付成果不符合质量标准（如无CNAS章、数据错误）设定违约责任。；责任边界应明确且可控制",
+          "basis": "[RULE_LIABILITY_AC19] 条款 2.u2 明确约定交付成果需“加盖CNAS测试章”等具体质量要求；但条款 8.2 仅约定“如未按合同约定交付...每逾期一天...支付违约金”，将违约责任限定在“逾期”维度，未对交付成果不符合质量标准（如无CNAS章、数据错误）设定违约责任。；条款 2.u2 设定了质量交付标准，但条款 8.2 仅将违约责任与“逾期”挂钩。若乙方按时交付了一份缺少CNAS章或内容错误的报告，甲方无法直接依据条款 8.2 要求支付违约金，只能要求整改或重做，缺乏对乙方质量违约的制约手段，增加了甲方的维权成本。；责任边界应明确且可控制；合同中设定了具体质量要求的交付成果，对应的违约责任条款应当覆盖该质量要求。若违约责任仅与时间维度挂钩而忽视质量维度，将导致质量要求形同虚设，无法有效约束乙方按约履行。",
+          "review_required_reason": [
+            "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+          ],
+          "is_boilerplate_related": false,
+          "merged_from_risk_ids": [
+            null
+          ],
+          "risk_id": 14
+        }
+      ],
+      "target_text": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+      "target_text_source": "host_clause_text",
+      "clause_text": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+      "status": "pending",
+      "ai_rewrite": {
+        "state": "succeeded",
+        "target_text": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），",
+        "revised_text": "甲方委托乙方,依据“甲方提供的验收指标”（详见附件），",
+        "comment_text": "将“参照”修改为“依据”。",
+        "rationale": "将“参照”修改为“依据”，明确验收标准的强制性约束力，确保乙方交付成果必须符合指标要求，保障甲方验收权益。",
+        "edit_type": "replace",
+        "workflow_kind": "aggregate",
+        "created_at": "2026-04-08T07:11:09Z"
+      },
+      "ai_rewrite_decision": "proposed"
+    },
+    {
+      "aggregate_id": "agg_segment_3::3.u5_3",
+      "aggregate_type": "anchored_multi_clause",
+      "host_risk_id": "3",
+      "host_clause_uid": "segment_3::3.u5",
+      "host_clause_id": "3.u5",
+      "source_risk_ids": [
+        "3",
+        "13"
+      ],
+      "multi_clause_risk_ids": [
+        "13"
+      ],
+      "anchored_risk": {
+        "risk_code": "full_prepayment_without_acceptance_anchor",
+        "risk_source_type": "anchored",
+        "dimension": "付款结算、发票与税费",
+        "risk_level": "high",
+        "risk_label": "签约后一次性全额付款导致履约失控",
+        "issue": "条款约定合同签订后甲方即需一次性支付全额检测费用，未将付款进度与乙方履约进度、交付成果或验收结果挂钩。",
+        "evidence_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）",
+        "anchor_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+        "factual_basis": "条款明确要求甲方在合同签订后30日内一次性支付全部检测费用，未设置任何以乙方提交成果、验收合格或服务进度为前提的付款条件。",
+        "reasoning_basis": "在服务合同中，若甲方在乙方未开始服务或未交付成果前即支付全额款项，将丧失对乙方履约行为的核心资金制约手段。一旦乙方收款后出现拒绝履约、迟延交付或服务质量不达标，甲方将陷入被动，需通过诉讼追回款项，面临资金占用、维权成本增加及财政资金合规性审计风险。",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "付款节点应与履约进度挂钩以保障资金安全",
+          "basis_detail": "依据合同履行抗辩权原理及财政资金使用效益原则，付款节点的设置应确保资金安全与服务质量可控，避免“先款后货”导致的履约风险。",
+          "citation_text": ""
+        },
+        "suggestion": "将“一次性向乙方支付”修改为“支付合同总额的XX%作为预付款，剩余XX%于验收合格后支付”。",
+        "suggestion_minimal": "将“一次性向乙方支付”修改为“支付合同总额的XX%作为预付款，剩余XX%于验收合格后支付”。",
+        "suggestion_optimized": "合同签订后__日内，甲方向乙方支付合同总额__%的预付款；乙方完成检测服务并提交合格报告，经甲方验收合格后__日内，甲方向乙方支付剩余__%款项。",
+        "suggestion_basis": "通过分期付款和验收后付款机制，确保甲方掌握履约主动权，降低资金风险。",
+        "needs_human_review": true,
+        "clause_uid": "segment_3::3.u5",
+        "display_clause_id": "3.u5",
+        "clause_uids": [
+          "segment_3::3.u5"
+        ],
+        "clause_id": "3.u5",
+        "related_clause_ids": [
+          "3.u5"
+        ],
+        "related_clause_uids": [
+          "segment_3::3.u5"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "3.u5"
+        ],
+        "clause_ids": [
+          "3.u5"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_PAYMENT_D0CE",
+        "basis_summary": "条款明确要求甲方在合同签订后30日内一次性支付全部检测费用，未设置任何以乙方提交成果、验收合格或服务进度为前提的付款条件。；付款节点应与履约进度挂钩以保障资金安全",
+        "basis": "[RULE_PAYMENT_D0CE] 条款明确要求甲方在合同签订后30日内一次性支付全部检测费用，未设置任何以乙方提交成果、验收合格或服务进度为前提的付款条件。；在服务合同中，若甲方在乙方未开始服务或未交付成果前即支付全额款项，将丧失对乙方履约行为的核心资金制约手段。一旦乙方收款后出现拒绝履约、迟延交付或服务质量不达标，甲方将陷入被动，需通过诉讼追回款项，面临资金占用、维权成本增加及财政资金合规性审计风险。；付款节点应与履约进度挂钩以保障资金安全；依据合同履行抗辩权原理及财政资金使用效益原则，付款节点的设置应确保资金安全与服务质量可控，避免“先款后货”导致的履约风险。",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 3
+      },
+      "multi_clause_risks": [
+        {
+          "risk_code": "prepayment_timing_vs_delivery_risk",
+          "risk_source_type": "multi_clause",
+          "risk_label": "付款进度与服务交付进度错配",
+          "dimension": "付款结算、发票与税费",
+          "risk_level": "high",
+          "issue": "合同约定甲方需在签订后30日内一次性支付全款，而测试周期长达30天且起算点可能晚于签约时间，导致甲方在未获得任何服务成果前即需全额付款，资金风险敞口大。",
+          "evidence_text": "条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）...\n条款 1：自受测件接收开始起 30 天完成。",
+          "main_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+          "factual_basis": "条款 3.u5 约定付款期限为“合同签订后30日内”，且为“一次性”支付；条款 1 约定测试周期为“自受测件接收开始起 30 天”。两者结合显示，付款截止时间可能早于或重合于测试完成时间，且付款节点不挂钩任何交付成果。",
+          "reasoning_basis": "甲方在签约后即需支付全款，而此时测试工作可能尚未开始或正在进行，甲方无法通过付款节点控制服务质量。若乙方后续交付的成果存在质量问题或无法通过验收，甲方已丧失付款进度的主动控制权，追回款项难度大，处于被动地位。",
+          "normative_basis": {
+            "basis_type": "deal_practice_rule",
+            "basis_title": "付款进度应与服务交付进度形成可执行闭环",
+            "basis_detail": "服务合同中，付款节点通常应与关键交付成果挂钩，使甲方能够在关键节点控制风险。本合同一次性预付全款的安排，将全部资金风险集中于合同早期，违背了服务合同中风险分担的基本原则。"
+          },
+          "suggestion_minimal": "增加分阶段付款机制，约定合同签订后支付部分预付款，剩余款项在检测报告交付并经甲方确认后支付。",
+          "suggestion_optimized": "设置付款与交付成果挂钩的里程碑节点：合同签订后支付不超过30%作为预付款，乙方向甲方出具检测报告且甲方确认接收后支付剩余款项，同时约定质量保证金条款。",
+          "suggestion_basis": "通过分阶段付款和成果确认节点，使甲方能够在关键节点控制风险，避免在未获得任何交付成果前即支付全款。若乙方后续交付成果不合格，甲方可拒绝支付尾款并主张权利，形成有效的风险控制闭环。",
+          "related_clause_ids": [
+            "3.u5",
+            "1"
+          ],
+          "related_clause_uids": [
+            "segment_3::3.u5",
+            "segment_1::1"
+          ],
+          "needs_human_review": true,
+          "workflow_sources": [
+            "missing_multi"
+          ],
+          "suggestion": "增加分阶段付款机制，约定合同签订后支付部分预付款，剩余款项在检测报告交付并经甲方确认后支付。",
+          "evidence_confidence": null,
+          "quality_flags": [],
+          "clause_uid": "segment_1::1",
+          "display_clause_id": "1",
+          "clause_id": "1",
+          "clause_uids": [
+            "segment_1::1"
+          ],
+          "display_clause_ids": [
+            "1"
+          ],
+          "clause_ids": [
+            "1"
+          ],
+          "is_multi_clause_risk": true,
+          "status": "pending",
+          "auto_apply_allowed": false,
+          "mapping_conflict": false,
+          "anchor_text": "条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）... 条款 1：自受测件接收开始起 30 天完成。",
+          "basis_rule_id": "RULE_PAYMENT_D391",
+          "basis_summary": "条款 3.u5 约定付款期限为“合同签订后30日内”，且为“一次性”支付；条款 1 约定测试周期为“自受测件接收开始起 30 天”。两者结合显示，付款截止时间可能早于或重合于测试完成时间，且付款节点不挂钩任何交付成果。；付款进度应与服务交付进度形成可执行闭环",
+          "basis": "[RULE_PAYMENT_D391] 条款 3.u5 约定付款期限为“合同签订后30日内”，且为“一次性”支付；条款 1 约定测试周期为“自受测件接收开始起 30 天”。两者结合显示，付款截止时间可能早于或重合于测试完成时间，且付款节点不挂钩任何交付成果。；甲方在签约后即需支付全款，而此时测试工作可能尚未开始或正在进行，甲方无法通过付款节点控制服务质量。若乙方后续交付的成果存在质量问题或无法通过验收，甲方已丧失付款进度的主动控制权，追回款项难度大，处于被动地位。；付款进度应与服务交付进度形成可执行闭环；服务合同中，付款节点通常应与关键交付成果挂钩，使甲方能够在关键节点控制风险。本合同一次性预付全款的安排，将全部资金风险集中于合同早期，违背了服务合同中风险分担的基本原则。",
+          "review_required_reason": [
+            "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+            "高风险项默认进入人工复核。"
+          ],
+          "is_boilerplate_related": false,
+          "merged_from_risk_ids": [
+            null
+          ],
+          "risk_id": 13
+        }
+      ],
+      "target_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+      "target_text_source": "host_clause_text",
+      "clause_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+      "status": "pending",
+      "ai_rewrite": {
+        "state": "succeeded",
+        "target_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+        "revised_text": "合同签订后30日内，甲方支付合同总额的__%作为预付款，剩余__%于验收合格后支付，检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+        "comment_text": "将“一次性向乙方支付”修改为“支付合同总额的__%作为预付款，剩余__%于验收合格后支付，”。",
+        "rationale": "将一次性全额付款改为分阶段付款机制，约定部分作为预付款、剩余款项于验收合格后支付，使付款进度与乙方履约进度挂钩，降低甲方资金风险。",
+        "edit_type": "replace",
+        "workflow_kind": "aggregate",
+        "created_at": "2026-04-08T07:11:14Z"
+      },
+      "ai_rewrite_decision": "proposed"
+    },
+    {
+      "aggregate_id": "agg_segment_8::8.2_11",
+      "aggregate_type": "anchored_multi_clause",
+      "host_risk_id": "11",
+      "host_clause_uid": "segment_8::8.2",
+      "host_clause_id": "8.2",
+      "source_risk_ids": [
+        "11",
+        "14"
+      ],
+      "multi_clause_risk_ids": [
+        "14"
+      ],
+      "anchored_risk": {
+        "risk_code": "termination_contradicts_performance",
+        "risk_source_type": "anchored",
+        "dimension": "解除、终止与续约机制",
+        "risk_level": "high",
+        "risk_label": "解除后果逻辑矛盾，阻碍甲方止损",
+        "issue": "条款约定甲方解除合同后，乙方仍需“完成未完成检测”，混淆了“合同解除”与“继续履行”的法律后果，导致甲方无法通过解除合同终止交易关系并委托第三方。",
+        "evidence_text": "甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+        "anchor_text": "2 、乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+        "factual_basis": "条款在赋予甲方单方解除权的同时，又强制规定乙方在解除后仍需“完成未完成检测”，构成了“解除合同”与“继续履行义务”的直接逻辑冲突。",
+        "reasoning_basis": "合同解除的核心法律后果是“权利义务终止”。该约定导致甲方在乙方严重违约（如逾期30天）时，虽行使解除权却无法切断与乙方的合作羁绊，无法另行采购第三方服务进行止损，陷入“解除了还得让对方做”的僵局，完全丧失了解除权的制度价值。",
+        "normative_basis": {
+          "basis_type": "legal_rule",
+          "basis_title": "合同解除的法律后果",
+          "basis_detail": "根据《民法典》第五百六十六条，合同解除后，尚未履行的，终止履行。条款约定解除后继续履行，违反了合同解除的基本法理。",
+          "citation_text": "《中华人民共和国民法典》第五百六十六条"
+        },
+        "suggestion": "删除“除乙方应完成未完成检测外”一句。",
+        "suggestion_minimal": "删除“除乙方应完成未完成检测外”一句。",
+        "suggestion_optimized": "修改为：“甲方决定解除合同的，有权要求乙方返还已支付款项，并要求乙方支付相当于合同总价XX%的违约金；若甲方另行委托第三方完成的，乙方还应赔偿差价损失。”",
+        "suggestion_basis": "纠正逻辑矛盾，确保甲方行使解除权后能够真正终止交易，通过退款和索赔机制实现止损，而非被迫接受违约方的继续履行。",
+        "needs_human_review": true,
+        "clause_uid": "segment_8::8.2",
+        "display_clause_id": "8.2",
+        "clause_uids": [
+          "segment_8::8.2"
+        ],
+        "clause_id": "8.2",
+        "related_clause_ids": [
+          "8.2"
+        ],
+        "related_clause_uids": [
+          "segment_8::8.2"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "8.2"
+        ],
+        "clause_ids": [
+          "8.2"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_TERMINATION_0FF6",
+        "basis_summary": "条款在赋予甲方单方解除权的同时，又强制规定乙方在解除后仍需“完成未完成检测”，构成了“解除合同”与“继续履行义务”的直接逻辑冲突。；合同解除的法律后果",
+        "basis": "[RULE_TERMINATION_0FF6] 条款在赋予甲方单方解除权的同时，又强制规定乙方在解除后仍需“完成未完成检测”，构成了“解除合同”与“继续履行义务”的直接逻辑冲突。；合同解除的核心法律后果是“权利义务终止”。该约定导致甲方在乙方严重违约（如逾期30天）时，虽行使解除权却无法切断与乙方的合作羁绊，无法另行采购第三方服务进行止损，陷入“解除了还得让对方做”的僵局，完全丧失了解除权的制度价值。；合同解除的法律后果；根据《民法典》第五百六十六条，合同解除后，尚未履行的，终止履行。条款约定解除后继续履行，违反了合同解除的基本法理。；《中华人民共和国民法典》第五百六十六条",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 11
+      },
+      "multi_clause_risks": [
+        {
+          "risk_code": "quality_nonconformity_liability_gap",
+          "risk_source_type": "multi_clause",
+          "risk_label": "质量违约责任缺失",
+          "dimension": "违约责任与赔偿机制",
+          "risk_level": "medium",
+          "issue": "违约责任条款仅覆盖逾期交付情形，未覆盖交付成果质量不符合约定的情形，导致甲方在收到不符合要求的检测报告时缺乏直接的违约金索赔依据。",
+          "evidence_text": "条款 2.u2：...并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。\n条款 8.2：...如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金...",
+          "main_text": "乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+          "factual_basis": "条款 2.u2 明确约定交付成果需“加盖CNAS测试章”等具体质量要求；但条款 8.2 仅约定“如未按合同约定交付...每逾期一天...支付违约金”，将违约责任限定在“逾期”维度，未对交付成果不符合质量标准（如无CNAS章、数据错误）设定违约责任。",
+          "reasoning_basis": "条款 2.u2 设定了质量交付标准，但条款 8.2 仅将违约责任与“逾期”挂钩。若乙方按时交付了一份缺少CNAS章或内容错误的报告，甲方无法直接依据条款 8.2 要求支付违约金，只能要求整改或重做，缺乏对乙方质量违约的制约手段，增加了甲方的维权成本。",
+          "normative_basis": {
+            "basis_type": "contract_logic_rule",
+            "basis_title": "责任边界应明确且可控制",
+            "basis_detail": "合同中设定了具体质量要求的交付成果，对应的违约责任条款应当覆盖该质量要求。若违约责任仅与时间维度挂钩而忽视质量维度，将导致质量要求形同虚设，无法有效约束乙方按约履行。"
+          },
+          "suggestion_minimal": "在违约责任条款中增加质量违约情形，约定乙方交付的检测报告不符合约定标准（如未加盖CNAS章、内容错误等）时，应承担违约金或免费重测义务。",
+          "suggestion_optimized": "明确质量违约责任：检测报告未按约定加盖CNAS章、数据存在重大错误或遗漏的，甲方有权拒绝接受报告并要求乙方在规定期限内免费重新出具报告；若乙方拒绝或重测后仍不合格，应向甲方支付合同金额一定比例的违约金。",
+          "suggestion_basis": "将违约责任从单一的逾期维度扩展至质量维度，使乙方在交付成果不符合质量标准时承担明确的违约金或重测义务，增强甲方对交付成果质量的控制力，确保条款 2.u2 中的质量要求具有可执行的约束力。",
+          "related_clause_ids": [
+            "2.u2",
+            "8.2"
+          ],
+          "related_clause_uids": [
+            "segment_2::2.u2",
+            "segment_8::8.2"
+          ],
+          "needs_human_review": true,
+          "workflow_sources": [
+            "missing_multi"
+          ],
+          "suggestion": "在违约责任条款中增加质量违约情形，约定乙方交付的检测报告不符合约定标准（如未加盖CNAS章、内容错误等）时，应承担违约金或免费重测义务。",
+          "evidence_confidence": null,
+          "quality_flags": [],
+          "clause_uid": "",
+          "display_clause_id": "",
+          "clause_id": "",
+          "clause_uids": [],
+          "display_clause_ids": [],
+          "clause_ids": [],
+          "is_multi_clause_risk": true,
+          "status": "pending",
+          "auto_apply_allowed": false,
+          "mapping_conflict": false,
+          "anchor_text": "条款 2.u2：...并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。 条款 8.2：...如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金...",
+          "basis_rule_id": "RULE_LIABILITY_AC19",
+          "basis_summary": "条款 2.u2 明确约定交付成果需“加盖CNAS测试章”等具体质量要求；但条款 8.2 仅约定“如未按合同约定交付...每逾期一天...支付违约金”，将违约责任限定在“逾期”维度，未对交付成果不符合质量标准（如无CNAS章、数据错误）设定违约责任。；责任边界应明确且可控制",
+          "basis": "[RULE_LIABILITY_AC19] 条款 2.u2 明确约定交付成果需“加盖CNAS测试章”等具体质量要求；但条款 8.2 仅约定“如未按合同约定交付...每逾期一天...支付违约金”，将违约责任限定在“逾期”维度，未对交付成果不符合质量标准（如无CNAS章、数据错误）设定违约责任。；条款 2.u2 设定了质量交付标准，但条款 8.2 仅将违约责任与“逾期”挂钩。若乙方按时交付了一份缺少CNAS章或内容错误的报告，甲方无法直接依据条款 8.2 要求支付违约金，只能要求整改或重做，缺乏对乙方质量违约的制约手段，增加了甲方的维权成本。；责任边界应明确且可控制；合同中设定了具体质量要求的交付成果，对应的违约责任条款应当覆盖该质量要求。若违约责任仅与时间维度挂钩而忽视质量维度，将导致质量要求形同虚设，无法有效约束乙方按约履行。",
+          "review_required_reason": [
+            "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+          ],
+          "is_boilerplate_related": false,
+          "merged_from_risk_ids": [
+            null
+          ],
+          "risk_id": 14
+        }
+      ],
+      "target_text": "2 、乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+      "target_text_source": "host_clause_text",
+      "clause_text": "2 、乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+      "status": "pending",
+      "ai_rewrite": {
+        "state": "succeeded",
+        "target_text": "甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+        "revised_text": "甲方决定解除合同的，仍应当向甲方支付违约金。",
+        "comment_text": "将“除乙方应完成未完成检测外，”修改为“甲方决定解除合同的，仍应当向甲方支付违约金。”。",
+        "rationale": "删除'除乙方应完成未完成检测外'一句，纠正合同解除后仍要求乙方继续履行的逻辑矛盾，确保甲方解除权能真正终止交易关系，符合《民法典》第五百六十六条合同解除后尚未履行部分终止履行的规定。",
+        "edit_type": "replace",
+        "workflow_kind": "aggregate",
+        "created_at": "2026-04-08T07:11:48Z"
+      },
+      "ai_rewrite_decision": "proposed"
+    }
+  ]
+}

@@ -1,0 +1,1421 @@
+/* Legacy review page styles (scoped). Generated from original styles.css */
+.legacyReview {
+--bg: #f4f5f7;
+  --panel: rgba(255, 255, 255, 0.78);
+  --panel-strong: rgba(255, 255, 255, 0.9);
+  --line: rgba(15, 23, 42, 0.08);
+  --line-strong: rgba(15, 23, 42, 0.12);
+  --text: #111827;
+  --muted: #667085;
+  /* Align accents with MARKUP (Figma) green */
+  --accent: #00b365;
+  --accent-soft: rgba(0, 179, 101, 0.14);
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --info: #3b82f6;
+  --shadow-lg: 0 30px 60px rgba(15, 23, 42, 0.10);
+  --shadow-md: 0 14px 30px rgba(15, 23, 42, 0.08);
+  --radius-xl: 28px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  /* Comment (balloon) sizing: Figma-style, responsive but stable.
+     - Cards should "stick" to the paper edge, so their LEFT edge aligns with the paper boundary.
+     - We reserve horizontal space in `.docRow--withComments` to prevent overlap. */
+  --commentW: clamp(240px, 22vw, 320px);
+  --commentPadRight: calc(var(--commentW) + 24px);
+font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--text);
+  background: #f6f7fb;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+}
+.legacyReview * { box-sizing: border-box; }
+.legacyReview button, .legacyReview input { font: inherit; }
+.legacyReview .hiddenInput {
+display: none;
+}
+.legacyReview .glassPane {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.legacyReview .glassInset {
+background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(255,255,255,0.76);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+}
+.legacyReview .appShell {
+  height: 100vh;
+  min-height: 100vh;
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  transition: grid-template-columns 180ms ease;
+}
+
+/* Review-only layout (no left sidebar) */
+.legacyReview .reviewOnlyShell {
+  height: 100vh;
+  min-height: 100vh;
+  padding: 0;
+}
+.legacyReview .reviewOnlyShell .contentShell {
+  height: 100vh;
+  overflow: hidden;
+}
+.legacyReview .reviewOnlyShell .reviewWorkspace {
+  /* Override modern .reviewWorkspace card styles to avoid nested rounded surfaces */
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+}
+.legacyReview .appShell--sidebarExpanded {
+grid-template-columns: 248px minmax(0, 1fr);
+}
+.legacyReview .appShell--sidebarCollapsed {
+grid-template-columns: 88px minmax(0, 1fr);
+}
+.legacyReview .sideNav {
+min-height: 0;
+  border-radius: 28px;
+  padding: 18px 14px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: padding 180ms ease;
+}
+.legacyReview .sideNav--collapsed {
+align-items: center;
+  padding-inline: 10px;
+}
+.legacyReview .sideNavTop {
+display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.legacyReview .sideNav--collapsed .sideNavTop {
+width: 100%;
+  flex-direction: column;
+}
+.legacyReview .brandPanel {
+display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.legacyReview .brandBadge {
+width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #101828, #1d2939);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  flex: 0 0 auto;
+}
+.legacyReview .brandMeta {
+min-width: 0;
+}
+.legacyReview .brandTitle {
+font-weight: 700;
+  font-size: 15px;
+  line-height: 1.2;
+}
+.legacyReview .brandSubtitle {
+margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.legacyReview .sideToggleBtn {
+width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 0;
+  background: rgba(255,255,255,0.86);
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,0.06);
+  color: #344054;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.legacyReview .navList {
+width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.legacyReview .navItem {
+display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  padding: 10px;
+  border: 0;
+  background: transparent;
+  border-radius: 18px;
+  cursor: pointer;
+  color: var(--text);
+  text-align: left;
+}
+.legacyReview .sideNav--collapsed .navItem {
+justify-content: center;
+  padding: 8px;
+}
+.legacyReview .navItem:hover {
+background: rgba(255,255,255,0.62);
+}
+.legacyReview .navItem--active {
+background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(250,250,252,0.84));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.82), 0 10px 24px rgba(15,23,42,0.08);
+}
+.legacyReview .navIconWrap {
+width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,0.72);
+  color: #111827;
+  flex: 0 0 auto;
+}
+.legacyReview .navItem--active .navIconWrap {
+background: linear-gradient(180deg, rgba(37,99,235,0.16), rgba(37,99,235,0.08));
+  color: #1d4ed8;
+}
+.legacyReview .navTextWrap {
+min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.legacyReview .navLabel {
+font-weight: 650; font-size: 14px;
+}
+.legacyReview .navDesc {
+font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.legacyReview .sideNavFooter {
+margin-top: auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.62);
+}
+.legacyReview .sideNav--collapsed .sideNavFooter {
+justify-content: center;
+  padding: 8px;
+}
+.legacyReview .sideFooterBadge {
+min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.84);
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,0.06);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.legacyReview .sideFooterMeta {
+min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.legacyReview .sideFooterLabel {
+font-size: 12px;
+  color: var(--muted);
+}
+.legacyReview .sideFooterValue {
+font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.legacyReview .contentShell {
+  min-width: 0;
+  min-height: 0;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(255,255,255,0.68);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.legacyReview .dashboardPage, .legacyReview .historyPage, .legacyReview .reviewWorkspace {
+  height: 100vh;
+  min-height: 100vh;
+  min-height: 0;
+}
+.legacyReview .dashboardPage, .legacyReview .historyPage {
+overflow: auto;
+  padding: 28px;
+}
+.legacyReview .eyebrow {
+font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #98a2b3;
+}
+.legacyReview .sectionTitle {
+margin: 12px 0 0;
+  font-size: 38px;
+  line-height: 1.12;
+  letter-spacing: -0.05em;
+}
+.legacyReview .sectionTitle--compact {
+max-width: 760px;
+}
+.legacyReview .cardTitle {
+font-size: 18px;
+  font-weight: 650;
+}
+.legacyReview .cardHint, .legacyReview .latestMetaSub, .legacyReview .historyRun, .legacyReview .metricLabel, .legacyReview .historyMetaLabel {
+font-size: 12px;
+  color: var(--muted);
+}
+.legacyReview .metricValue {
+margin-top: 8px;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.legacyReview .sectionTopBar {
+display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.legacyReview .sectionTopBar--tight {
+align-items: center;
+  margin-bottom: 18px;
+}
+.legacyReview .workspaceHero, .legacyReview .historyHero, .legacyReview .historyCollection {
+border-radius: var(--radius-xl);
+  padding: 28px;
+}
+.legacyReview .uploadLayout {
+margin-top: 22px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+  gap: 18px;
+}
+.legacyReview .uploadDropzone {
+min-height: 360px;
+  border-radius: 30px;
+  padding: 34px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(249,250,252,0.82));
+  border: 1px dashed rgba(37,99,235,0.22);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.72), 0 18px 40px rgba(15,23,42,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+.legacyReview .uploadDropzone:hover, .legacyReview .uploadDropzone--active {
+transform: translateY(-1px);
+  border-color: rgba(37,99,235,0.42);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.82), 0 22px 46px rgba(37,99,235,0.10);
+}
+.legacyReview .dropzoneIcon {
+width: 72px;
+  height: 72px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  color: #1d4ed8;
+  background: linear-gradient(180deg, rgba(37,99,235,0.16), rgba(37,99,235,0.08));
+}
+.legacyReview .dropzoneTitle {
+margin-top: 22px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.legacyReview .dropzoneHint {
+margin-top: 10px;
+  max-width: 520px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.legacyReview .dropzoneFilePill {
+margin-top: 20px;
+  max-width: 100%;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.92);
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,0.06);
+  font-size: 13px;
+  color: #475467;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.legacyReview .dropzoneActions {
+margin-top: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.legacyReview .workspaceAside {
+display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.legacyReview .dashboardStatsGrid, .legacyReview .historySummaryGrid {
+display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.legacyReview .metricCard {
+padding: 18px 18px 20px;
+  border-radius: 24px;
+}
+.legacyReview .latestReviewCard, .legacyReview .historyFeatured, .legacyReview .dashboardCard, .legacyReview .emptyHistory {
+padding: 22px;
+  border-radius: 26px;
+}
+.legacyReview .latestReviewHeader, .legacyReview .cardHeader {
+display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.legacyReview .cardHeader--stack {
+align-items: flex-start;
+}
+.legacyReview .latestReviewName, .legacyReview .historyFeaturedName {
+margin-top: 16px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.legacyReview .latestReviewActions, .legacyReview .historyFeaturedActions {
+margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.legacyReview .historyFeatured {
+margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.legacyReview .historyFeaturedLabel {
+font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.legacyReview .workspaceSecondaryGrid {
+margin-top: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 18px;
+}
+.legacyReview .checkList {
+margin-top: 18px;
+  display: grid;
+  gap: 14px;
+}
+.legacyReview .checkItem {
+display: flex;
+  gap: 10px;
+  line-height: 1.7;
+  color: #475467;
+}
+.legacyReview .checkMark {
+font-weight: 700;
+  color: #1d4ed8;
+}
+.legacyReview .recentRunList {
+margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+.legacyReview .recentRunItem {
+width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.76);
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+.legacyReview .recentRunText {
+min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.legacyReview .recentRunName {
+font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.legacyReview .recentRunMeta {
+font-size: 12px;
+  color: var(--muted);
+}
+.legacyReview .historyCollection {
+margin-top: 18px;
+}
+.legacyReview .historyRows {
+display: grid;
+  gap: 14px;
+}
+.legacyReview .historyRow {
+display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+}
+.legacyReview .historyRowTitle {
+font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+.legacyReview .historyRowSummary {
+margin-top: 10px;
+  color: #475467;
+  line-height: 1.7;
+}
+.legacyReview .historyRowMeta {
+display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.legacyReview .historyMetaBlock {
+min-width: 180px;
+}
+.legacyReview .historyMetaValue {
+margin-top: 6px;
+  line-height: 1.6;
+}
+.legacyReview .emptyCardState {
+margin-top: 16px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.legacyReview .btn {
+height: 40px;
+  padding: 0 16px;
+  white-space: nowrap;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(255,255,255,0.82);
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,0.06);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.legacyReview .btnIcon {
+  width: 40px;
+  padding: 0;
+  justify-content: center;
+}
+.legacyReview .btn:hover {
+transform: translateY(-1px);
+}
+.legacyReview .btn:disabled {
+opacity: 0.55; cursor: not-allowed; transform: none;
+}
+.legacyReview .btnPrimary {
+  background: linear-gradient(180deg, rgba(0,179,101,0.98), rgba(0,163,90,0.98));
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(0, 179, 101, 0.18);
+}
+.legacyReview .btnDark {
+background: linear-gradient(180deg, #111827, #1f2937);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(17,24,39,0.18);
+}
+.legacyReview .btnSoft {
+background: rgba(255,255,255,0.94);
+}
+.legacyReview .statusChip, .legacyReview .statusPill, .legacyReview .summaryPill {
+display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.06);
+  color: #344054;
+  font-size: 12px;
+  font-weight: 600;
+}
+.legacyReview .statusPill--completed {
+background: rgba(34, 197, 94, 0.14); color: #166534;
+}
+.legacyReview .statusPill--running {
+  background: rgba(245, 158, 11, 0.14);
+  color: #92400e;
+}
+.legacyReview .statusPill--queued {
+  background: rgba(148, 163, 184, 0.18);
+  color: #475569;
+}
+.legacyReview .statusPill--failed {
+background: rgba(239, 68, 68, 0.14); color: #b42318;
+}
+.legacyReview .topBar {
+  margin: 0;
+  min-height: 72px;
+  border-radius: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(15,23,42,0.08);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.legacyReview .topBarLead, .legacyReview .topBarActions, .legacyReview .topBarMeta {
+display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+.legacyReview .topBarRight {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.legacyReview .topBarLead {
+min-width: 0;
+}
+.legacyReview .topBarActions {
+  gap: 10px;
+}
+.legacyReview .topBarMeta {
+  gap: 8px;
+}
+.legacyReview .brand {
+display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.legacyReview .brandDot {
+width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #6ee7b7, #00b365);
+  box-shadow: 0 0 0 6px rgba(0,179,101,0.10);
+  flex: 0 0 auto;
+}
+.legacyReview .brandText {
+font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.legacyReview .topBarSubtext {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #667085;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.legacyReview .filePill {
+min-width: 0;
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.82);
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,0.06);
+  font-size: 12px;
+  color: var(--muted);
+}
+.legacyReview .statusId, .legacyReview .statusText {
+font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.legacyReview .statusId {
+max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.82);
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,0.06);
+}
+.legacyReview .statusTextPill {
+padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.06);
+  color: #344054;
+  font-weight: 700;
+}
+.legacyReview .mainGrid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 0;
+  padding: 0;
+  align-items: stretch;
+  border-top: 1px solid rgba(15,23,42,0.08);
+}
+.legacyReview .docPane, .legacyReview .riskPane {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+  overflow: hidden;
+}
+.legacyReview .riskPane {
+  border-left: 1px solid rgba(15,23,42,0.08);
+}
+
+.legacyReview .paneHeader {
+  min-height: 64px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(15,23,42,0.08);
+  background: #fff;
+}
+.legacyReview .paneHeader--risk {
+  padding: 16px 18px;
+  justify-content: space-between;
+  gap: 12px;
+}
+.legacyReview .paneTitle {
+font-weight: 700; font-size: 15px;
+}
+.legacyReview .riskHeaderStats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.legacyReview .riskHeaderStat {
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(15,23,42,0.10);
+  background: rgba(15,23,42,0.03);
+  color: #475467;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+.legacyReview .riskHeaderStat--high {
+  border-color: rgba(239,68,68,0.22);
+  background: rgba(239,68,68,0.08);
+  color: #b42318;
+}
+.legacyReview .riskHeaderStat--medium {
+  border-color: rgba(245,158,11,0.22);
+  background: rgba(245,158,11,0.10);
+  color: #b54708;
+}
+.legacyReview .riskHeaderStat--low {
+  border-color: rgba(59,130,246,0.22);
+  background: rgba(59,130,246,0.08);
+  color: #175cd3;
+}
+.legacyReview .paneHint {
+display: none;
+}
+/*
+  IMPORTANT:
+  The following rules are MOBILE overrides.
+  Previously they were unscoped and caused the desktop workspace to collapse into a single column,
+  which is why DocumentEditor + RiskPanel appeared in two ROWS.
+*/
+@media (max-width: 980px) {
+  .legacyReview .appShell--sidebarExpanded {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+  .legacyReview .uploadLayout, .legacyReview .workspaceSecondaryGrid {
+    grid-template-columns: 1fr;
+  }
+  .legacyReview .topBar {
+    grid-template-columns: 1fr;
+  }
+  .legacyReview .topBarActions, .legacyReview .topBarMeta {
+    justify-self: start;
+  }
+  .legacyReview .topBarRight {
+    justify-self: start;
+    flex-wrap: wrap;
+  }
+  .legacyReview .appShell, .legacyReview .appShell--sidebarExpanded, .legacyReview .appShell--sidebarCollapsed {
+    display: block;
+    height: auto;
+    padding: 12px;
+  }
+  .legacyReview .sideNav {
+    margin-bottom: 12px;
+    flex-direction: row;
+    align-items: center;
+    overflow: auto;
+  }
+  .legacyReview .sideNavTop, .legacyReview .sideNav--collapsed .sideNavTop {
+    flex-direction: row;
+  }
+  .legacyReview .navList {
+    flex-direction: row;
+  }
+  .legacyReview .contentShell, .legacyReview .reviewWorkspace, .legacyReview .dashboardPage, .legacyReview .historyPage {
+    min-height: auto;
+  }
+  .legacyReview .dashboardStatsGrid, .legacyReview .historySummaryGrid, .legacyReview .historyRow, .legacyReview .mainGrid {
+    grid-template-columns: 1fr;
+  }
+  .legacyReview .historyFeatured, .legacyReview .topBar, .legacyReview .topBarLead, .legacyReview .topBarActions, .legacyReview .topBarMeta, .legacyReview .topBarRight {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .legacyReview .mainGrid {
+    border-top: 0;
+  }
+}
+.legacyReview .docEditor {
+flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #fff;
+}
+.legacyReview .docToolbar {
+height: 44px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding: 0 12px;
+  gap: 10px;
+  background: #fff;
+}
+.legacyReview .docToolbarLeft {
+display: flex; align-items: center; gap: 8px;
+}
+.legacyReview .docToolbarRight {
+min-width: 0;
+}
+.legacyReview .toolbarLabel {
+font-size: 12px; color: var(--muted);
+}
+.legacyReview .iconBtn {
+width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #fff;
+  cursor: pointer;
+}
+.legacyReview .iconBtn:hover {
+background: #f8fafc;
+}
+.legacyReview .zoomText {
+font-size: 12px; width: 52px; text-align: center; color: var(--text);
+}
+.legacyReview .toolbarHint {
+font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 520px; display: block;
+}
+.legacyReview .docScroll {
+position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  /* Figma-style: neutral work surface behind the paper */
+  background: #f6f7fb;
+}
+.legacyReview .docRow {
+position: relative;
+  width: max-content;
+  min-width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 16px 12px 44px;
+  transition: gap 180ms ease;
+}
+.legacyReview .docRow--compact {
+gap: 8px;
+  padding-right: 18px;
+}
+.legacyReview .docRow--withComments {
+gap: 8px;
+  /* Reserve space for the comment column so balloons never overlap the paper.
+     (The gutter itself is absolutely positioned and doesn't contribute to layout width.) */
+  padding-right: var(--commentPadRight);
+}
+.legacyReview .docCanvas {
+position: relative;
+  /* Do not add an extra white layer under the paper. The paper is the docx section itself. */
+  width: max-content;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+}
+.legacyReview .docCanvas > div:first-child {
+position: relative;
+  z-index: 1;
+}
+.legacyReview .changeOverlay {
+position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.legacyReview .changeHighlight {
+position: absolute;
+  border-radius: 4px;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.65);
+}
+.legacyReview .changeHighlight--insert {
+background: rgba(34, 197, 94, 0.24);
+  outline: 1px solid rgba(34, 197, 94, 0.45);
+}
+.legacyReview .changeHighlight--replace {
+background: rgba(59, 130, 246, 0.20);
+  outline: 1px solid rgba(59, 130, 246, 0.40);
+}
+.legacyReview .changeHighlight--delete {
+background: rgba(239, 68, 68, 0.14);
+  outline: 1px solid rgba(239, 68, 68, 0.28);
+}
+.legacyReview .changeDeleteMarker {
+position: absolute;
+  width: 2px;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.95);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.7);
+}
+.legacyReview .changeDeleteMarker--replace {
+background: rgba(245, 158, 11, 0.95);
+}
+.legacyReview .docx-wrapper {
+background: transparent !important;
+  padding: 0 !important;
+}
+.legacyReview .docx {
+background: transparent !important;
+}
+.legacyReview .docx > section {
+  /* Render a single "paper" surface (no double-white background). */
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+  outline: 1px solid #eceff3;
+}
+.legacyReview .editableBlock {
+position: relative;
+  outline: none;
+  caret-color: #111827;
+}
+.legacyReview .changedBlock {
+position: relative;
+}
+.legacyReview .changedBlock::before {
+content: '';
+  position: absolute;
+  left: -12px;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  border-radius: 999px;
+  background: rgba(59,130,246,0.85);
+}
+.legacyReview .riskBlock {
+background: rgba(250, 204, 21, 0.24);
+  border-radius: 3px;
+}
+.legacyReview .focusPulse {
+animation: legacyPulse 1.6s ease-in-out 3;
+}
+@keyframes legacyPulse {
+  0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.00); background: rgba(59,130,246,0.00); }
+  25% { box-shadow: 0 0 0 9px rgba(59,130,246,0.16); background: rgba(59,130,246,0.10); }
+  100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.00); background: rgba(59,130,246,0.00); }
+}
+.legacyReview .commentLines {
+position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+}
+.legacyReview .commentPolyline {
+  fill: none;
+  stroke: rgba(15,23,42,0.22);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.65;
+}
+
+.legacyReview .commentTrunk {
+stroke-width: 1.05;
+  stroke-dasharray: 4 3;
+  opacity: 0.95;
+}
+.legacyReview .commentGutter {
+width: var(--commentW);
+  overflow: visible;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+.legacyReview .commentGutter--open {
+opacity: 1;
+  pointer-events: auto;
+}
+.legacyReview .commentGutterInner {
+position: relative;
+  min-height: 100%;
+  padding-top: 12px;
+}
+.legacyReview .commentBalloon {
+width: var(--commentW);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 10px 10px 9px;
+  text-align: left;
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+  right: auto;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06);
+}
+.legacyReview .commentBalloon:hover {
+box-shadow: 0 10px 22px rgba(15, 23, 42, 0.10);
+}
+.legacyReview .commentBalloonHead {
+display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+}
+.legacyReview .commentTag {
+font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(239,68,68,0.22);
+  background: rgba(239,68,68,0.06);
+  color: var(--danger);
+}
+.legacyReview .commentTime {
+font-size: 12px; color: var(--muted); white-space: nowrap;
+}
+.legacyReview .commentText {
+margin-top: 6px; font-size: 12px; line-height: 1.45; color: var(--text);
+}
+.legacyReview .commentDel {
+text-decoration: line-through; color: rgba(31,35,40,0.80);
+}
+.legacyReview .commentIns {
+color: #16a34a;
+}
+.legacyReview .commentBalloon--delete .commentTag {
+border-color: rgba(239,68,68,0.24); background: rgba(239,68,68,0.08); color: var(--danger);
+}
+.legacyReview .commentBalloon--insert .commentTag {
+border-color: rgba(34,197,94,0.24); background: rgba(34,197,94,0.08); color: #15803d;
+}
+.legacyReview .commentBalloon--replace .commentTag {
+border-color: rgba(245,158,11,0.24); background: rgba(245,158,11,0.08); color: #d97706;
+}
+.legacyReview .emptyState {
+padding: 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.legacyReview .riskRoot {
+  height: 100vh;
+  min-height: 100vh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+.legacyReview .riskControls {
+  padding: 10px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  border-bottom: 1px solid rgba(15,23,42,0.06);
+}
+.legacyReview .riskUndoBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(15,23,42,0.08);
+  border-radius: 10px;
+  background: #f8fafc;
+  font-size: 12px;
+  color: #475467;
+}
+
+.legacyReview .riskList {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 16px 18px;
+  background: #f8fafc;
+}
+
+.legacyReview .riskGroup {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  margin-bottom: 16px;
+}
+
+.legacyReview .riskGroupTitle {
+  cursor: pointer;
+  padding: 6px 2px 10px;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border-bottom: 1px solid rgba(15,23,42,0.06);
+}
+
+.legacyReview .riskGroupCount {
+font-size: 12px; color: var(--muted);
+}
+.legacyReview .riskCards {
+  padding: 12px 0 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.legacyReview .riskCard {
+  border: 1px solid rgba(15,23,42,0.06);
+  border-radius: 16px;
+  background: #fff;
+  padding: 14px;
+  box-shadow: 0 1px 0 rgba(15,23,42,0.04);
+}
+
+.legacyReview .riskCardHead {
+display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+}
+.legacyReview .riskTitle {
+display: flex; align-items: center; gap: 8px;
+}
+.legacyReview .riskBadge {
+font-size: 12px;
+  font-weight: 800;
+  width: 26px;
+  height: 20px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: #fafafa;
+}
+.legacyReview .riskBadge--high {
+border-color: rgba(239,68,68,0.22); background: rgba(239,68,68,0.08); color: var(--danger);
+}
+.legacyReview .riskBadge--medium {
+border-color: rgba(245,158,11,0.22); background: rgba(245,158,11,0.08); color: #d97706;
+}
+.legacyReview .riskBadge--low {
+border-color: rgba(59,130,246,0.22); background: rgba(59,130,246,0.08); color: #2563eb;
+}
+.legacyReview .riskLabel {
+font-size: 13px; font-weight: 700; line-height: 1.35;
+}
+.legacyReview .btnSmall {
+height: 30px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.legacyReview .btnSmall:hover {
+background: #f8fafc;
+}
+.legacyReview .btnSmall--primary {
+  border-color: rgba(0,179,101,0.28);
+  background: rgba(0,179,101,0.10);
+  color: #065f46;
+  font-weight: 600;
+}
+.legacyReview .riskSection {
+margin-top: 12px;
+}
+.legacyReview .riskSectionTitle {
+font-size: 12px; font-weight: 700; margin-bottom: 6px;
+}
+.legacyReview .riskSectionBody {
+font-size: 12px;
+  line-height: 1.6;
+  color: rgba(31,35,40,0.92);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.legacyReview .riskSectionBody--scroll {
+max-height: 220px;
+  overflow: auto;
+  padding-right: 4px;
+}
+.legacyReview .riskCardActions {
+display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.legacyReview .riskCardActions {
+flex-wrap: wrap;
+}
+/* NOTE: The original CSS had a mobile-only fallback that collapses the grid to 1 column.
+   In this build we keep the desktop workspace two-column; a separate media query can be
+   added later if you want a responsive single-column layout on small screens. */
+.legacyReview .docRow {
+width: auto; min-width: 100%;
+}
+.legacyReview .topBar::-webkit-scrollbar {
+height: 6px;
+}
+.legacyReview .topBar::-webkit-scrollbar-thumb {
+background: rgba(15,23,42,0.12); border-radius: 999px;
+}
+.legacyReview .contentShell {
+display: flex; flex-direction: column;
+}
+.legacyReview .sideNav--collapsed .navIconWrap {
+width: 44px; height: 44px;
+}
+.legacyReview .sideNav--collapsed .navItem--active {
+box-shadow: inset 0 0 0 1px rgba(37,99,235,0.16), 0 10px 24px rgba(15,23,42,0.08);
+}
+.legacyReview .statusTextPill:empty {
+display: none;
+}
+
+
+/* Review progress (waiting view) */
+.legacyReview .progressWrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  background: #eceff3;
+}
+.legacyReview .progressCard {
+  width: 100%;
+  max-width: none;
+  border: 0;
+  border-radius: 0;
+  background: #eceff3;
+  box-shadow: none;
+  padding: 18px 18px 16px;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+}
+.legacyReview .progressHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.legacyReview .progressTitle {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #101828;
+}
+.legacyReview .progressSub {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #667085;
+  line-height: 1.35;
+}
+.legacyReview .progressTags {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legacyReview .progressTag {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,179,101,0.20);
+  background: rgba(0,179,101,0.10);
+  color: #065f46;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+.legacyReview .progressRun {
+  font-size: 11px;
+  color: #667085;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(15,23,42,0.10);
+  border-radius: 999px;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+.legacyReview .progressSteps {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+.legacyReview .progressGroup {
+  display: grid;
+  gap: 6px;
+}
+.legacyReview .progressGroupTitle {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #101828;
+}
+.legacyReview .progressGroupTasks {
+  display: grid;
+  gap: 6px;
+}
+.legacyReview .progressTask {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+.legacyReview .progressTaskIcon {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.legacyReview .progressTaskRing {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1.5px solid #c6c9d0;
+  box-sizing: border-box;
+}
+.legacyReview .progressTaskRing--spin {
+  border-top-color: #9aa2af;
+  animation: reviewProgressSpin 1s linear infinite;
+}
+.legacyReview .progressTaskCheck {
+  width: 12px;
+  height: 12px;
+  color: #34c38f;
+}
+.legacyReview .progressTask--done .progressTaskIcon {
+  border-radius: 999px;
+  background: rgba(52, 195, 143, 0.12);
+  border: 1px solid rgba(52, 195, 143, 0.42);
+}
+.legacyReview .progressTask--failed .progressTaskRing {
+  border-color: #e06d6d;
+}
+.legacyReview .progressTaskText {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #667085;
+}
+.legacyReview .progressHint {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #667085;
+  line-height: 1.35;
+  padding-top: 10px;
+  border-top: 1px solid rgba(15,23,42,0.09);
+}
+.legacyReview .progressActions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+@keyframes reviewProgressSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

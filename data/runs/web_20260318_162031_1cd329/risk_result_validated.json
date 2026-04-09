@@ -1,0 +1,2139 @@
+{
+  "is_valid": true,
+  "error_message": "",
+  "risk_result": {
+    "risk_items": [
+      {
+        "risk_code": "invalid_date_in_contract",
+        "risk_source_type": "anchored",
+        "dimension": "服务期限、里程碑与验收标准",
+        "risk_level": "medium",
+        "risk_label": "合同中存在无效日期约定",
+        "issue": "时间要求中出现不存在的日期\"2027年11月31日\"，11月仅有30天，该日期约定无效",
+        "evidence_text": "咨询在2027年11月31日前完成。",
+        "anchor_text": "1.知识产权管理体系建设 包含高价值专利品台体系建设相关费用，具体要求如下： 完成实验室专利高价值平台知识产权管理制度文件：规范建设平台架构、各个部门的资源管理、规范生产经营各个环节的知识产权管理等相关机制，为平台取得GB/T 29490贯标证书。构建“研发-知识产权”融合流程，包含针对开源代码合规性审查、技术秘密分级保护的具体制度设计，生成相应制度文件和报告。编制《知识产权管理制度》1份、《专利管理流程手册》1份以及相关报告1份。为建设机密计算高价值专利平台提供相关咨询，包括但不限于平台架构设计，专利运用率、专利成果转化方面。 时间要求：管理制度文件2026年6月30日前完成。咨询在2027年11月31日前完成。",
+        "factual_basis": "条款中\"咨询在2027年11月31日前完成\"，11月为小月仅有30天，不存在11月31日，属于无效日期约定",
+        "reasoning_basis": "无效日期导致合同履行期限不明确，若客户依据该日期主张供应商逾期，可能引发争议；且供应商难以据此安排工作进度",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "合同日期应当为有效日期",
+          "basis_detail": "合同约定的履行期限应当是确定且可执行的日期，11月31日不存在，属于无效日期约定",
+          "citation_text": ""
+        },
+        "suggestion": "将\"2027年11月31日\"改为\"2027年11月30日\"",
+        "suggestion_minimal": "将\"2027年11月31日\"改为\"2027年11月30日\"",
+        "suggestion_optimized": "明确咨询服务的具体完成时间节点，可分阶段约定",
+        "suggestion_basis": "修正日期后可消除因日期无效导致的履行期限争议",
+        "needs_human_review": true,
+        "clause_uid": "segment_1::1.（二）",
+        "display_clause_id": "1.（二）",
+        "clause_uids": [
+          "segment_1::1.（二）"
+        ],
+        "clause_id": "1.（二）",
+        "related_clause_ids": [
+          "1.（二）"
+        ],
+        "related_clause_uids": [
+          "segment_1::1.（二）"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "1.（二）"
+        ],
+        "clause_ids": [
+          "1.（二）"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_ACCEPTANCE_545B",
+        "basis_summary": "条款中\"咨询在2027年11月31日前完成\"，11月为小月仅有30天，不存在11月31日，属于无效日期约定；合同日期应当为有效日期",
+        "basis": "[RULE_ACCEPTANCE_545B] 条款中\"咨询在2027年11月31日前完成\"，11月为小月仅有30天，不存在11月31日，属于无效日期约定；无效日期导致合同履行期限不明确，若客户依据该日期主张供应商逾期，可能引发争议；且供应商难以据此安排工作进度；合同日期应当为有效日期；合同约定的履行期限应当是确定且可执行的日期，11月31日不存在，属于无效日期约定",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 1
+      },
+      {
+        "risk_code": "uncertain_deliverable_commitment",
+        "risk_source_type": "anchored",
+        "dimension": "服务范围与交付内容",
+        "risk_level": "medium",
+        "risk_label": "交付物包含无法完全由供应商控制的结果承诺",
+        "issue": "条款约定\"为平台取得GB/T 29490贯标证书\"，该证书取得涉及第三方认证机构审核，供应商无法完全控制结果",
+        "evidence_text": "为平台取得GB/T 29490贯标证书。",
+        "anchor_text": "1.知识产权管理体系建设 包含高价值专利品台体系建设相关费用，具体要求如下： 完成实验室专利高价值平台知识产权管理制度文件：规范建设平台架构、各个部门的资源管理、规范生产经营各个环节的知识产权管理等相关机制，为平台取得GB/T 29490贯标证书。构建“研发-知识产权”融合流程，包含针对开源代码合规性审查、技术秘密分级保护的具体制度设计，生成相应制度文件和报告。编制《知识产权管理制度》1份、《专利管理流程手册》1份以及相关报告1份。为建设机密计算高价值专利平台提供相关咨询，包括但不限于平台架构设计，专利运用率、专利成果转化方面。 时间要求：管理制度文件2026年6月30日前完成。咨询在2027年11月31日前完成。",
+        "factual_basis": "条款将\"取得GB/T 29490贯标证书\"作为交付要求，但贯标证书的取得需要第三方认证机构进行现场审核和评定，供应商仅能协助准备材料，无法保证最终取得证书",
+        "reasoning_basis": "若最终未能取得证书，供应商可能面临违约责任或被扣减服务费用；但该结果非供应商单方可控，可能导致责任与风险不匹配",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "服务合同中涉及第三方审批的结果不应作为供应商的确定义务",
+          "basis_detail": "涉及行政许可、认证、审批等第三方行为的交付物，供应商仅能承诺\"协助\"或\"配合\"，不应承诺确保取得特定结果",
+          "citation_text": ""
+        },
+        "suggestion": "在\"取得\"前增加\"协助\"二字",
+        "suggestion_minimal": "在\"取得\"前增加\"协助\"二字",
+        "suggestion_optimized": "明确供应商责任为\"提供贯标咨询辅导服务，确保满足认证条件\"，并约定认证失败的责任分担",
+        "suggestion_basis": "明确供应商仅承担协助义务而非保证取得结果，可避免因第三方认证不确定导致的违约风险",
+        "needs_human_review": true,
+        "clause_uid": "segment_1::1.（二）",
+        "display_clause_id": "1.（二）",
+        "clause_uids": [
+          "segment_1::1.（二）"
+        ],
+        "clause_id": "1.（二）",
+        "related_clause_ids": [
+          "1.（二）"
+        ],
+        "related_clause_uids": [
+          "segment_1::1.（二）"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "1.（二）"
+        ],
+        "clause_ids": [
+          "1.（二）"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_SCOPE_8661",
+        "basis_summary": "条款将\"取得GB/T 29490贯标证书\"作为交付要求，但贯标证书的取得需要第三方认证机构进行现场审核和评定，供应商仅能协助准备材料，无法保证最终取得证书；服务合同中涉及第三方审批的结果不应作为供应商的确定义务",
+        "basis": "[RULE_SCOPE_8661] 条款将\"取得GB/T 29490贯标证书\"作为交付要求，但贯标证书的取得需要第三方认证机构进行现场审核和评定，供应商仅能协助准备材料，无法保证最终取得证书；若最终未能取得证书，供应商可能面临违约责任或被扣减服务费用；但该结果非供应商单方可控，可能导致责任与风险不匹配；服务合同中涉及第三方审批的结果不应作为供应商的确定义务；涉及行政许可、认证、审批等第三方行为的交付物，供应商仅能承诺\"协助\"或\"配合\"，不应承诺确保取得特定结果",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 2
+      },
+      {
+        "risk_code": "uncertain_service_quantity",
+        "risk_source_type": "anchored",
+        "dimension": "服务范围与交付内容",
+        "risk_level": "medium",
+        "risk_label": "服务数量完全取决于客户需求，供应商工作范围不确定",
+        "issue": "条款约定\"评估数量根据平台实际需求为准，评估数量最多能达15件\"，数量完全由客户决定，供应商被动接受",
+        "evidence_text": "评估数量根据平台实际需求为准，评估数量最多能达15件。",
+        "anchor_text": "2.专利申请前评估 包含机密计算相关专利申请前评估费用，具体要求如下： 建立包含法律稳定性、技术先进性、市场应用前景、侵权可检测性的多维评估模型；提供详细的评估报告样本，且具备“查新-规避-布局”的一体化建议能力。 基于省平台专利申请前评估申请表/评估表在申请前对相关技术发明从技术、法律、市场等维度进行评估并生成相应报告（是否申请、如何申请（保护范围、权利要求设计）等）。评估数量根据平台实际需求为准，评估数量最多能达15件。 时间要求：根据具体专利申请时限要求进行。",
+        "factual_basis": "条款中评估数量设定为\"根据平台实际需求为准\"，上限为15件，但未明确客户需求的提出方式、时限及供应商是否必须接受，导致供应商可能被动接受任意数量的评估工作",
+        "reasoning_basis": "若客户在合同期间频繁提出评估需求或突然大幅增加需求，供应商可能面临人力成本超支、工作安排被打乱的风险，且难以拒绝",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "服务范围应当明确或设定合理的边界条件",
+          "basis_detail": "服务合同中工作量的约定应当具有确定性或可预测性，完全取决于对方需求会导致服务范围不确定",
+          "citation_text": ""
+        },
+        "suggestion": "增加\"具体评估数量由双方另行协商确定\"或设定最低保障数量",
+        "suggestion_minimal": "增加\"具体评估数量由双方另行协商确定\"或设定最低保障数量",
+        "suggestion_optimized": "约定评估服务按件计费，超出约定数量的部分另行收费",
+        "suggestion_basis": "明确数量确定机制后可避免供应商被动接受不确定工作量导致的成本风险",
+        "needs_human_review": true,
+        "clause_uid": "segment_1::1.2",
+        "display_clause_id": "1.2",
+        "clause_uids": [
+          "segment_1::1.2"
+        ],
+        "clause_id": "1.2",
+        "related_clause_ids": [
+          "1.2"
+        ],
+        "related_clause_uids": [
+          "segment_1::1.2"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "1.2"
+        ],
+        "clause_ids": [
+          "1.2"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_SCOPE_6865",
+        "basis_summary": "条款中评估数量设定为\"根据平台实际需求为准\"，上限为15件，但未明确客户需求的提出方式、时限及供应商是否必须接受，导致供应商可能被动接受任意数量的评估工作；服务范围应当明确或设定合理的边界条件",
+        "basis": "[RULE_SCOPE_6865] 条款中评估数量设定为\"根据平台实际需求为准\"，上限为15件，但未明确客户需求的提出方式、时限及供应商是否必须接受，导致供应商可能被动接受任意数量的评估工作；若客户在合同期间频繁提出评估需求或突然大幅增加需求，供应商可能面临人力成本超支、工作安排被打乱的风险，且难以拒绝；服务范围应当明确或设定合理的边界条件；服务合同中工作量的约定应当具有确定性或可预测性，完全取决于对方需求会导致服务范围不确定",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 3
+      },
+      {
+        "risk_code": "vague_responsibility_scope",
+        "risk_source_type": "anchored",
+        "dimension": "服务范围与交付内容",
+        "risk_level": "medium",
+        "risk_label": "\"辅助形成\"表述模糊，供应商责任范围不清晰",
+        "issue": "条款约定\"辅助形成3个高价值专利组合\"，\"辅助\"一词导致供应商责任边界不明确",
+        "evidence_text": "辅助形成 3 个高价值专利组合，并形成相关报告。",
+        "anchor_text": "4.专利池建设 包含机密计算相关专利池建设费用，具体要求如下： 围绕平台的相关领域科技攻关或关键核心技术，辅助形成 3 个高价值专利组合，并形成相关报告。提出符合机密计算产业特征的“产品型”或“标准型”专利池架构；包含详细的入池标准、许可费率测算模型、收益分配机制及反垄断合规分析。结合专利数据库的打造，建立专利资产管理和专利分级分类评估档案1套，形成高价值专利库。 时间要求：2027年3月31日前完成。",
+        "factual_basis": "条款使用\"辅助形成\"表述，但未明确\"辅助\"的具体含义和供应商应承担的工作内容、责任程度，导致验收标准模糊",
+        "reasoning_basis": "若客户对交付成果不满意，可能以\"仅辅助\"为由认为供应商未充分履约；而供应商可能认为已尽辅助义务，双方易产生争议",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "合同义务应当明确具体",
+          "basis_detail": "服务合同的交付义务应当具体明确，避免使用\"辅助\"\"配合\"等模糊词汇，应明确供应商的具体工作内容和责任边界",
+          "citation_text": ""
+        },
+        "suggestion": "明确\"辅助\"的具体工作内容，如\"负责专利筛选、分析并形成组合方案\"",
+        "suggestion_minimal": "明确\"辅助\"的具体工作内容，如\"负责专利筛选、分析并形成组合方案\"",
+        "suggestion_optimized": "约定专利组合的形成标准、评审机制及未能达标的责任承担",
+        "suggestion_basis": "明确责任边界后可避免因职责不清导致的交付争议",
+        "needs_human_review": true,
+        "clause_uid": "segment_1::1.4",
+        "display_clause_id": "1.4",
+        "clause_uids": [
+          "segment_1::1.4"
+        ],
+        "clause_id": "1.4",
+        "related_clause_ids": [
+          "1.4"
+        ],
+        "related_clause_uids": [
+          "segment_1::1.4"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "1.4"
+        ],
+        "clause_ids": [
+          "1.4"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_SCOPE_A96A",
+        "basis_summary": "条款使用\"辅助形成\"表述，但未明确\"辅助\"的具体含义和供应商应承担的工作内容、责任程度，导致验收标准模糊；合同义务应当明确具体",
+        "basis": "[RULE_SCOPE_A96A] 条款使用\"辅助形成\"表述，但未明确\"辅助\"的具体含义和供应商应承担的工作内容、责任程度，导致验收标准模糊；若客户对交付成果不满意，可能以\"仅辅助\"为由认为供应商未充分履约；而供应商可能认为已尽辅助义务，双方易产生争议；合同义务应当明确具体；服务合同的交付义务应当具体明确，避免使用\"辅助\"\"配合\"等模糊词汇，应明确供应商的具体工作内容和责任边界",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 4
+      },
+      {
+        "risk_code": "service_team_arrangement_obligation_vague",
+        "risk_source_type": "anchored",
+        "dimension": "服务范围与交付内容",
+        "risk_level": "medium",
+        "risk_label": "服务团队安排义务表述模糊，业主可单方面要求变更",
+        "issue": "条款约定“须根据项目进度及业主要求安排服务团队”，未明确业主提出要求的合理期限、次数限制或费用承担机制",
+        "evidence_text": "项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+        "anchor_text": "3、项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+        "factual_basis": "条款中“根据业主要求安排服务团队”的表述未设定边界，业主可随时以“项目实际需求”为由要求供应商更换或增加人员，且未约定此情形下的费用承担和工期影响",
+        "reasoning_basis": "该模糊表述导致供应商面临人员调配的不确定性，可能被迫接受业主的临时人员调整要求而无法主张额外费用，增加项目管理成本和履约风险",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "合同变更需双方协商一致",
+          "basis_detail": "服务团队安排属于合同履行内容，单方面由业主提出要求而无需协商一致，违背合同变更的基本逻辑",
+          "citation_text": ""
+        },
+        "suggestion": "明确业主提出团队调整需求需书面通知",
+        "suggestion_minimal": "明确业主提出团队调整需求需书面通知",
+        "suggestion_optimized": "约定业主每阶段最多可提出X次人员调整要求，且因调整产生的额外成本由业主承担，并相应延长工期",
+        "suggestion_basis": "通过设定通知期限和费用承担机制，限制业主随意调整团队的权利，降低供应商的不可控成本风险",
+        "needs_human_review": true,
+        "clause_uid": "segment_2::2.3",
+        "display_clause_id": "2.3",
+        "clause_uids": [
+          "segment_2::2.3"
+        ],
+        "clause_id": "2.3",
+        "related_clause_ids": [
+          "2.3"
+        ],
+        "related_clause_uids": [
+          "segment_2::2.3"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "2.3"
+        ],
+        "clause_ids": [
+          "2.3"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_SCOPE_FF6E",
+        "basis_summary": "条款中“根据业主要求安排服务团队”的表述未设定边界，业主可随时以“项目实际需求”为由要求供应商更换或增加人员，且未约定此情形下的费用承担和工期影响；合同变更需双方协商一致",
+        "basis": "[RULE_SCOPE_FF6E] 条款中“根据业主要求安排服务团队”的表述未设定边界，业主可随时以“项目实际需求”为由要求供应商更换或增加人员，且未约定此情形下的费用承担和工期影响；该模糊表述导致供应商面临人员调配的不确定性，可能被迫接受业主的临时人员调整要求而无法主张额外费用，增加项目管理成本和履约风险；合同变更需双方协商一致；服务团队安排属于合同履行内容，单方面由业主提出要求而无需协商一致，违背合同变更的基本逻辑",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 5
+      },
+      {
+        "risk_code": "project_requirement_standard_unclear",
+        "risk_source_type": "anchored",
+        "dimension": "服务范围与交付内容",
+        "risk_level": "medium",
+        "risk_label": "项目实际需求标准缺失，供应商可能承担无限责任",
+        "issue": "条款约定“保证满足项目实际需求”，但未定义“项目实际需求”的具体标准或范围",
+        "evidence_text": "项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+        "anchor_text": "3、项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+        "factual_basis": "条款中“项目实际需求”属于未界定的模糊概念，未说明需求的具体内容、验收标准或边界，供应商无法预判需满足何种程度的需求",
+        "reasoning_basis": "模糊的需求标准使供应商面临业主事后以“需求未满足”为由主张违约责任的风险，且因无明确标准，供应商难以进行有效抗辩",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "合同标的需明确具体",
+          "basis_detail": "服务合同的标的应当具体明确，需求标准缺失导致合同标的不确定，违背合同确定性原则",
+          "citation_text": ""
+        },
+        "suggestion": "在合同附件中列明项目需求清单，作为“项目实际需求”的具体定义",
+        "suggestion_minimal": "在合同附件中列明项目需求清单，作为“项目实际需求”的具体定义",
+        "suggestion_optimized": "约定以书面确认的需求清单为基准，业主变更需求需通过变更协议处理，供应商仅对确认清单范围内的需求负责",
+        "suggestion_basis": "通过明确需求范围和变更机制，限定供应商的责任边界，避免因需求定义模糊而承担无限责任",
+        "needs_human_review": true,
+        "clause_uid": "segment_2::2.3",
+        "display_clause_id": "2.3",
+        "clause_uids": [
+          "segment_2::2.3"
+        ],
+        "clause_id": "2.3",
+        "related_clause_ids": [
+          "2.3"
+        ],
+        "related_clause_uids": [
+          "segment_2::2.3"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "2.3"
+        ],
+        "clause_ids": [
+          "2.3"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_SCOPE_9079",
+        "basis_summary": "条款中“项目实际需求”属于未界定的模糊概念，未说明需求的具体内容、验收标准或边界，供应商无法预判需满足何种程度的需求；合同标的需明确具体",
+        "basis": "[RULE_SCOPE_9079] 条款中“项目实际需求”属于未界定的模糊概念，未说明需求的具体内容、验收标准或边界，供应商无法预判需满足何种程度的需求；模糊的需求标准使供应商面临业主事后以“需求未满足”为由主张违约责任的风险，且因无明确标准，供应商难以进行有效抗辩；合同标的需明确具体；服务合同的标的应当具体明确，需求标准缺失导致合同标的不确定，违背合同确定性原则",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 6
+      },
+      {
+        "risk_code": "vague_rectification_requirements",
+        "risk_source_type": "anchored",
+        "dimension": "服务范围与交付内容",
+        "risk_level": "medium",
+        "risk_label": "整改要求缺乏具体标准，供应商面临不确定的整改压力",
+        "issue": "条款约定甲方有权提出\"限期整改意见\"，但未明确整改的具体标准、范围、合格判定条件",
+        "evidence_text": "如日常工作中或抽检时发现因乙方原因造成的未按合同要求及时提供服务的，甲方有权提出限期整改意见",
+        "anchor_text": "在合同期内，甲方有权随时对乙方的工作进行监控。如日常工作中或抽检时发现因乙方原因造成的未按合同要求及时提供服务的，甲方有权提出限期整改意见。",
+        "factual_basis": "条款中仅表述为\"限期整改意见\"，未约定整改的具体技术标准、达到何种程度视为合格、整改期限的具体天数或计算方式",
+        "reasoning_basis": "由于整改标准不明确，甲方可基于主观判断任意要求整改，乙方难以预判整改是否达标，可能导致反复整改、累积违约金，甚至被认定为根本违约而终止合同",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "合同条款应当具体明确，避免解释争议",
+          "basis_detail": "整改要求属于合同履约的核心控制机制，若缺乏具体标准，将导致权利义务失衡，供应商承担不确定的整改义务和违约风险",
+          "citation_text": ""
+        },
+        "suggestion": "补充整改期限的具体天数约定",
+        "suggestion_minimal": "补充整改期限的具体天数约定",
+        "suggestion_optimized": "列明各类服务不达标的具体判定标准，并约定整改后由双方共同验收而非甲方单方认定",
+        "suggestion_basis": "明确标准后可避免甲方任意行使整改权，减少争议和违约风险",
+        "needs_human_review": true,
+        "clause_uid": "segment_3::3.2",
+        "display_clause_id": "3.2",
+        "clause_uids": [
+          "segment_3::3.2"
+        ],
+        "clause_id": "3.2",
+        "related_clause_ids": [
+          "3.2"
+        ],
+        "related_clause_uids": [
+          "segment_3::3.2"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "3.2"
+        ],
+        "clause_ids": [
+          "3.2"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_SCOPE_9EF7",
+        "basis_summary": "条款中仅表述为\"限期整改意见\"，未约定整改的具体技术标准、达到何种程度视为合格、整改期限的具体天数或计算方式；合同条款应当具体明确，避免解释争议",
+        "basis": "[RULE_SCOPE_9EF7] 条款中仅表述为\"限期整改意见\"，未约定整改的具体技术标准、达到何种程度视为合格、整改期限的具体天数或计算方式；由于整改标准不明确，甲方可基于主观判断任意要求整改，乙方难以预判整改是否达标，可能导致反复整改、累积违约金，甚至被认定为根本违约而终止合同；合同条款应当具体明确，避免解释争议；整改要求属于合同履约的核心控制机制，若缺乏具体标准，将导致权利义务失衡，供应商承担不确定的整改义务和违约风险",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 7
+      },
+      {
+        "risk_code": "unlimited_penalty_accumulation",
+        "risk_source_type": "anchored",
+        "dimension": "违约责任与赔偿机制",
+        "risk_level": "high",
+        "risk_label": "验收不合格的违约金可无限累积，无上限封顶",
+        "issue": "条款约定\"每追加验收一次按合同价款5%的标准支付违约金\"，未限定违约金总额上限或累计次数上限",
+        "evidence_text": "甲方有权要求乙方按每追加验收一次按合同价款_5 %的标准支付违约金，直至终止合同",
+        "anchor_text": "每_1年_综合验收一次。如验收不合格，乙方须按照甲方验收结果限期整改，如乙方不进行整改或整改后甲方再次验收仍不合格的，甲方有权要求乙方按每追加验收一次按合同价款_5 %的标准支付违约金，直至终止合同。",
+        "factual_basis": "条款仅约定\"每追加验收一次\"按5%支付违约金，未约定累计违约金总额上限，也未约定达到多少次验收不合格可终止合同的具体条件",
+        "reasoning_basis": "若乙方多次验收不合格，可能面临违约金不断累积的情形，5%×N次可能远超合同总价，甚至导致供应商因累积违约金而承担远超合同金额的赔偿责任，且\"直至终止合同\"的表述使风险无边界",
+        "normative_basis": {
+          "basis_type": "legal_rule",
+          "basis_title": "违约金应当合理，不宜过高或无上限",
+          "basis_detail": "根据合同公平原则和违约金的补偿性功能，违约金应当与实际损失相当，无上限的违约金累积可能导致显失公平",
+          "citation_text": "《民法典》第五百八十五条第二款：约定的违约金低于造成的损失的，人民法院或者仲裁机构可以根据当事人的请求予以增加；约定的违约金过分高于造成的损失的，人民法院或者仲裁机构可以根据当事人的请求予以适当减少"
+        },
+        "suggestion": "约定累计违约金不超过合同价款的30%",
+        "suggestion_minimal": "约定累计违约金不超过合同价款的30%",
+        "suggestion_optimized": "约定累计违约金上限为合同价款的20%，且整改次数限定为2次，超过则合同终止并按实际损失赔偿",
+        "suggestion_basis": "设定上限可防止违约金无限累积，使风险可控，符合公平原则",
+        "needs_human_review": true,
+        "clause_uid": "segment_3::3",
+        "display_clause_id": "3",
+        "clause_uids": [
+          "segment_3::3"
+        ],
+        "clause_id": "3",
+        "related_clause_ids": [
+          "3"
+        ],
+        "related_clause_uids": [
+          "segment_3::3"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "3"
+        ],
+        "clause_ids": [
+          "3"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_LIABILITY_ABA9",
+        "basis_summary": "条款仅约定\"每追加验收一次\"按5%支付违约金，未约定累计违约金总额上限，也未约定达到多少次验收不合格可终止合同的具体条件；违约金应当合理，不宜过高或无上限",
+        "basis": "[RULE_LIABILITY_ABA9] 条款仅约定\"每追加验收一次\"按5%支付违约金，未约定累计违约金总额上限，也未约定达到多少次验收不合格可终止合同的具体条件；若乙方多次验收不合格，可能面临违约金不断累积的情形，5%×N次可能远超合同总价，甚至导致供应商因累积违约金而承担远超合同金额的赔偿责任，且\"直至终止合同\"的表述使风险无边界；违约金应当合理，不宜过高或无上限；根据合同公平原则和违约金的补偿性功能，违约金应当与实际损失相当，无上限的违约金累积可能导致显失公平；《民法典》第五百八十五条第二款：约定的违约金低于造成的损失的，人民法院或者仲裁机构可以根据当事人的请求予以增加；约定的违约金过分高于造成的损失的，人民法院或者仲裁机构可以根据当事人的请求予以适当减少",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "风险说明涉及法律判断、比例上限或法规口径，必须由人工确认。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 8
+      },
+      {
+        "risk_code": "missing_acceptance_criteria",
+        "risk_source_type": "anchored",
+        "dimension": "服务期限、里程碑与验收标准",
+        "risk_level": "high",
+        "risk_label": "综合验收缺乏具体标准，仅表述为\"综合验收\"",
+        "issue": "条款仅约定\"每1年综合验收一次\"，但未明确综合验收的具体内容、标准、程序和合格判定条件",
+        "evidence_text": "每_1年_综合验收一次。如验收不合格，乙方须按照甲方验收结果限期整改",
+        "anchor_text": "每_1年_综合验收一次。如验收不合格，乙方须按照甲方验收结果限期整改，如乙方不进行整改或整改后甲方再次验收仍不合格的，甲方有权要求乙方按每追加验收一次按合同价款_5 %的标准支付违约金，直至终止合同。",
+        "factual_basis": "条款中仅使用\"综合验收\"这一概括性表述，未列明验收的具体指标、考核维度、合格分数线或甲方验收的具体程序",
+        "reasoning_basis": "由于验收标准完全缺失，验收是否合格完全取决于甲方主观判断，乙方无法预判自身服务是否达标，可能导致验收结论的不确定性，进而触发整改和违约金条款",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "服务验收标准应当具体可量化",
+          "basis_detail": "验收标准是判断服务是否合格的核心依据，缺乏具体标准将使供应商处于不确定的履约风险中，也容易引发验收争议",
+          "citation_text": ""
+        },
+        "suggestion": "约定验收的具体维度和合格判定标准（如服务响应时间、故障解决率等）",
+        "suggestion_minimal": "约定验收的具体维度和合格判定标准（如服务响应时间、故障解决率等）",
+        "suggestion_optimized": "制定详细的验收清单和评分标准，约定70分及以上为合格，70分以下需整改，连续2次不合格可协商终止合同",
+        "suggestion_basis": "明确验收标准可减少验收争议，使乙方清楚达标要求，也限制甲方任意认定不合格的权利",
+        "needs_human_review": true,
+        "clause_uid": "segment_3::3",
+        "display_clause_id": "3",
+        "clause_uids": [
+          "segment_3::3"
+        ],
+        "clause_id": "3",
+        "related_clause_ids": [
+          "3"
+        ],
+        "related_clause_uids": [
+          "segment_3::3"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "3"
+        ],
+        "clause_ids": [
+          "3"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_ACCEPTANCE_0B24",
+        "basis_summary": "条款中仅使用\"综合验收\"这一概括性表述，未列明验收的具体指标、考核维度、合格分数线或甲方验收的具体程序；服务验收标准应当具体可量化",
+        "basis": "[RULE_ACCEPTANCE_0B24] 条款中仅使用\"综合验收\"这一概括性表述，未列明验收的具体指标、考核维度、合格分数线或甲方验收的具体程序；由于验收标准完全缺失，验收是否合格完全取决于甲方主观判断，乙方无法预判自身服务是否达标，可能导致验收结论的不确定性，进而触发整改和违约金条款；服务验收标准应当具体可量化；验收标准是判断服务是否合格的核心依据，缺乏具体标准将使供应商处于不确定的履约风险中，也容易引发验收争议",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 9
+      },
+      {
+        "risk_code": "undefined_personnel_requirements",
+        "risk_source_type": "anchored",
+        "dimension": "服务范围与交付内容",
+        "risk_level": "medium",
+        "risk_label": "专职人员要求未明确具体标准",
+        "issue": "条款仅要求\"指定专职人员\"但未明确人员数量、资质要求、工作时间、是否驻场等关键要素",
+        "evidence_text": "乙方应指定专职人员做好系统运维服务。",
+        "anchor_text": "乙方应指定专职人员做好系统运维服务。",
+        "factual_basis": "条款要求指定专职人员，但未约定具体人数、专业资质认证、工作经验要求、工作时长或是否需要驻场服务",
+        "reasoning_basis": "因人员要求不明确，甲方可任意解读并要求增加人员数量或特定资质，导致乙方人力成本不可控；或因理解差异引发验收争议",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "服务内容应具体明确",
+          "basis_detail": "服务合同中人员配置属于核心交付要素，若仅原则性约定而未量化具体标准，易引发履约争议",
+          "citation_text": ""
+        },
+        "suggestion": "约定专职人员的基本数量下限和资质要求",
+        "suggestion_minimal": "约定专职人员的基本数量下限和资质要求",
+        "suggestion_optimized": "约定专职人员配置清单，包括人员数量、姓名、资质、联系方式，并约定未经乙方同意甲方不得随意要求更换人员",
+        "suggestion_basis": "明确人员配置标准可避免甲方随意解读导致成本增加，也可减少因人员配置问题引发的验收争议",
+        "needs_human_review": true,
+        "clause_uid": "segment_4::4.1",
+        "display_clause_id": "4.1",
+        "clause_uids": [
+          "segment_4::4.1"
+        ],
+        "clause_id": "4.1",
+        "related_clause_ids": [
+          "4.1"
+        ],
+        "related_clause_uids": [
+          "segment_4::4.1"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "4.1"
+        ],
+        "clause_ids": [
+          "4.1"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_SCOPE_BCC1",
+        "basis_summary": "条款要求指定专职人员，但未约定具体人数、专业资质认证、工作经验要求、工作时长或是否需要驻场服务；服务内容应具体明确",
+        "basis": "[RULE_SCOPE_BCC1] 条款要求指定专职人员，但未约定具体人数、专业资质认证、工作经验要求、工作时长或是否需要驻场服务；因人员要求不明确，甲方可任意解读并要求增加人员数量或特定资质，导致乙方人力成本不可控；或因理解差异引发验收争议；服务内容应具体明确；服务合同中人员配置属于核心交付要素，若仅原则性约定而未量化具体标准，易引发履约争议",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 10
+      },
+      {
+        "risk_code": "absolute_inspection_obligation",
+        "risk_source_type": "anchored",
+        "dimension": "权责分配与责任限制",
+        "risk_level": "medium",
+        "risk_label": "检查配合义务表述绝对化，缺乏合理例外",
+        "issue": "条款规定\"不得以任何理由拒绝检查\"，排除了乙方对不合理检查行为的抗辩权",
+        "evidence_text": "乙方必须积极配合甲方的日常监控和临时抽检，不得以任何理由拒绝检查或在检查中弄虚作假。",
+        "anchor_text": "乙方必须积极配合甲方的日常监控和临时抽检，不得以任何理由拒绝检查或在检查中弄虚作假。",
+        "factual_basis": "条款使用绝对性表述\"不得以任何理由拒绝\"，未对检查的合理时间、频率、方式作出限制，也未约定甲方检查权行使的边界",
+        "reasoning_basis": "若甲方频繁或在不合理时间（如深夜）进行临时抽检，乙方仍必须配合，无法拒绝，导致乙方正常运营受影响；且\"任何理由\"排除了一切抗辩可能，乙方权益缺乏保护",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "检查权行使应遵循合理必要原则",
+          "basis_detail": "合同中约定检查权时，应同时明确检查的时间、频率、方式等限制，避免检查权被滥用",
+          "citation_text": ""
+        },
+        "suggestion": "增加但书条款：\"但甲方检查应提前通知，且检查频率应合理，不得影响乙方正常服务\"",
+        "suggestion_minimal": "增加但书条款：\"但甲方检查应提前通知，且检查频率应合理，不得影响乙方正常服务\"",
+        "suggestion_optimized": "约定检查的具体流程：日常监控需提前告知，临时抽检每月不超过X次，且应在工作时间内进行；乙方有权对不合理的检查要求提出异议",
+        "suggestion_basis": "明确检查权的边界可防止甲方滥用检查权，保障乙方正常运营权益，同时保留甲方合理监督权",
+        "needs_human_review": true,
+        "clause_uid": "segment_4::4.3",
+        "display_clause_id": "4.3",
+        "clause_uids": [
+          "segment_4::4.3"
+        ],
+        "clause_id": "4.3",
+        "related_clause_ids": [
+          "4.3"
+        ],
+        "related_clause_uids": [
+          "segment_4::4.3"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "4.3"
+        ],
+        "clause_ids": [
+          "4.3"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_ALLOCATION_2497",
+        "basis_summary": "条款使用绝对性表述\"不得以任何理由拒绝\"，未对检查的合理时间、频率、方式作出限制，也未约定甲方检查权行使的边界；检查权行使应遵循合理必要原则",
+        "basis": "[RULE_ALLOCATION_2497] 条款使用绝对性表述\"不得以任何理由拒绝\"，未对检查的合理时间、频率、方式作出限制，也未约定甲方检查权行使的边界；若甲方频繁或在不合理时间（如深夜）进行临时抽检，乙方仍必须配合，无法拒绝，导致乙方正常运营受影响；且\"任何理由\"排除了一切抗辩可能，乙方权益缺乏保护；检查权行使应遵循合理必要原则；合同中约定检查权时，应同时明确检查的时间、频率、方式等限制，避免检查权被滥用",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 11
+      },
+      {
+        "risk_code": "vague_service_standard_liability",
+        "risk_source_type": "anchored",
+        "dimension": "违约责任与赔偿机制",
+        "risk_level": "high",
+        "risk_label": "服务标准模糊导致供应商易被追责",
+        "issue": "条款中\"周到、及时服务\"属于主观性表述，缺乏客观衡量标准，供应商可能因对服务质量的认知差异而被认定为违约",
+        "evidence_text": "乙方未能按本合同约定要求提供周到、及时服务，应向甲方承担违约责任",
+        "anchor_text": "乙方未能按本合同约定要求提供周到、及时服务，应向甲方承担违约责任，应向甲方支付违约金，即合同总额 5 %。",
+        "factual_basis": "条款使用\"周到、及时服务\"描述供应商义务，但未定义何为\"周到\"、何为\"及时\"的具体标准或可量化指标",
+        "reasoning_basis": "在合同履行中，甲方可单方面以服务不够\"周到\"或不够\"及时\"为由主张供应商违约，而供应商因缺乏明确标准难以抗辩，导致承担违约金责任的风险显著增加",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "合同条款应具备明确性和可操作性",
+          "basis_detail": "根据合同解释原则，条款表述应具体明确，避免使用主观性、模糊性词汇，否则易产生争议并导致不利解释",
+          "citation_text": ""
+        },
+        "suggestion": "在合同附件或补充协议中明确\"周到、及时服务\"的具体定义和衡量标准",
+        "suggestion_minimal": "在合同附件或补充协议中明确\"周到、及时服务\"的具体定义和衡量标准",
+        "suggestion_optimized": "将服务标准细化为：1）响应时间不超过X小时；2）每月服务报告；3）客户满意度不低于X%；并配套相应的考核机制",
+        "suggestion_basis": "明确的服务标准可减少甲方主观认定违约的空间，降低供应商被随意追责的风险",
+        "needs_human_review": true,
+        "clause_uid": "segment_6::6.3",
+        "display_clause_id": "6.3",
+        "clause_uids": [
+          "segment_6::6.3"
+        ],
+        "clause_id": "6.3",
+        "related_clause_ids": [
+          "6.3"
+        ],
+        "related_clause_uids": [
+          "segment_6::6.3"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "6.3"
+        ],
+        "clause_ids": [
+          "6.3"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_LIABILITY_3A35",
+        "basis_summary": "条款使用\"周到、及时服务\"描述供应商义务，但未定义何为\"周到\"、何为\"及时\"的具体标准或可量化指标；合同条款应具备明确性和可操作性",
+        "basis": "[RULE_LIABILITY_3A35] 条款使用\"周到、及时服务\"描述供应商义务，但未定义何为\"周到\"、何为\"及时\"的具体标准或可量化指标；在合同履行中，甲方可单方面以服务不够\"周到\"或不够\"及时\"为由主张供应商违约，而供应商因缺乏明确标准难以抗辩，导致承担违约金责任的风险显著增加；合同条款应具备明确性和可操作性；根据合同解释原则，条款表述应具体明确，避免使用主观性、模糊性词汇，否则易产生争议并导致不利解释",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 12
+      },
+      {
+        "risk_code": "liquidated_damage_calculation_basis_unclear",
+        "risk_source_type": "anchored",
+        "dimension": "违约责任与赔偿机制",
+        "risk_level": "medium",
+        "risk_label": "违约金计算基数未区分违约情形",
+        "issue": "违约金按\"合同总额5%\"计算，但未区分不同违约情形（如部分服务未提供、延迟服务、质量瑕疵等）是否均适用同一比例，可能导致责任与损失不匹配",
+        "evidence_text": "应向甲方支付违约金，即合同总额 5 %",
+        "anchor_text": "乙方未能按本合同约定要求提供周到、及时服务，应向甲方承担违约责任，应向甲方支付违约金，即合同总额 5 %。",
+        "factual_basis": "条款统一规定违约金为合同总额的5%，未根据违约行为的严重程度、影响范围进行差异化设定",
+        "reasoning_basis": "若供应商仅存在轻微延迟或部分服务瑕疵，仍需按合同总额5%支付违约金，可能造成违约金与实际损失严重不对等，供应商权益难以得到合理保护",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "违约金应与违约情形相匹配",
+          "basis_detail": "实践中，违约金应根据违约行为的性质、情节、后果进行分层设定，避免\"一刀切\"导致责任失衡",
+          "citation_text": ""
+        },
+        "suggestion": "在条款中补充\"具体违约金金额根据违约情形及影响程度确定\"的弹性条款",
+        "suggestion_minimal": "在条款中补充\"具体违约金金额根据违约情形及影响程度确定\"的弹性条款",
+        "suggestion_optimized": "设定梯度违约金：1）轻微延迟（X天内）按合同总额X%；2）严重延迟或部分服务未提供按合同总额Y%；3）完全未提供服务按合同总额Z%",
+        "suggestion_basis": "梯度化的违约金设定可实现责任与损失的对等，避免轻微违约情形下供应商承担过重违约金",
+        "needs_human_review": true,
+        "clause_uid": "segment_6::6.3",
+        "display_clause_id": "6.3",
+        "clause_uids": [
+          "segment_6::6.3"
+        ],
+        "clause_id": "6.3",
+        "related_clause_ids": [
+          "6.3"
+        ],
+        "related_clause_uids": [
+          "segment_6::6.3"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "6.3"
+        ],
+        "clause_ids": [
+          "6.3"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_LIABILITY_EF26",
+        "basis_summary": "条款统一规定违约金为合同总额的5%，未根据违约行为的严重程度、影响范围进行差异化设定；违约金应与违约情形相匹配",
+        "basis": "[RULE_LIABILITY_EF26] 条款统一规定违约金为合同总额的5%，未根据违约行为的严重程度、影响范围进行差异化设定；若供应商仅存在轻微延迟或部分服务瑕疵，仍需按合同总额5%支付违约金，可能造成违约金与实际损失严重不对等，供应商权益难以得到合理保护；违约金应与违约情形相匹配；实践中，违约金应根据违约行为的性质、情节、后果进行分层设定，避免\"一刀切\"导致责任失衡",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 13
+      },
+      {
+        "risk_code": "ip_ownership_all_transferred_to_client",
+        "risk_source_type": "anchored",
+        "dimension": "知识产权归属与使用权",
+        "risk_level": "high",
+        "risk_label": "所有项目成果知识产权无条件归甲方，乙方丧失自有知识产权",
+        "issue": "条款将项目所有文件、资料、数据信息的所有权无条件归甲方所有，未区分乙方原有知识产权与项目新产出的知识产权",
+        "evidence_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
+        "anchor_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
+        "factual_basis": "条款明确约定'所有文件、资料、数据信息等'的所有权均归甲方，包括乙方在项目过程中可能新产生的知识产权，也包括乙方原本就拥有的自有知识产权（如工具、方法论等）",
+        "reasoning_basis": "乙方在项目实施中使用自身原有的技术、方法、工具所产生的工作成果，其知识产权被无条件转移给甲方，导致乙方丧失对这些成果的任何权利，无法继续用于其他项目或商业用途",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "知识产权归属应区分原有权利与新产出权利",
+          "basis_detail": "服务合同中，供应商通常保留其原有知识产权，仅将项目特定产出物的知识产权转让或授权给客户，而非将所有相关成果一概转移",
+          "citation_text": ""
+        },
+        "suggestion": "补充'但乙方在项目实施前已拥有的知识产权除外'或'乙方保留对自有工具、方法的知识产权'",
+        "suggestion_minimal": "补充'但乙方在项目实施前已拥有的知识产权除外'或'乙方保留对自有工具、方法的知识产权'",
+        "suggestion_optimized": "约定项目成果知识产权归甲方，但乙方保留对自有技术、工具、方法论的永久所有权及免费使用权；项目成果中如涉及乙方原有知识产权，乙方授权甲方有限使用",
+        "suggestion_basis": "通过区分原有与新产出知识产权，保护供应商的核心资产，避免供应商因项目合作丧失对自身技术的控制权",
+        "needs_human_review": true,
+        "clause_uid": "segment_7::7.1",
+        "display_clause_id": "7.1",
+        "clause_uids": [
+          "segment_7::7.1"
+        ],
+        "clause_id": "7.1",
+        "related_clause_ids": [
+          "7.1"
+        ],
+        "related_clause_uids": [
+          "segment_7::7.1"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "7.1"
+        ],
+        "clause_ids": [
+          "7.1"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_IP_AA15",
+        "basis_summary": "条款明确约定'所有文件、资料、数据信息等'的所有权均归甲方，包括乙方在项目过程中可能新产生的知识产权，也包括乙方原本就拥有的自有知识产权（如工具、方法论等）；知识产权归属应区分原有权利与新产出权利",
+        "basis": "[RULE_IP_AA15] 条款明确约定'所有文件、资料、数据信息等'的所有权均归甲方，包括乙方在项目过程中可能新产生的知识产权，也包括乙方原本就拥有的自有知识产权（如工具、方法论等）；乙方在项目实施中使用自身原有的技术、方法、工具所产生的工作成果，其知识产权被无条件转移给甲方，导致乙方丧失对这些成果的任何权利，无法继续用于其他项目或商业用途；知识产权归属应区分原有权利与新产出权利；服务合同中，供应商通常保留其原有知识产权，仅将项目特定产出物的知识产权转让或授权给客户，而非将所有相关成果一概转移",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 14
+      },
+      {
+        "risk_code": "ip_usage_restriction_no_post_project_application",
+        "risk_source_type": "anchored",
+        "dimension": "知识产权归属与使用权",
+        "risk_level": "high",
+        "risk_label": "未经授权禁止将项目资料用于任何其他用途，乙方丧失成果后续利用权",
+        "issue": "条款禁止乙方将项目文件、资料、数据信息用于项目以外用途，未设定任何例外或授权机制",
+        "evidence_text": "未经甲方书面授权，乙方不得将上述文件、资料、数据信息等应用到项目以外的用途。",
+        "anchor_text": "未经甲方书面授权，乙方不得将上述文件、资料、数据信息等应用到项目以外的用途。",
+        "factual_basis": "条款明确禁止乙方将项目相关资料用于任何项目外用途，且未设定授权机制、期限或条件",
+        "reasoning_basis": "即使项目结束且甲方已获得知识产权，乙方仍无法将项目过程中积累的经验、数据、资料用于其他项目或商业发展，严重限制乙方业务发展",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "供应商通常应保留项目经验与一般性知识的使用权",
+          "basis_detail": "服务合同中，供应商一般保留使用项目过程中积累的一般性知识、经验和方法论的权利，仅项目特定成果归客户所有",
+          "citation_text": ""
+        },
+        "suggestion": "补充'但乙方有权保留及使用在项目中积累的一般性知识、经验和方法论'",
+        "suggestion_minimal": "补充'但乙方有权保留及使用在项目中积累的一般性知识、经验和方法论'",
+        "suggestion_optimized": "约定：项目特定成果归甲方所有，但乙方有权使用项目过程中积累的一般性知识、经验和方法论，且无需甲方额外授权；仅项目核心成果需甲方书面授权方可使用",
+        "suggestion_basis": "保障供应商在项目结束后仍能利用积累的一般性知识开展业务，避免因参与项目而导致知识固化无法复用",
+        "needs_human_review": true,
+        "clause_uid": "segment_7::7.2",
+        "display_clause_id": "7.2",
+        "clause_uids": [
+          "segment_7::7.2"
+        ],
+        "clause_id": "7.2",
+        "related_clause_ids": [
+          "7.2"
+        ],
+        "related_clause_uids": [
+          "segment_7::7.2"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "7.2"
+        ],
+        "clause_ids": [
+          "7.2"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_IP_3E66",
+        "basis_summary": "条款明确禁止乙方将项目相关资料用于任何项目外用途，且未设定授权机制、期限或条件；供应商通常应保留项目经验与一般性知识的使用权",
+        "basis": "[RULE_IP_3E66] 条款明确禁止乙方将项目相关资料用于任何项目外用途，且未设定授权机制、期限或条件；即使项目结束且甲方已获得知识产权，乙方仍无法将项目过程中积累的经验、数据、资料用于其他项目或商业发展，严重限制乙方业务发展；供应商通常应保留项目经验与一般性知识的使用权；服务合同中，供应商一般保留使用项目过程中积累的一般性知识、经验和方法论的权利，仅项目特定成果归客户所有",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 15
+      },
+      {
+        "risk_code": "ip_infringement_full_liability_no_cap",
+        "risk_source_type": "anchored",
+        "dimension": "违约责任与赔偿机制",
+        "risk_level": "high",
+        "risk_label": "乙方承担全部侵权责任且无赔偿上限，风险敞口过大",
+        "issue": "条款要求乙方对甲方知识产权侵权承担全部损失赔偿，且未设定任何责任上限或限制",
+        "evidence_text": "由于乙方原因造成甲方知识产权被侵害，由乙方负责赔偿与之相关的一切损失。",
+        "anchor_text": "由于乙方原因造成甲方知识产权被侵害，由乙方负责赔偿与之相关的一切损失。",
+        "factual_basis": "条款明确约定'一切损失'由乙方赔偿，且未设定赔偿上限、责任限制或止损条款",
+        "reasoning_basis": "知识产权侵权赔偿金额可能极高（包括直接损失、间接损失、律师费、诉讼费等），乙方可能因一次侵权事件承担远超合同金额的赔偿责任，且无法预测最大风险敞口",
+        "normative_basis": {
+          "basis_type": "legal_rule",
+          "basis_title": "合同责任应设定合理上限以控制商业风险",
+          "basis_detail": "根据合同公平原则，服务合同中通常约定责任上限（如合同金额的一定倍数），避免一方因不可控因素承担远超预期的责任",
+          "citation_text": ""
+        },
+        "suggestion": "补充'乙方赔偿总额不超过合同总金额的X倍'或'但因甲方原因导致的侵权除外'",
+        "suggestion_minimal": "补充'乙方赔偿总额不超过合同总金额的X倍'或'但因甲方原因导致的侵权除外'",
+        "suggestion_optimized": "约定：乙方赔偿责任上限为合同总金额的2倍；以下情形乙方免责：（1）甲方提供的素材或要求导致的侵权；（2）甲方书面确认的方案导致的侵权；（3）不可抗力",
+        "suggestion_basis": "通过设定责任上限控制供应商的最大风险敞口，避免因一次侵权事件导致供应商承担远超合同收益的赔偿责任",
+        "needs_human_review": true,
+        "clause_uid": "segment_7::7.3",
+        "display_clause_id": "7.3",
+        "clause_uids": [
+          "segment_7::7.3"
+        ],
+        "clause_id": "7.3",
+        "related_clause_ids": [
+          "7.3"
+        ],
+        "related_clause_uids": [
+          "segment_7::7.3"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "7.3"
+        ],
+        "clause_ids": [
+          "7.3"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_LIABILITY_3CA2",
+        "basis_summary": "条款明确约定'一切损失'由乙方赔偿，且未设定赔偿上限、责任限制或止损条款；合同责任应设定合理上限以控制商业风险",
+        "basis": "[RULE_LIABILITY_3CA2] 条款明确约定'一切损失'由乙方赔偿，且未设定赔偿上限、责任限制或止损条款；知识产权侵权赔偿金额可能极高（包括直接损失、间接损失、律师费、诉讼费等），乙方可能因一次侵权事件承担远超合同金额的赔偿责任，且无法预测最大风险敞口；合同责任应设定合理上限以控制商业风险；根据合同公平原则，服务合同中通常约定责任上限（如合同金额的一定倍数），避免一方因不可控因素承担远超预期的责任",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "风险说明涉及法律判断、比例上限或法规口径，必须由人工确认。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 16
+      },
+      {
+        "risk_code": "ip_infringement_all_liability_self_insured",
+        "risk_source_type": "anchored",
+        "dimension": "权责分配与责任限制",
+        "risk_level": "high",
+        "risk_label": "乙方承担全部侵权法律责任，甲方完全免责",
+        "issue": "条款约定乙方自行承担所有知识产权侵权责任及费用，甲方完全不承担任何责任",
+        "evidence_text": "对乙方在履行本合同过程中所涉及的因乙方原因引起的对任何版权和其他知识产权的侵犯，应由乙方自行承担可能发生的一切法律责任费用，甲方不承担任何相关责任和费用。",
+        "anchor_text": "对乙方在履行本合同过程中所涉及的因乙方原因引起的对任何版权和其他知识产权的侵犯，应由乙方自行承担可能发生的一切法律责任费用，甲方不承担任何相关责任和费用。",
+        "factual_basis": "条款明确约定所有因乙方原因导致的知识产权侵权责任和费用由乙方自行承担，甲方完全免责",
+        "reasoning_basis": "即使甲方在项目中对方案进行了指示、审批或参与设计，因乙方原因导致的侵权仍由乙方全责承担，甲方无需分担任何风险或费用，权责严重失衡",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "双方共同参与的侵权风险应按过错分担责任",
+          "basis_detail": "服务合同中，若甲方参与了方案设计或提供了素材导致侵权，应根据过错程度分担责任，而非完全由供应商承担",
+          "citation_text": ""
+        },
+        "suggestion": "补充'但因甲方指示、审批或提供的素材导致的侵权，由双方按过错程度分担责任'",
+        "suggestion_minimal": "补充'但因甲方指示、审批或提供的素材导致的侵权，由双方按过错程度分担责任'",
+        "suggestion_optimized": "约定：因乙方原因导致的侵权由乙方全责；因甲方指示、审批确认的方案或甲方提供的素材导致的侵权，由甲方承担主要责任；双方共同过错导致的侵权按过错比例分担",
+        "suggestion_basis": "避免甲方将所有侵权风险转嫁给乙方，特别是在甲方参与方案设计或提供素材的情况下，应根据实际情况分担责任",
+        "needs_human_review": true,
+        "clause_uid": "segment_7::7.5",
+        "display_clause_id": "7.5",
+        "clause_uids": [
+          "segment_7::7.5"
+        ],
+        "clause_id": "7.5",
+        "related_clause_ids": [
+          "7.5"
+        ],
+        "related_clause_uids": [
+          "segment_7::7.5"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "7.5"
+        ],
+        "clause_ids": [
+          "7.5"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_ALLOCATION_51CD",
+        "basis_summary": "条款明确约定所有因乙方原因导致的知识产权侵权责任和费用由乙方自行承担，甲方完全免责；双方共同参与的侵权风险应按过错分担责任",
+        "basis": "[RULE_ALLOCATION_51CD] 条款明确约定所有因乙方原因导致的知识产权侵权责任和费用由乙方自行承担，甲方完全免责；即使甲方在项目中对方案进行了指示、审批或参与设计，因乙方原因导致的侵权仍由乙方全责承担，甲方无需分担任何风险或费用，权责严重失衡；双方共同参与的侵权风险应按过错分担责任；服务合同中，若甲方参与了方案设计或提供了素材导致侵权，应根据过错程度分担责任，而非完全由供应商承担",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 17
+      },
+      {
+        "risk_code": "force_majeure_30day_negotiation_only",
+        "risk_source_type": "anchored",
+        "dimension": "解除、终止与续约机制",
+        "risk_level": "medium",
+        "risk_label": "超30天仅协商解除，供应商无单方解除权",
+        "issue": "条款规定不可抗力超过30天后，双方'可通过友好协商'达成继续履行或解除合同的协议，但未赋予任何一方单方解除权",
+        "evidence_text": "如果不可抗力影响时间延续_30__天以上的，双方可通过友好协商达成在合理的时间内继续履行本合同或解除本合同的协议。",
+        "anchor_text": "双方任一方由于不可抗力的影响而不能执行合同时，履行合同的期限应予延长。延长的期限应相当于事故所影响的时间。如果不可抗力影响时间延续_30__天以上的，双方可通过友好协商达成在合理的时间内继续履行本合同或解除本合同的协议。不可抗力系指甲乙双方在缔结合同时所不能预见的，并且它的发生及其后果无法避免和无法克服的事故。",
+        "factual_basis": "条款中'双方可通过友好协商'的表述意味着解除合同需要双方达成一致意见，供应商无法在不可抗力持续超过30天后单方决定解除合同",
+        "reasoning_basis": "若不可抗力事件持续超过30天（如疫情、重大自然灾害），供应商可能已无法继续履行合同，但因解除需双方协商，客户可能拒绝解除或拖延谈判，导致供应商陷入合同僵局，无法及时止损或承接新业务",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "不可抗力持续超定期限应赋予单方解除权",
+          "basis_detail": "根据合同公平原则，当不可抗力事件持续超过合理期限导致合同目的无法实现时，应赋予受影响方单方解除权，而非仅依赖协商解除",
+          "citation_text": ""
+        },
+        "suggestion": "在30天后协商条款后增加：'协商不成时，任一方可解除合同'",
+        "suggestion_minimal": "在30天后协商条款后增加：'协商不成时，任一方可解除合同'",
+        "suggestion_optimized": "明确不可抗力超过30天后，双方均有合同解除权，且供应商有权就已履行部分主张付款及合理费用补偿",
+        "suggestion_basis": "赋予供应商单方解除权可避免合同僵局，使其在不可抗力持续时及时止损，同时不影响双方协商解决的可能性",
+        "needs_human_review": true,
+        "clause_uid": "segment_8::8.u32",
+        "display_clause_id": "8.u32",
+        "clause_uids": [
+          "segment_8::8.u32"
+        ],
+        "clause_id": "8.u32",
+        "related_clause_ids": [
+          "8.u32"
+        ],
+        "related_clause_uids": [
+          "segment_8::8.u32"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "8.u32"
+        ],
+        "clause_ids": [
+          "8.u32"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_TERMINATION_B53F",
+        "basis_summary": "条款中'双方可通过友好协商'的表述意味着解除合同需要双方达成一致意见，供应商无法在不可抗力持续超过30天后单方决定解除合同；不可抗力持续超定期限应赋予单方解除权",
+        "basis": "[RULE_TERMINATION_B53F] 条款中'双方可通过友好协商'的表述意味着解除合同需要双方达成一致意见，供应商无法在不可抗力持续超过30天后单方决定解除合同；若不可抗力事件持续超过30天（如疫情、重大自然灾害），供应商可能已无法继续履行合同，但因解除需双方协商，客户可能拒绝解除或拖延谈判，导致供应商陷入合同僵局，无法及时止损或承接新业务；不可抗力持续超定期限应赋予单方解除权；根据合同公平原则，当不可抗力事件持续超过合理期限导致合同目的无法实现时，应赋予受影响方单方解除权，而非仅依赖协商解除",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 18
+      },
+      {
+        "risk_code": "force_majeure_notification_proof_obligations_missing",
+        "risk_source_type": "anchored",
+        "dimension": "服务范围与交付内容",
+        "risk_level": "low",
+        "risk_label": "缺少不可抗力通知义务和证明要求",
+        "issue": "条款未规定不可抗力发生后的通知期限、方式及证明文件要求",
+        "evidence_text": "双方任一方由于不可抗力的影响而不能执行合同时，履行合同的期限应予延长。",
+        "anchor_text": "双方任一方由于不可抗力的影响而不能执行合同时，履行合同的期限应予延长。延长的期限应相当于事故所影响的时间。如果不可抗力影响时间延续_30__天以上的，双方可通过友好协商达成在合理的时间内继续履行本合同或解除本合同的协议。不可抗力系指甲乙双方在缔结合同时所不能预见的，并且它的发生及其后果无法避免和无法克服的事故。",
+        "factual_basis": "条款仅规定不可抗力发生后的法律后果（期限延长），但未规定供应商在发生不可抗力时应履行的通知义务和证明责任",
+        "reasoning_basis": "若供应商发生不可抗力事件但未及时通知或无法提供有效证明，可能被客户主张违约或拒绝接受期限延长，增加供应商的举证风险和争议成本",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "不可抗力条款应包含通知和证明义务",
+          "basis_detail": "行业实践中，不可抗力条款通常要求受影响方在知悉后若干天内书面通知对方，并提供相关证明文件，否则可能丧失主张不可抗力的权利",
+          "citation_text": ""
+        },
+        "suggestion": "增加通知义务：'应立即书面通知对方'",
+        "suggestion_minimal": "增加通知义务：'应立即书面通知对方'",
+        "suggestion_optimized": "明确通知期限、方式、证明材料范围，以及未及时通知的法律后果（但仍保留供应商主张不可抗力的权利，仅承担相应责任）",
+        "suggestion_basis": "明确通知和证明义务可减少双方争议，同时保障供应商在合规通知后主张不可抗力免责的权利",
+        "needs_human_review": true,
+        "clause_uid": "segment_8::8.u32",
+        "display_clause_id": "8.u32",
+        "clause_uids": [
+          "segment_8::8.u32"
+        ],
+        "clause_id": "8.u32",
+        "related_clause_ids": [
+          "8.u32"
+        ],
+        "related_clause_uids": [
+          "segment_8::8.u32"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "8.u32"
+        ],
+        "clause_ids": [
+          "8.u32"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_SCOPE_9C36",
+        "basis_summary": "条款仅规定不可抗力发生后的法律后果（期限延长），但未规定供应商在发生不可抗力时应履行的通知义务和证明责任；不可抗力条款应包含通知和证明义务",
+        "basis": "[RULE_SCOPE_9C36] 条款仅规定不可抗力发生后的法律后果（期限延长），但未规定供应商在发生不可抗力时应履行的通知义务和证明责任；若供应商发生不可抗力事件但未及时通知或无法提供有效证明，可能被客户主张违约或拒绝接受期限延长，增加供应商的举证风险和争议成本；不可抗力条款应包含通知和证明义务；行业实践中，不可抗力条款通常要求受影响方在知悉后若干天内书面通知对方，并提供相关证明文件，否则可能丧失主张不可抗力的权利",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 19
+      },
+      {
+        "risk_code": "confidentiality_scope_unclear",
+        "risk_source_type": "anchored",
+        "dimension": "保密、数据安全与合规",
+        "risk_level": "medium",
+        "risk_label": "保密信息范围界定模糊",
+        "issue": "条款中\"甲方的所有秘密信息\"范围不明确，缺乏具体界定标准，可能导致供应商承担过宽的保密义务",
+        "evidence_text": "以及乙方在履行本合同过程中知悉的甲方的所有秘密信息",
+        "anchor_text": "对甲方在履行本合同过程中向乙方提供的业务资料、技术资料等，以及乙方在履行本合同过程中知悉的甲方的所有秘密信息，乙方均应严格保密，未经甲方同意不得自行使用或披露给任何第三方。",
+        "factual_basis": "条款使用\"所有秘密信息\"这一概括性表述，未明确秘密信息的定义、范围或例外情形，边界模糊",
+        "reasoning_basis": "范围不明确导致供应商难以判断哪些信息需要保密，可能因误披露而违约，或因过度保守而影响正常业务开展",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "保密信息范围应具体明确",
+          "basis_detail": "合同中的保密条款应当明确界定保密信息的具体范围，避免使用\"所有\"等概括性表述，这是合同条款明确性原则的基本要求",
+          "citation_text": ""
+        },
+        "suggestion": "在条款中增加\"秘密信息包括但不限于以下类型：...\"的列举式界定",
+        "suggestion_minimal": "在条款中增加\"秘密信息包括但不限于以下类型：...\"的列举式界定",
+        "suggestion_optimized": "采用正负面清单结合方式，明确保密信息的具体范围及不属于保密信息的情形",
+        "suggestion_basis": "明确范围后可避免供应商因范围争议承担不必要的保密义务",
+        "needs_human_review": true,
+        "clause_uid": "segment_9::9.1",
+        "display_clause_id": "9.1",
+        "clause_uids": [
+          "segment_9::9.1"
+        ],
+        "clause_id": "9.1",
+        "related_clause_ids": [
+          "9.1"
+        ],
+        "related_clause_uids": [
+          "segment_9::9.1"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "9.1"
+        ],
+        "clause_ids": [
+          "9.1"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_CONFIDENTIALITY_F054",
+        "basis_summary": "条款使用\"所有秘密信息\"这一概括性表述，未明确秘密信息的定义、范围或例外情形，边界模糊；保密信息范围应具体明确",
+        "basis": "[RULE_CONFIDENTIALITY_F054] 条款使用\"所有秘密信息\"这一概括性表述，未明确秘密信息的定义、范围或例外情形，边界模糊；范围不明确导致供应商难以判断哪些信息需要保密，可能因误披露而违约，或因过度保守而影响正常业务开展；保密信息范围应具体明确；合同中的保密条款应当明确界定保密信息的具体范围，避免使用\"所有\"等概括性表述，这是合同条款明确性原则的基本要求",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 20
+      },
+      {
+        "risk_code": "confidentiality_obligation_one_way",
+        "risk_source_type": "anchored",
+        "dimension": "权责分配与责任限制",
+        "risk_level": "medium",
+        "risk_label": "保密义务仅约束供应商一方",
+        "issue": "条款仅规定乙方的保密义务，未对甲方设定对等的保密义务，责任分配失衡",
+        "evidence_text": "对甲方在履行本合同过程中向乙方提供的业务资料、技术资料等，以及乙方在履行本合同过程中知悉的甲方的所有秘密信息，乙方均应严格保密",
+        "anchor_text": "对甲方在履行本合同过程中向乙方提供的业务资料、技术资料等，以及乙方在履行本合同过程中知悉的甲方的所有秘密信息，乙方均应严格保密，未经甲方同意不得自行使用或披露给任何第三方。",
+        "factual_basis": "整段条款仅约束乙方（供应商）的保密义务，未提及甲方对乙方信息的保密责任",
+        "reasoning_basis": "在服务合同中，双方通常会互相交换商业秘密，单方保密义务对供应商不公平，可能导致供应商的技术资料和商业信息被泄露后无法追责",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "保密义务应对等设置",
+          "basis_detail": "服务合同中双方通常互有商业秘密，保密义务应对等设置，这是商业合作的互惠原则基本要求",
+          "citation_text": ""
+        },
+        "suggestion": "在条款末尾增加\"甲方对乙方在履行本合同过程中向甲方提供的业务资料、技术资料等秘密信息同样负有保密义务\"",
+        "suggestion_minimal": "在条款末尾增加\"甲方对乙方在履行本合同过程中向甲方提供的业务资料、技术资料等秘密信息同样负有保密义务\"",
+        "suggestion_optimized": "设置双向对等的保密义务条款，包括使用限制、披露范围及违约责任",
+        "suggestion_basis": "对等设置可平衡双方权利义务，避免供应商商业秘密被甲方泄露后无法维权",
+        "needs_human_review": true,
+        "clause_uid": "segment_9::9.1",
+        "display_clause_id": "9.1",
+        "clause_uids": [
+          "segment_9::9.1"
+        ],
+        "clause_id": "9.1",
+        "related_clause_ids": [
+          "9.1"
+        ],
+        "related_clause_uids": [
+          "segment_9::9.1"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "9.1"
+        ],
+        "clause_ids": [
+          "9.1"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_ALLOCATION_154C",
+        "basis_summary": "整段条款仅约束乙方（供应商）的保密义务，未提及甲方对乙方信息的保密责任；保密义务应对等设置",
+        "basis": "[RULE_ALLOCATION_154C] 整段条款仅约束乙方（供应商）的保密义务，未提及甲方对乙方信息的保密责任；在服务合同中，双方通常会互相交换商业秘密，单方保密义务对供应商不公平，可能导致供应商的技术资料和商业信息被泄露后无法追责；保密义务应对等设置；服务合同中双方通常互有商业秘密，保密义务应对等设置，这是商业合作的互惠原则基本要求",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 21
+      },
+      {
+        "risk_code": "breach_liability_vague",
+        "risk_source_type": "anchored",
+        "dimension": "违约责任与赔偿机制",
+        "risk_level": "medium",
+        "risk_label": "违约责任表述过于笼统",
+        "issue": "条款仅写\"承担相应法律责任\"，未明确违约责任的具体形式、范围或上限",
+        "evidence_text": "乙方违反保密法及相关法律，应承担相应法律责任",
+        "anchor_text": "乙方违反保密法及相关法律，应承担相应法律责任。",
+        "factual_basis": "条款使用概括性表述\"相应法律责任\"，未明确责任的具体内容、计算方式或赔偿范围",
+        "reasoning_basis": "责任范围不明确导致供应商面临不确定的法律风险，可能被要求承担全部损失赔偿责任，缺乏可预期性",
+        "normative_basis": {
+          "basis_type": "legal_rule",
+          "basis_title": "违约责任应具体明确",
+          "basis_detail": "根据合同明确性原则及《民法典》关于违约责任的规定，违约责任条款应当具体明确，避免使用概括性表述",
+          "citation_text": "《民法典》第五百八十四条"
+        },
+        "suggestion": "将\"承担相应法律责任\"修改为\"承担赔偿责任，赔偿范围以乙方因违约所获得的直接损失为限\"",
+        "suggestion_minimal": "将\"承担相应法律责任\"修改为\"承担赔偿责任，赔偿范围以乙方因违约所获得的直接损失为限\"",
+        "suggestion_optimized": "设定明确的赔偿上限（如合同总金额的一定比例或固定金额），并区分一般违约与故意泄密的不同的责任承担方式",
+        "suggestion_basis": "明确责任范围可降低供应商的不确定风险，提供可预期的责任边界",
+        "needs_human_review": true,
+        "clause_uid": "segment_9::9.3",
+        "display_clause_id": "9.3",
+        "clause_uids": [
+          "segment_9::9.3"
+        ],
+        "clause_id": "9.3",
+        "related_clause_ids": [
+          "9.3"
+        ],
+        "related_clause_uids": [
+          "segment_9::9.3"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "9.3"
+        ],
+        "clause_ids": [
+          "9.3"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_LIABILITY_49AD",
+        "basis_summary": "条款使用概括性表述\"相应法律责任\"，未明确责任的具体内容、计算方式或赔偿范围；违约责任应具体明确",
+        "basis": "[RULE_LIABILITY_49AD] 条款使用概括性表述\"相应法律责任\"，未明确责任的具体内容、计算方式或赔偿范围；责任范围不明确导致供应商面临不确定的法律风险，可能被要求承担全部损失赔偿责任，缺乏可预期性；违约责任应具体明确；根据合同明确性原则及《民法典》关于违约责任的规定，违约责任条款应当具体明确，避免使用概括性表述；《民法典》第五百八十四条",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "风险说明涉及法律判断、比例上限或法规口径，必须由人工确认。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 22
+      },
+      {
+        "risk_code": "post_contract_confidentiality_perpetual",
+        "risk_source_type": "anchored",
+        "dimension": "保密、数据安全与合规",
+        "risk_level": "high",
+        "risk_label": "保密义务期限过长",
+        "issue": "条款规定保密效力不受合同效力影响，意味着合同终止后保密义务仍然长期有效，对供应商限制过严",
+        "evidence_text": "本条规定的效力不受本合同效力的影响",
+        "anchor_text": "本条规定的效力不受本合同效力的影响。",
+        "factual_basis": "该条款明确保密义务的效力独立于合同有效期，即合同终止后保密义务仍然存续",
+        "reasoning_basis": "保密义务永久有效将导致供应商在合同终止后仍受严格约束，无法自由使用在合作中积累的相关经验和知识，影响后续业务开展",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "保密义务应有合理期限",
+          "basis_detail": "虽然保密义务可约定为持续性义务，但应当设定合理期限（如合同终止后2-3年），永久性义务对供应商过于苛刻",
+          "citation_text": ""
+        },
+        "suggestion": "在条款中增加\"本条保密义务在合同终止后仍持续有效，但最长不超过___年\"",
+        "suggestion_minimal": "在条款中增加\"本条保密义务在合同终止后仍持续有效，但最长不超过___年\"",
+        "suggestion_optimized": "区分不同类型信息设定不同保密期限，对一般商业秘密设定2-3年，对核心机密设定5年，并明确期限起算点",
+        "suggestion_basis": "设定合理期限可平衡甲方商业利益保护与供应商后续业务自由，避免永久性义务的不合理限制",
+        "needs_human_review": true,
+        "clause_uid": "segment_9::9.4",
+        "display_clause_id": "9.4",
+        "clause_uids": [
+          "segment_9::9.4"
+        ],
+        "clause_id": "9.4",
+        "related_clause_ids": [
+          "9.4"
+        ],
+        "related_clause_uids": [
+          "segment_9::9.4"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "9.4"
+        ],
+        "clause_ids": [
+          "9.4"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_CONFIDENTIALITY_260B",
+        "basis_summary": "该条款明确保密义务的效力独立于合同有效期，即合同终止后保密义务仍然存续；保密义务应有合理期限",
+        "basis": "[RULE_CONFIDENTIALITY_260B] 该条款明确保密义务的效力独立于合同有效期，即合同终止后保密义务仍然存续；保密义务永久有效将导致供应商在合同终止后仍受严格约束，无法自由使用在合作中积累的相关经验和知识，影响后续业务开展；保密义务应有合理期限；虽然保密义务可约定为持续性义务，但应当设定合理期限（如合同终止后2-3年），永久性义务对供应商过于苛刻",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 23
+      },
+      {
+        "risk_code": "dispute_resolution_method_ambiguous",
+        "risk_source_type": "anchored",
+        "dimension": "争议解决、适用法律与管辖",
+        "risk_level": "high",
+        "risk_label": "争议解决方式约定矛盾",
+        "issue": "10.u1 约定\"应按照以下第 1 种方式处理\"，但列出的两种方式中第 1 种是诉讼（10.1），第 2 种是仲裁（10.2），导致实际采用何种方式不明确",
+        "evidence_text": "如友好协商不能解决时，应按照以下第 1 种方式处理：\n1. 依法向甲方所在地人民法院起诉；\n2. 提交嘉兴市仲裁委员会申请仲裁。",
+        "anchor_text": "双方在履行合同时如有争议，都应尽最大的努力友好协商解决，如友好协商不能解决时，应按照以下第 1 种方式处理：",
+        "factual_basis": "条款约定\"按照以下第 1 种方式处理\"，但第 1 种方式是诉讼（10.1），第 2 种方式是仲裁（10.2），两者是并列选项而非递进关系，导致争议解决方式约定存在矛盾",
+        "reasoning_basis": "由于约定矛盾，争议发生时双方可能对适用诉讼还是仲裁产生分歧，导致争议解决程序无法顺利启动，供应商可能被迫接受对其不利的诉讼管辖",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "争议解决方式应当明确且不矛盾",
+          "basis_detail": "合同约定应当明确具体，争议解决方式不能同时约定两种相互排斥的路径（诉讼与仲裁只能选一），否则属于约定不明",
+          "citation_text": ""
+        },
+        "suggestion": "将\"应按照以下第 1 种方式处理\"改为\"可选择以下任一方式处理\"",
+        "suggestion_minimal": "将\"应按照以下第 1 种方式处理\"改为\"可选择以下任一方式处理\"",
+        "suggestion_optimized": "删除第 2 种仲裁方式，仅保留诉讼约定；或约定争议发生后先仲裁，仲裁不成再诉讼",
+        "suggestion_basis": "消除约定矛盾，避免争议解决方式不明导致的程序拖延",
+        "needs_human_review": true,
+        "clause_uid": "segment_10::10.u37",
+        "display_clause_id": "10.u37",
+        "clause_uids": [
+          "segment_10::10.u37"
+        ],
+        "clause_id": "10.u37",
+        "related_clause_ids": [
+          "10.u37"
+        ],
+        "related_clause_uids": [
+          "segment_10::10.u37"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "10.u37"
+        ],
+        "clause_ids": [
+          "10.u37"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": true,
+        "basis_rule_id": "RULE_DISPUTE_C913",
+        "basis_summary": "条款约定\"按照以下第 1 种方式处理\"，但第 1 种方式是诉讼（10.1），第 2 种方式是仲裁（10.2），两者是并列选项而非递进关系，导致争议解决方式约定存在矛盾；争议解决方式应当明确且不矛盾",
+        "basis": "[RULE_DISPUTE_C913] 条款约定\"按照以下第 1 种方式处理\"，但第 1 种方式是诉讼（10.1），第 2 种方式是仲裁（10.2），两者是并列选项而非递进关系，导致争议解决方式约定存在矛盾；由于约定矛盾，争议发生时双方可能对适用诉讼还是仲裁产生分歧，导致争议解决程序无法顺利启动，供应商可能被迫接受对其不利的诉讼管辖；争议解决方式应当明确且不矛盾；合同约定应当明确具体，争议解决方式不能同时约定两种相互排斥的路径（诉讼与仲裁只能选一），否则属于约定不明",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 24
+      },
+      {
+        "risk_code": "jurisdiction_unfavorable_to_supplier",
+        "risk_source_type": "anchored",
+        "dimension": "争议解决、适用法律与管辖",
+        "risk_level": "medium",
+        "risk_label": "诉讼管辖约定对供应商不利",
+        "issue": "约定由甲方所在地人民法院管辖诉讼，供应商作为乙方需远赴甲方所在地应诉，增加诉讼成本和地域劣势",
+        "evidence_text": "1. 依法向甲方所在地人民法院起诉；",
+        "anchor_text": "1. 依法向甲方所在地人民法院起诉；",
+        "factual_basis": "条款明确约定争议由甲方所在地人民法院管辖，未约定任何对供应商有利的管辖连接点",
+        "reasoning_basis": "供应商在甲方所在地法院诉讼面临客场作战的劣势，需承担差旅成本，且对当地司法环境不熟悉，在证据调取、证人出庭等方面均处于不利地位",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "供应商争取在己方所在地或中立地点诉讼",
+          "basis_detail": "服务合同中供应商通常争取在己方所在地法院管辖，以降低诉讼成本并获得主场优势",
+          "citation_text": ""
+        },
+        "suggestion": "约定为被告所在地人民法院管辖（双方平等）",
+        "suggestion_minimal": "约定为被告所在地人民法院管辖（双方平等）",
+        "suggestion_optimized": "约定为供应商所在地人民法院管辖",
+        "suggestion_basis": "降低供应商的诉讼成本和地域劣势，获得主场便利",
+        "needs_human_review": true,
+        "clause_uid": "segment_10::10.1",
+        "display_clause_id": "10.1",
+        "clause_uids": [
+          "segment_10::10.1"
+        ],
+        "clause_id": "10.1",
+        "related_clause_ids": [
+          "10.1"
+        ],
+        "related_clause_uids": [
+          "segment_10::10.1"
+        ],
+        "quality_flags": [
+          "rule_capped_jurisdiction_risk"
+        ],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "10.1"
+        ],
+        "clause_ids": [
+          "10.1"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_DISPUTE_C35B",
+        "basis_summary": "条款明确约定争议由甲方所在地人民法院管辖，未约定任何对供应商有利的管辖连接点；供应商争取在己方所在地或中立地点诉讼",
+        "basis": "[RULE_DISPUTE_C35B] 条款明确约定争议由甲方所在地人民法院管辖，未约定任何对供应商有利的管辖连接点；供应商在甲方所在地法院诉讼面临客场作战的劣势，需承担差旅成本，且对当地司法环境不熟悉，在证据调取、证人出庭等方面均处于不利地位；供应商争取在己方所在地或中立地点诉讼；服务合同中供应商通常争取在己方所在地法院管辖，以降低诉讼成本并获得主场优势",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 25
+      },
+      {
+        "risk_code": "notice_delivery_risk_for_supplier",
+        "risk_source_type": "anchored",
+        "dimension": "权责分配与责任限制",
+        "risk_label": "通知送达条款对供应商不利",
+        "issue": "条款约定任何一方变更联系方式需提前7天书面通知，否则按原地址发出通知视为有效送达，该规则对供应商同样适用，但供应商作为收款方面临更大风险",
+        "evidence_text": "任何一方变更联系方式的，应提前 7 天书面通知对方，否则对方按本合同约定地址发出通知视为有效送达。",
+        "anchor_text": "本合同履行重要事项的通知，双方同意采用书面形式，按照本合同首部双方预留联系方式发出。通过传真、电子邮件等即时方式发出的，自通知发出之日起视为送达；通过邮政特快专递、挂号信等可跟踪查询邮寄情况的方式发出的，自交寄之日起 7 天视为送达。任何一方变更联系方式的，应提前 7 天书面通知对方，否则对方按本合同约定地址发出通知视为有效送达。",
+        "factual_basis": "该条款对双方一视同仁，但供应商作为服务提供方和收款方，对通知的及时性要求更高（如付款通知、验收通知、变更通知等），且变更联系方式需提前7天通知的义务对供应商经营灵活性构成限制",
+        "reasoning_basis": "若供应商因经营需要搬迁或变更联系方式，需提前7天通知甲方，期间甲方向原地址发送的通知仍视为有效送达，可能导致供应商错过重要通知（如付款提醒、验收异议、合同变更等），进而影响收款权利或承担不利后果",
+        "normative_basis": {
+          "basis_type": "deal_practice_rule",
+          "basis_title": "通知条款应对供应商有适当保护",
+          "basis_detail": "在合同履行中，供应商对甲方发出的通知（如付款通知、验收确认等）有更强的依赖性，通知送达条款应适当倾斜保护供应商的知情权",
+          "citation_text": ""
+        },
+        "suggestion": "将'提前7天书面通知'改为'及时书面通知'或'提前3天书面通知'",
+        "suggestion_minimal": "将'提前7天书面通知'改为'及时书面通知'或'提前3天书面通知'",
+        "suggestion_optimized": "区分双方义务：'甲方变更联系方式的，应提前7天书面通知乙方；乙方变更联系方式的，有权随时通知甲方，甲方应按乙方最新通知地址发送通知'",
+        "suggestion_basis": "减少供应商通知义务的时限要求，或赋予供应商随时变更联系方式的权利，可降低因地址变更导致的通知不到风险，保障供应商对合同重要事项的知情权",
+        "needs_human_review": true,
+        "clause_uid": "segment_11::11.5",
+        "display_clause_id": "11.5",
+        "clause_uids": [
+          "segment_11::11.5"
+        ],
+        "clause_id": "11.5",
+        "related_clause_ids": [
+          "11.5"
+        ],
+        "related_clause_uids": [
+          "segment_11::11.5"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "risk_level": "medium",
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "11.5"
+        ],
+        "clause_ids": [
+          "11.5"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_ALLOCATION_05D4",
+        "basis_summary": "该条款对双方一视同仁，但供应商作为服务提供方和收款方，对通知的及时性要求更高（如付款通知、验收通知、变更通知等），且变更联系方式需提前7天通知的义务对供应商经营灵活性构成限制；通知条款应对供应商有适当保护",
+        "basis": "[RULE_ALLOCATION_05D4] 该条款对双方一视同仁，但供应商作为服务提供方和收款方，对通知的及时性要求更高（如付款通知、验收通知、变更通知等），且变更联系方式需提前7天通知的义务对供应商经营灵活性构成限制；若供应商因经营需要搬迁或变更联系方式，需提前7天通知甲方，期间甲方向原地址发送的通知仍视为有效送达，可能导致供应商错过重要通知（如付款提醒、验收异议、合同变更等），进而影响收款权利或承担不利后果；通知条款应对供应商有适当保护；在合同履行中，供应商对甲方发出的通知（如付款通知、验收确认等）有更强的依赖性，通知送达条款应适当倾斜保护供应商的知情权",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 26
+      },
+      {
+        "risk_code": "contract_effective_date_not_specified",
+        "risk_source_type": "anchored",
+        "dimension": "合同生效、适用法律与管辖",
+        "risk_level": "medium",
+        "risk_label": "合同未明确约定生效日期",
+        "issue": "条款仅约定'自合同双方盖章后生效'，未明确具体的合同签署日期或生效日期",
+        "evidence_text": "本合同一式 贰 份，双方各执 壹 份，具有同等法律效力，自合同双方盖章后生效。",
+        "anchor_text": "本合同一式 贰 份，双方各执 壹 份，具有同等法律效力，自合同双方盖章后生效。",
+        "factual_basis": "条款正文仅写'自合同双方盖章后生效'，缺少合同签署的具体日期（年月日）约定",
+        "reasoning_basis": "合同生效日期不明确将导致合同履行期限起算点模糊，可能影响供应商主张付款、验收、违约责任等权利的时效计算",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "合同应明确约定生效日期",
+          "basis_detail": "合同法规定依法成立的合同自成立时生效，但服务合同通常需要明确具体的合同期间起算点，以便确定供应商的服务期限、付款节点、验收期限等权利义务的起算时间",
+          "citation_text": ""
+        },
+        "suggestion": "在条款中补充合同签订日期或明确合同期限起算日",
+        "suggestion_minimal": "在条款中补充合同签订日期或明确合同期限起算日",
+        "suggestion_optimized": "约定'本合同自双方盖章之日起成立并生效，有效期从____年____月____日起至____年____月____日止'",
+        "suggestion_basis": "明确生效日期可确保供应商清楚知道合同义务的履行期间，便于主张付款权利和计算诉讼时效",
+        "needs_human_review": true,
+        "clause_uid": "segment_11::11.7",
+        "display_clause_id": "11.7",
+        "clause_uids": [
+          "segment_11::11.7"
+        ],
+        "clause_id": "11.7",
+        "related_clause_ids": [
+          "11.7"
+        ],
+        "related_clause_uids": [
+          "segment_11::11.7"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "11.7"
+        ],
+        "clause_ids": [
+          "11.7"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_GENERAL_001_FA93",
+        "basis_summary": "条款正文仅写'自合同双方盖章后生效'，缺少合同签署的具体日期（年月日）约定；合同应明确约定生效日期",
+        "basis": "[RULE_GENERAL_001_FA93] 条款正文仅写'自合同双方盖章后生效'，缺少合同签署的具体日期（年月日）约定；合同生效日期不明确将导致合同履行期限起算点模糊，可能影响供应商主张付款、验收、违约责任等权利的时效计算；合同应明确约定生效日期；合同法规定依法成立的合同自成立时生效，但服务合同通常需要明确具体的合同期间起算点，以便确定供应商的服务期限、付款节点、验收期限等权利义务的起算时间",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 27
+      },
+      {
+        "risk_code": "acceptance_criteria_missing",
+        "risk_source_type": "missing_clause",
+        "risk_label": "验收标准缺失或不明确",
+        "dimension": "服务期限、里程碑与验收标准",
+        "risk_level": "high",
+        "issue": "合同未明确综合验收的具体标准、流程和通过条件，仅约定\"每1年综合验收一次\"",
+        "evidence_text": "条款3：每_1年_综合验收一次。如验收不合格，乙方须按照甲方验收结果限期整改，如乙方不进行整改或整改后甲方再次验收仍不合格的，甲方有权要求乙方按每追加验收一次按合同价款_5 %的标准支付违约金，直至终止合同。",
+        "factual_basis": "合同中仅约定验收时间（每1年一次）和验收不合格的处理方式，但未约定验收的具体技术标准、文档要求、功能指标或质量要求",
+        "reasoning_basis": "对供应商而言，验收标准不明确会导致：1）无法准确把握交付要求，可能反复整改；2）验收时间不确定，40%尾款支付时间无法预期；3）易因标准模糊被认定为验收不合格，承担违约金风险；4）增加争议成本，可能影响项目回款周期",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "验收标准应具体可执行",
+          "basis_detail": "验收标准是合同履约的核心边界，标准缺失会导致交付要求模糊，增加供应商被不当认定为违约的风险，同时影响尾款回收的可预期性"
+        },
+        "suggestion_minimal": "在合同中增加验收标准条款，明确验收的具体技术要求、文档清单、功能指标、质量要求以及验收流程",
+        "suggestion_optimized": "在验收标准条款中详细列明：1）各阶段交付物的具体清单和格式要求；2）技术指标和功能验收条件；3）验收测试方法和流程；4）验收异议处理程序；5）明确首次验收时限和整改次数上限",
+        "suggestion_basis": "明确验收标准能够为供应商提供清晰的交付目标，减少因标准模糊导致的反复整改风险，同时确保40%尾款的回收时间可预期，改善供应商的资金周转预期",
+        "related_clause_ids": [
+          "3"
+        ],
+        "related_clause_uids": [
+          "segment_3::3"
+        ],
+        "needs_human_review": true,
+        "workflow_sources": [
+          "missing_multi"
+        ],
+        "suggestion": "在合同中增加验收标准条款，明确验收的具体技术要求、文档清单、功能指标、质量要求以及验收流程",
+        "evidence_confidence": null,
+        "quality_flags": [
+          "rule_escalated_acceptance_unclear"
+        ],
+        "clause_uid": "",
+        "display_clause_id": "",
+        "clause_id": "",
+        "clause_uids": [],
+        "display_clause_ids": [],
+        "clause_ids": [],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "anchor_text": "条款3：每_1年_综合验收一次。如验收不合格，乙方须按照甲方验收结果限期整改，如乙方不进行整改或整改后甲方再次验收仍不合格的，甲方有权要求乙方按每追加验收一次按合同价款_5 %的标准支付违约金，直至终止合同。",
+        "basis_rule_id": "RULE_ACCEPTANCE_ECEF",
+        "basis_summary": "合同中仅约定验收时间（每1年一次）和验收不合格的处理方式，但未约定验收的具体技术标准、文档要求、功能指标或质量要求；验收标准应具体可执行",
+        "basis": "[RULE_ACCEPTANCE_ECEF] 合同中仅约定验收时间（每1年一次）和验收不合格的处理方式，但未约定验收的具体技术标准、文档要求、功能指标或质量要求；对供应商而言，验收标准不明确会导致：1）无法准确把握交付要求，可能反复整改；2）验收时间不确定，40%尾款支付时间无法预期；3）易因标准模糊被认定为验收不合格，承担违约金风险；4）增加争议成本，可能影响项目回款周期；验收标准应具体可执行；验收标准是合同履约的核心边界，标准缺失会导致交付要求模糊，增加供应商被不当认定为违约的风险，同时影响尾款回收的可预期性",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 28
+      },
+      {
+        "risk_code": "payment_acceptance_linkage_unclear",
+        "risk_source_type": "missing_clause",
+        "risk_label": "付款条件与验收关联不明确",
+        "dimension": "付款结算、发票与税费",
+        "risk_level": "medium",
+        "issue": "合同未明确验收的具体时限、验收不合格的次数限制以及长期验收不通过的处理方式",
+        "evidence_text": "条款5.1：合同签订后10日内向中标供应商支付合同总额的60%；项目验收合格后甲方向乙方支付合同总额的40%货款。条款3：每1年综合验收一次。",
+        "factual_basis": "合同约定验收合格后支付40%尾款，但未约定：1）验收的明确时限（首次验收何时进行）；2）验收不合格的整改次数上限；3）多次验收不通过的合同处理方式；4）验收流程的具体步骤",
+        "reasoning_basis": "对供应商造成实际不利：1）尾款支付时间完全取决于甲方验收进度，供应商无法掌控；2）若甲方拖延验收或反复要求整改，供应商可能长期无法收回40%尾款；3）缺乏明确的验收时限约束，可能导致付款无限期延迟；4）\"直至终止合同\"的约定对供应商极为不利，但未配套保护措施",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "付款条件应与验收形成可执行闭环",
+          "basis_detail": "付款条件与验收标准联动才能形成有效的合同约束，缺少时限和次数限制会导致付款时间完全由甲方掌控，供应商面临长期无法收回尾款的风险"
+        },
+        "suggestion_minimal": "在付款条款中明确首次验收的具体时限、验收流程、整改次数上限以及多次验收不通过时的合同处理方式",
+        "suggestion_optimized": "在付款条款中增加：1）合同签订后首次验收的启动时限；2）每次验收间隔的合理期限；3）整改次数上限（如不超过2次）；4）超过整改上限仍不通过时的合同终止和结算条款；5）甲方拖延验收的违约责任",
+        "suggestion_basis": "明确验收时限和整改次数上限能够确保供应商对尾款回收时间有合理预期，避免甲方无限期拖延验收或反复要求整改而拒付尾款，改善供应商的资金安全",
+        "related_clause_ids": [
+          "5.1",
+          "3"
+        ],
+        "related_clause_uids": [
+          "segment_5::5.1",
+          "segment_3::3"
+        ],
+        "needs_human_review": true,
+        "workflow_sources": [
+          "missing_multi"
+        ],
+        "suggestion": "在付款条款中明确首次验收的具体时限、验收流程、整改次数上限以及多次验收不通过时的合同处理方式",
+        "evidence_confidence": null,
+        "quality_flags": [],
+        "clause_uid": "",
+        "display_clause_id": "",
+        "clause_id": "",
+        "clause_uids": [],
+        "display_clause_ids": [],
+        "clause_ids": [],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "anchor_text": "条款5.1：合同签订后10日内向中标供应商支付合同总额的60%；项目验收合格后甲方向乙方支付合同总额的40%货款。条款3：每1年综合验收一次。",
+        "basis_rule_id": "RULE_PAYMENT_0207",
+        "basis_summary": "合同约定验收合格后支付40%尾款，但未约定：1）验收的明确时限（首次验收何时进行）；2）验收不合格的整改次数上限；3）多次验收不通过的合同处理方式；4）验收流程的具体步骤；付款条件应与验收形成可执行闭环",
+        "basis": "[RULE_PAYMENT_0207] 合同约定验收合格后支付40%尾款，但未约定：1）验收的明确时限（首次验收何时进行）；2）验收不合格的整改次数上限；3）多次验收不通过的合同处理方式；4）验收流程的具体步骤；对供应商造成实际不利：1）尾款支付时间完全取决于甲方验收进度，供应商无法掌控；2）若甲方拖延验收或反复要求整改，供应商可能长期无法收回40%尾款；3）缺乏明确的验收时限约束，可能导致付款无限期延迟；4）\"直至终止合同\"的约定对供应商极为不利，但未配套保护措施；付款条件应与验收形成可执行闭环；付款条件与验收标准联动才能形成有效的合同约束，缺少时限和次数限制会导致付款时间完全由甲方掌控，供应商面临长期无法收回尾款的风险",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 29
+      },
+      {
+        "risk_code": "confidentiality_duration_missing",
+        "risk_source_type": "missing_clause",
+        "risk_label": "保密期限不明确",
+        "dimension": "保密、数据安全与合规",
+        "risk_level": "medium",
+        "issue": "合同仅约定乙方负有保密义务，但未明确保密的期限和保密义务的存续期间",
+        "evidence_text": "条款9.1：对甲方在履行本合同过程中向乙方提供的业务资料、技术资料等，以及乙方在履行本合同过程中知悉的甲方的所有秘密信息，乙方均应严格保密，未经甲方同意不得自行使用或披露给任何第三方。",
+        "factual_basis": "合同保密条款（9.1-9.4）仅规定保密义务的内容、违约责任和法律责任，但未约定保密期限是仅限合同期内还是延续至合同终止后一定年限",
+        "reasoning_basis": "对供应商不利：1）可能需要无限期承担保密义务，责任边界不清晰；2）合同终止后仍可能被追究保密违约责任，风险无法消除；3）影响供应商未来业务开展，可能无法使用一般性技术经验；4）增加了供应商的法律风险敞口",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "保密期限应有明确边界",
+          "basis_detail": "保密义务必须有明确的存续期限，否则供应商将面临无限期责任，风险无法消除，同时影响供应商未来正常开展类似业务"
+        },
+        "suggestion_minimal": "在保密条款中明确保密期限为合同终止后一定年限（如2-3年），并区分一般保密信息和核心保密信息的不同期限",
+        "suggestion_optimized": "在保密条款中详细约定：1）保密期限为合同终止后3年；2）明确界定保密信息的具体范围和例外情况；3）合同终止后保密信息的处理方式；4）保密期限届满后的信息使用自由",
+        "suggestion_basis": "明确保密期限能够为供应商提供清晰的责任边界，消除无限期保密义务带来的不确定性，同时保护供应商在合同终止后能够正常开展业务",
+        "related_clause_ids": [
+          "9.1",
+          "9.2",
+          "9.3",
+          "9.4"
+        ],
+        "related_clause_uids": [
+          "segment_9::9.1",
+          "segment_9::9.2",
+          "segment_9::9.3",
+          "segment_9::9.4"
+        ],
+        "needs_human_review": true,
+        "workflow_sources": [
+          "missing_multi"
+        ],
+        "suggestion": "在保密条款中明确保密期限为合同终止后一定年限（如2-3年），并区分一般保密信息和核心保密信息的不同期限",
+        "evidence_confidence": null,
+        "quality_flags": [],
+        "clause_uid": "",
+        "display_clause_id": "",
+        "clause_id": "",
+        "clause_uids": [],
+        "display_clause_ids": [],
+        "clause_ids": [],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "anchor_text": "条款9.1：对甲方在履行本合同过程中向乙方提供的业务资料、技术资料等，以及乙方在履行本合同过程中知悉的甲方的所有秘密信息，乙方均应严格保密，未经甲方同意不得自行使用或披露给任何第三方。",
+        "basis_rule_id": "RULE_CONFIDENTIALITY_40E5",
+        "basis_summary": "合同保密条款（9.1-9.4）仅规定保密义务的内容、违约责任和法律责任，但未约定保密期限是仅限合同期内还是延续至合同终止后一定年限；保密期限应有明确边界",
+        "basis": "[RULE_CONFIDENTIALITY_40E5] 合同保密条款（9.1-9.4）仅规定保密义务的内容、违约责任和法律责任，但未约定保密期限是仅限合同期内还是延续至合同终止后一定年限；对供应商不利：1）可能需要无限期承担保密义务，责任边界不清晰；2）合同终止后仍可能被追究保密违约责任，风险无法消除；3）影响供应商未来业务开展，可能无法使用一般性技术经验；4）增加了供应商的法律风险敞口；保密期限应有明确边界；保密义务必须有明确的存续期限，否则供应商将面临无限期责任，风险无法消除，同时影响供应商未来正常开展类似业务",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 30
+      },
+      {
+        "risk_code": "personnel_change_restriction_missing",
+        "risk_source_type": "missing_clause",
+        "risk_label": "项目人员变更限制缺失",
+        "dimension": "服务范围与交付内容",
+        "risk_level": "medium",
+        "issue": "合同对项目团队有明确资质要求（项目负责人需专利代理师资格，团队至少3名专利代理师），但未约定项目执行中人员变更的条件和限制",
+        "evidence_text": "条款2.1：项目负责人需具有专利代理师资格。条款2：其他人员：团队成员（不含项目负责人）须具有3名以上专利代理师。条款2.3：项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+        "factual_basis": "合同约定了投标阶段的人员资质要求，但未明确：1）项目执行中是否可以更换人员；2）更换人员的条件（如需同等资质）；3）未经甲方同意更换人员的违约责任；4）人员离职或无法继续服务的处理方式",
+        "reasoning_basis": "对供应商风险：1）项目执行中核心人员可能因各种原因无法继续参与，但合同未明确处理方式；2）若甲方以人员变动为由拒绝验收或主张违约，供应商缺乏合同依据抗辩；3）增加了供应商的人员管理风险和法律责任不确定性；4）可能影响项目连续性和服务质量认定",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "人员变更应有合理机制",
+          "basis_detail": "项目团队资质要求是合同履约能力的重要保障，但项目执行中人员变动是正常现象，合同应明确变更条件和程序以平衡双方权益"
+        },
+        "suggestion_minimal": "在项目团队条款中增加人员变更条款，明确更换人员的条件、程序和甲方同意的前提",
+        "suggestion_optimized": "在项目团队条款中详细约定：1）项目执行中经甲方书面同意可更换人员；2）更换人员须具备同等资质；3）核心人员变更需提前通知；4）未经同意擅自变更的违约责任；5）人员不可抗力离场的处理方式",
+        "suggestion_basis": "明确人员变更机制能够保护供应商在项目执行中的人员调整灵活性，同时确保甲方对项目质量的合理关切得到满足，减少因人员变动引发的争议",
+        "related_clause_ids": [
+          "2.1",
+          "2",
+          "2.3"
+        ],
+        "related_clause_uids": [
+          "segment_2::2.1",
+          "segment_2::2",
+          "segment_2::2.3"
+        ],
+        "needs_human_review": true,
+        "workflow_sources": [
+          "missing_multi"
+        ],
+        "suggestion": "在项目团队条款中增加人员变更条款，明确更换人员的条件、程序和甲方同意的前提",
+        "evidence_confidence": null,
+        "quality_flags": [],
+        "clause_uid": "",
+        "display_clause_id": "",
+        "clause_id": "",
+        "clause_uids": [],
+        "display_clause_ids": [],
+        "clause_ids": [],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "anchor_text": "条款2.1：项目负责人需具有专利代理师资格。条款2：其他人员：团队成员（不含项目负责人）须具有3名以上专利代理师。条款2.3：项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+        "basis_rule_id": "RULE_SCOPE_C86A",
+        "basis_summary": "合同约定了投标阶段的人员资质要求，但未明确：1）项目执行中是否可以更换人员；2）更换人员的条件（如需同等资质）；3）未经甲方同意更换人员的违约责任；4）人员离职或无法继续服务的处理方式；人员变更应有合理机制",
+        "basis": "[RULE_SCOPE_C86A] 合同约定了投标阶段的人员资质要求，但未明确：1）项目执行中是否可以更换人员；2）更换人员的条件（如需同等资质）；3）未经甲方同意更换人员的违约责任；4）人员离职或无法继续服务的处理方式；对供应商风险：1）项目执行中核心人员可能因各种原因无法继续参与，但合同未明确处理方式；2）若甲方以人员变动为由拒绝验收或主张违约，供应商缺乏合同依据抗辩；3）增加了供应商的人员管理风险和法律责任不确定性；4）可能影响项目连续性和服务质量认定；人员变更应有合理机制；项目团队资质要求是合同履约能力的重要保障，但项目执行中人员变动是正常现象，合同应明确变更条件和程序以平衡双方权益",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 31
+      },
+      {
+        "risk_code": "ip_ownership_boundary_unclear",
+        "risk_source_type": "missing_clause",
+        "risk_label": "知识产权归属边界不清晰",
+        "dimension": "知识产权归属与使用权",
+        "risk_level": "medium",
+        "issue": "合同约定项目所有文件、资料、数据信息所有权归甲方，但未明确乙方在服务过程中自有的工具、方法论、技术成果的归属",
+        "evidence_text": "条款7.1：由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
+        "factual_basis": "合同仅约定项目成果归甲方所有，但未明确：1）乙方原有的知识产权是否需要披露和使用；2）乙方为执行项目开发的工具、软件、模板的归属；3）乙方在项目中积累的一般性方法论、经验的归属；4）乙方改进或二次开发的既有成果的归属",
+        "reasoning_basis": "对供应商不利：1）可能丧失项目成果的合法权益，无法自主使用；2）自有的技术工具、经验可能被无偿占用；3）未来业务拓展受限，无法将类似方法论用于其他项目；4）知识产权边界模糊增加争议风险",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "知识产权归属应区分自有与项目成果",
+          "basis_detail": "合同应明确区分乙方自有的知识产权与项目衍生成果，避免将供应商的一般性技术积累和方法论无偿转让给甲方"
+        },
+        "suggestion_minimal": "在知识产权条款中增加知识产权归属划分，明确乙方自有的工具、方法论、技术成果的归属不受项目影响",
+        "suggestion_optimized": "在知识产权条款中详细约定：1）乙方原有知识产权归乙方所有；2）乙方为执行项目开发的通用工具、模板归乙方所有；3）项目特定成果归甲方所有；4）明确一般性方法论和行业经验的归属；5）明确乙方使用项目成果的范围限制",
+        "suggestion_basis": "明确知识产权归属划分能够保护供应商的自有技术资产，避免一般性方法论和技术积累被无偿占用，确保供应商未来能够正常开展类似业务",
+        "related_clause_ids": [
+          "7.1",
+          "7.2",
+          "7.3",
+          "7.4",
+          "7.5"
+        ],
+        "related_clause_uids": [
+          "segment_7::7.1",
+          "segment_7::7.2",
+          "segment_7::7.3",
+          "segment_7::7.4",
+          "segment_7::7.5"
+        ],
+        "needs_human_review": true,
+        "workflow_sources": [
+          "missing_multi"
+        ],
+        "suggestion": "在知识产权条款中增加知识产权归属划分，明确乙方自有的工具、方法论、技术成果的归属不受项目影响",
+        "evidence_confidence": null,
+        "quality_flags": [],
+        "clause_uid": "",
+        "display_clause_id": "",
+        "clause_id": "",
+        "clause_uids": [],
+        "display_clause_ids": [],
+        "clause_ids": [],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "anchor_text": "条款7.1：由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
+        "basis_rule_id": "RULE_IP_90C5",
+        "basis_summary": "合同仅约定项目成果归甲方所有，但未明确：1）乙方原有的知识产权是否需要披露和使用；2）乙方为执行项目开发的工具、软件、模板的归属；3）乙方在项目中积累的一般性方法论、经验的归属；4）乙方改进或二次开发的既有成果的归属；知识产权归属应区分自有与项目成果",
+        "basis": "[RULE_IP_90C5] 合同仅约定项目成果归甲方所有，但未明确：1）乙方原有的知识产权是否需要披露和使用；2）乙方为执行项目开发的工具、软件、模板的归属；3）乙方在项目中积累的一般性方法论、经验的归属；4）乙方改进或二次开发的既有成果的归属；对供应商不利：1）可能丧失项目成果的合法权益，无法自主使用；2）自有的技术工具、经验可能被无偿占用；3）未来业务拓展受限，无法将类似方法论用于其他项目；4）知识产权边界模糊增加争议风险；知识产权归属应区分自有与项目成果；合同应明确区分乙方自有的知识产权与项目衍生成果，避免将供应商的一般性技术积累和方法论无偿转让给甲方",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 32
+      },
+      {
+        "risk_code": "payment_account_inconsistency",
+        "risk_source_type": "multi_clause",
+        "risk_label": "付款账户与合同主体不一致",
+        "dimension": "付款结算、发票与税费",
+        "risk_level": "high",
+        "issue": "合同约定的付款账户（浙江永鼎律师事务所）与合同供应商主体（投标单位）不一致，且发票开具主体不明确",
+        "evidence_text": "条款5.3：户名：浙江永鼎律师事务所 开户行: 中国工商银行朝晖支行 账号：1202022109900115275。条款5.1：合同签订后10日内向中标供应商支付合同总额的60%。",
+        "factual_basis": "条款5.3明确付款账户为\"浙江永鼎律师事务所\"，但合同供应商应为\"中标供应商\"（投标单位），两者可能不一致；条款5.1提到\"中标供应商\"但未明确发票开具主体",
+        "reasoning_basis": "对供应商（投标单位）造成实际不利：1）合同付款账户与供应商主体不一致，可能导致付款不被认定为向供应商付款；2）发票开具主体不明确，可能导致税务风险；3）资金流向与合同主体分离，可能被认定为虚开发票或洗钱风险；4）供应商可能无法合法取得合同款项，存在财务合规风险",
+        "normative_basis": {
+          "basis_type": "legal_rule",
+          "basis_title": "付款账户应与合同主体一致",
+          "basis_detail": "合同付款应支付给合同相对方，付款账户与合同主体不一致可能导致税务合规问题和资金安全风险",
+          "citation_text": ""
+        },
+        "suggestion_minimal": "将付款账户修改为与合同供应商主体（中标供应商）一致的账户，并明确发票开具主体与合同主体一致",
+        "suggestion_optimized": "在付款条款中明确：1）付款账户为供应商在合同签订时提供的对公账户；2）发票由供应商作为开票主体开具；3）如需第三方代收，须签订三方协议并明确税务处理方式",
+        "suggestion_basis": "明确付款账户和发票开具主体能够确保合同付款的合法合规性，避免税务风险和资金安全风险，保护供应商的合法权益",
+        "related_clause_ids": [
+          "5.3",
+          "5.1",
+          "5.u19"
+        ],
+        "related_clause_uids": [
+          "segment_5::5.3",
+          "segment_5::5.1",
+          "segment_5::5.u19"
+        ],
+        "needs_human_review": true,
+        "workflow_sources": [
+          "missing_multi"
+        ],
+        "suggestion": "将付款账户修改为与合同供应商主体（中标供应商）一致的账户，并明确发票开具主体与合同主体一致",
+        "evidence_confidence": null,
+        "quality_flags": [],
+        "clause_uid": "",
+        "display_clause_id": "",
+        "clause_id": "",
+        "clause_uids": [],
+        "display_clause_ids": [],
+        "clause_ids": [],
+        "is_multi_clause_risk": true,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "anchor_text": "条款5.3：户名：浙江永鼎律师事务所 开户行: 中国工商银行朝晖支行 账号：1202022109900115275。条款5.1：合同签订后10日内向中标供应商支付合同总额的60%。",
+        "basis_rule_id": "RULE_PAYMENT_8D6E",
+        "basis_summary": "条款5.3明确付款账户为\"浙江永鼎律师事务所\"，但合同供应商应为\"中标供应商\"（投标单位），两者可能不一致；条款5.1提到\"中标供应商\"但未明确发票开具主体；付款账户应与合同主体一致",
+        "basis": "[RULE_PAYMENT_8D6E] 条款5.3明确付款账户为\"浙江永鼎律师事务所\"，但合同供应商应为\"中标供应商\"（投标单位），两者可能不一致；条款5.1提到\"中标供应商\"但未明确发票开具主体；对供应商（投标单位）造成实际不利：1）合同付款账户与供应商主体不一致，可能导致付款不被认定为向供应商付款；2）发票开具主体不明确，可能导致税务风险；3）资金流向与合同主体分离，可能被认定为虚开发票或洗钱风险；4）供应商可能无法合法取得合同款项，存在财务合规风险；付款账户应与合同主体一致；合同付款应支付给合同相对方，付款账户与合同主体不一致可能导致税务合规问题和资金安全风险",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "高风险项默认进入人工复核。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 33
+      },
+      {
+        "risk_code": "termination_compensation_unbalanced",
+        "risk_source_type": "multi_clause",
+        "risk_label": "合同解除权与退款义务不对等",
+        "dimension": "解除、终止与续约机制",
+        "risk_level": "medium",
+        "issue": "甲方有权基于验收不合格或根本性变化解除合同并要求全额退款，但未明确乙方相应的权利保障",
+        "evidence_text": "条款3：甲方有权要求乙方按每追加验收一次按合同价款5%的标准支付违约金，直至终止合同。条款11.6：协商不成的，甲方有权解除本合同并要求乙方退还全部已付款项。",
+        "factual_basis": "条款3约定验收不合格可终止合同并收取违约金，条款11.6约定根本性变化时甲方可解除合同并要求退还全部已付款项，但合同未约定：1）甲方原因导致项目失败的责任；2）甲方拖延验收或恶意解除合同的后果；3）乙方已完成工作部分的报酬请求权；4）乙方因甲方原因遭受损失的保护",
+        "reasoning_basis": "对供应商不利：1）甲方可无成本解除合同并收回全部已付款，供应商可能白干活无法获得报酬；2）验收标准不明确+解除权宽松，供应商可能被不当解除合同；3）已完成工作价值无法得到保障，风险完全由供应商承担；4）缺乏对等责任机制，权利义务严重失衡",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "合同解除权应对等且有合理补偿",
+          "basis_detail": "合同解除权不应单方面偏向一方，已完成工作部分应获得相应报酬，否则会导致供应商承担全部风险而无法获得对价"
+        },
+        "suggestion_minimal": "在合同中增加甲方解除合同的条件限制和乙方已完成工作部分的报酬请求权条款",
+        "suggestion_optimized": "在合同中详细约定：1）甲方解除合同须有正当理由并提前通知；2）乙方已完成工作部分应获得相应报酬；3）甲方拖延验收或恶意解除的违约责任；4）明确因甲方原因导致合同解除时的结算方式",
+        "suggestion_basis": "增加甲方解除合同的条件限制和已完成工作的报酬请求权，能够平衡双方权利义务，保护供应商已完成工作的价值，避免供应商白干活无法获得报酬的风险",
+        "related_clause_ids": [
+          "3",
+          "11.6",
+          "6.2"
+        ],
+        "related_clause_uids": [
+          "segment_3::3",
+          "segment_11::11.6",
+          "segment_6::6.2"
+        ],
+        "needs_human_review": true,
+        "workflow_sources": [
+          "missing_multi"
+        ],
+        "suggestion": "在合同中增加甲方解除合同的条件限制和乙方已完成工作部分的报酬请求权条款",
+        "evidence_confidence": null,
+        "quality_flags": [],
+        "clause_uid": "",
+        "display_clause_id": "",
+        "clause_id": "",
+        "clause_uids": [],
+        "display_clause_ids": [],
+        "clause_ids": [],
+        "is_multi_clause_risk": true,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "anchor_text": "条款3：甲方有权要求乙方按每追加验收一次按合同价款5%的标准支付违约金，直至终止合同。条款11.6：协商不成的，甲方有权解除本合同并要求乙方退还全部已付款项。",
+        "basis_rule_id": "RULE_TERMINATION_2309",
+        "basis_summary": "条款3约定验收不合格可终止合同并收取违约金，条款11.6约定根本性变化时甲方可解除合同并要求退还全部已付款项，但合同未约定：1）甲方原因导致项目失败的责任；2）甲方拖延验收或恶意解除合同的后果；3）乙方已完成工作部分的报酬请求权；4）乙方因甲方原因遭受损失的保护；合同解除权应对等且有合理补偿",
+        "basis": "[RULE_TERMINATION_2309] 条款3约定验收不合格可终止合同并收取违约金，条款11.6约定根本性变化时甲方可解除合同并要求退还全部已付款项，但合同未约定：1）甲方原因导致项目失败的责任；2）甲方拖延验收或恶意解除合同的后果；3）乙方已完成工作部分的报酬请求权；4）乙方因甲方原因遭受损失的保护；对供应商不利：1）甲方可无成本解除合同并收回全部已付款，供应商可能白干活无法获得报酬；2）验收标准不明确+解除权宽松，供应商可能被不当解除合同；3）已完成工作价值无法得到保障，风险完全由供应商承担；4）缺乏对等责任机制，权利义务严重失衡；合同解除权应对等且有合理补偿；合同解除权不应单方面偏向一方，已完成工作部分应获得相应报酬，否则会导致供应商承担全部风险而无法获得对价",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 34
+      },
+      {
+        "risk_code": "liability_cap_missing",
+        "risk_source_type": "missing_clause",
+        "risk_label": "违约责任上限缺失",
+        "dimension": "违约责任与赔偿机制",
+        "risk_level": "medium",
+        "issue": "合同约定了多种违约金情形（验收不合格5%、保密违约5%等），但未约定供应商承担违约责任的总金额上限",
+        "evidence_text": "条款3：每追加验收一次按合同价款5%的标准支付违约金。条款6.3：乙方未能按本合同约定要求提供周到、及时服务，应向甲方支付违约金，即合同总额5%。条款9.2：乙方如违反上述保密义务，应向甲方支付违约金（合同价款的5%）。",
+        "factual_basis": "合同约定了多项5%违约金条款，但未明确：1）多项违约金是否可以累计；2）供应商承担违约金的总上限；3）违约金与实际损失赔偿的关系；4）违约金总额超过合同金额时的处理",
+        "reasoning_basis": "对供应商风险：1）多项违约金可能累计叠加，理论上可能超过合同总额；2）缺乏责任上限，供应商可能承担远超合同收入的赔偿责任；3）每次验收不合格都收取5%违约金，\"直至终止合同\"意味着可能累积大量违约金；4）增加了供应商的责任风险敞口和不确定性",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "违约责任应有合理上限",
+          "basis_detail": "违约责任上限是控制供应商风险敞口的重要机制，缺乏上限会导致供应商可能承担远超合同收入的赔偿责任"
+        },
+        "suggestion_minimal": "在违约责任条款中明确供应商承担违约金的总金额上限为合同总价的一定比例",
+        "suggestion_optimized": "在违约责任条款中详细约定：1）供应商承担违约金的总上限为合同金额的30%；2）明确多项违约金不累计计算，以最高者为准；3）违约金与实际损失赔偿的关系；4）超过上限的责任承担方式",
+        "suggestion_basis": "明确违约责任上限能够控制供应商的最大风险敞口，避免多项违约金累计导致供应商承担远超合同收入的赔偿责任，为供应商提供可预期的责任边界",
+        "related_clause_ids": [
+          "3",
+          "6.3",
+          "9.2"
+        ],
+        "related_clause_uids": [
+          "segment_3::3",
+          "segment_6::6.3",
+          "segment_9::9.2"
+        ],
+        "needs_human_review": true,
+        "workflow_sources": [
+          "missing_multi"
+        ],
+        "suggestion": "在违约责任条款中明确供应商承担违约金的总金额上限为合同总价的一定比例",
+        "evidence_confidence": null,
+        "quality_flags": [],
+        "clause_uid": "",
+        "display_clause_id": "",
+        "clause_id": "",
+        "clause_uids": [],
+        "display_clause_ids": [],
+        "clause_ids": [],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "anchor_text": "条款3：每追加验收一次按合同价款5%的标准支付违约金。条款6.3：乙方未能按本合同约定要求提供周到、及时服务，应向甲方支付违约金，即合同总额5%。条款9.2：乙方如违反上述保密义务，应向甲方支付违约金（合同价款的5%）。",
+        "basis_rule_id": "RULE_LIABILITY_7645",
+        "basis_summary": "合同约定了多项5%违约金条款，但未明确：1）多项违约金是否可以累计；2）供应商承担违约金的总上限；3）违约金与实际损失赔偿的关系；4）违约金总额超过合同金额时的处理；违约责任应有合理上限",
+        "basis": "[RULE_LIABILITY_7645] 合同约定了多项5%违约金条款，但未明确：1）多项违约金是否可以累计；2）供应商承担违约金的总上限；3）违约金与实际损失赔偿的关系；4）违约金总额超过合同金额时的处理；对供应商风险：1）多项违约金可能累计叠加，理论上可能超过合同总额；2）缺乏责任上限，供应商可能承担远超合同收入的赔偿责任；3）每次验收不合格都收取5%违约金，\"直至终止合同\"意味着可能累积大量违约金；4）增加了供应商的责任风险敞口和不确定性；违约责任应有合理上限；违约责任上限是控制供应商风险敞口的重要机制，缺乏上限会导致供应商可能承担远超合同收入的赔偿责任",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+          "风险说明涉及法律判断、比例上限或法规口径，必须由人工确认。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 35
+      }
+    ]
+  }
+}

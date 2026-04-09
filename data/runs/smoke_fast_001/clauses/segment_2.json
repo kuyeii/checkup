@@ -1,0 +1,46 @@
+[
+  {
+    "clause_id": "1",
+    "clause_title": "",
+    "clause_text": "1、项目负责人需具有专利代理师资格。",
+    "segment_id": "segment_2",
+    "segment_title": "二、项目团队要求",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "1、项目负责人需具有专利代理师资格。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "2",
+    "clause_title": "",
+    "clause_text": "2、其他人员：团队成员（不含项目负责人）须具有3名以上专利代理师。",
+    "segment_id": "segment_2",
+    "segment_title": "二、项目团队要求",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "2、其他人员：团队成员（不含项目负责人）须具有3名以上专利代理师。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "3",
+    "clause_title": "",
+    "clause_text": "3、项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+    "segment_id": "segment_2",
+    "segment_title": "二、项目团队要求",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "3、项目实施过程中须根据项目进度及业主要求安排服务团队，保证满足项目实际需求。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "",
+    "clause_title": "",
+    "clause_text": "注：以上人员均要求在投标单位正常参保。",
+    "segment_id": "segment_2",
+    "segment_title": "二、项目团队要求",
+    "clause_kind": "note_clause",
+    "source_excerpt": "注：以上人员均要求在投标单位正常参保。",
+    "numbering_confidence": 0.0,
+    "title_confidence": 0.0
+  }
+]

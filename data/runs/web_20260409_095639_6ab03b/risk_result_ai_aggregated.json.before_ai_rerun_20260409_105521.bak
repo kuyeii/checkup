@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-09T02:26:58Z",
+  "groups": [
+    {
+      "aggregate_id": "agg_segment_3::3.u5_11",
+      "aggregate_type": "anchored_multi_clause",
+      "host_risk_id": "11",
+      "host_clause_uid": "segment_3::3.u5",
+      "host_clause_id": "3.u5",
+      "source_risk_ids": [
+        "11",
+        "17"
+      ],
+      "multi_clause_risk_ids": [
+        "17"
+      ],
+      "anchored_risk": {
+        "risk_code": "prepayment_full_amount_risk",
+        "risk_source_type": "anchored",
+        "dimension": "付款结算、发票与税费",
+        "risk_level": "medium",
+        "risk_label": "签约后全额预付导致甲方丧失履约抓手",
+        "issue": "条款规定甲方在合同签订后30日内“一次性”支付全部检测费用，付款触发条件仅为“合同签订”，未与乙方履约进度（如交付检测报告、验收合格）挂钩。",
+        "evidence_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）",
+        "anchor_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+        "factual_basis": "条款文本明确约定“合同签订后30日内，甲方一次性向乙方支付检测费用”，即要求甲方在乙方尚未开始履行检测服务前即支付100%合同款项。",
+        "reasoning_basis": "在服务合同中，全额预付模式导致甲方丧失对乙方履约的质量控制抓手。若乙方后续拒绝交付、交付成果不合格或延迟履行，甲方已支付全款，需通过诉讼追回款项，面临资金占用损失及维权成本，处于被动地位。",
+        "normative_basis": {
+          "basis_type": "contract_logic_rule",
+          "basis_title": "付款节点应与履约进度挂钩",
+          "basis_detail": "技术服务合同通常遵循“付款跟随履约”原则，预付全款显著打破双方权利义务的平衡，增加了委托方的履约风险。",
+          "citation_text": ""
+        },
+        "suggestion": "将“一次性支付”修改为“合同签订后支付50%，验收合格后支付50%”。",
+        "suggestion_minimal": "将“一次性支付”修改为“合同签订后支付50%，验收合格后支付50%”。",
+        "suggestion_optimized": "合同签订后30日内，甲方向乙方支付检测费用总额的50%作为预付款；乙方交付检测报告且经甲方验收合格后30日内，甲方向乙方支付剩余50%款项。",
+        "suggestion_basis": "通过分阶段付款，将资金支付与乙方履约进度绑定，确保甲方在乙方违约时享有履行抗辩权，降低资金风险。",
+        "needs_human_review": true,
+        "clause_uid": "segment_3::3.u5",
+        "display_clause_id": "3.u5",
+        "clause_uids": [
+          "segment_3::3.u5"
+        ],
+        "clause_id": "3.u5",
+        "related_clause_ids": [
+          "3.u5"
+        ],
+        "related_clause_uids": [
+          "segment_3::3.u5"
+        ],
+        "quality_flags": [],
+        "workflow_sources": [
+          "anchored"
+        ],
+        "evidence_confidence": null,
+        "display_clause_ids": [
+          "3.u5"
+        ],
+        "clause_ids": [
+          "3.u5"
+        ],
+        "is_multi_clause_risk": false,
+        "status": "pending",
+        "auto_apply_allowed": false,
+        "mapping_conflict": false,
+        "basis_rule_id": "RULE_PAYMENT_5BDA",
+        "basis_summary": "条款文本明确约定“合同签订后30日内，甲方一次性向乙方支付检测费用”，即要求甲方在乙方尚未开始履行检测服务前即支付100%合同款项。；付款节点应与履约进度挂钩",
+        "basis": "[RULE_PAYMENT_5BDA] 条款文本明确约定“合同签订后30日内，甲方一次性向乙方支付检测费用”，即要求甲方在乙方尚未开始履行检测服务前即支付100%合同款项。；在服务合同中，全额预付模式导致甲方丧失对乙方履约的质量控制抓手。若乙方后续拒绝交付、交付成果不合格或延迟履行，甲方已支付全款，需通过诉讼追回款项，面临资金占用损失及维权成本，处于被动地位。；付款节点应与履约进度挂钩；技术服务合同通常遵循“付款跟随履约”原则，预付全款显著打破双方权利义务的平衡，增加了委托方的履约风险。",
+        "review_required_reason": [
+          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+        ],
+        "is_boilerplate_related": false,
+        "merged_from_risk_ids": [
+          null
+        ],
+        "risk_id": 11
+      },
+      "multi_clause_risks": [
+        {
+          "risk_code": "payment_delivery_timing_mismatch",
+          "risk_source_type": "multi_clause",
+          "risk_label": "付款时间与交付时间错配导致先付后验",
+          "dimension": "付款结算、发票与税费",
+          "risk_level": "medium",
+          "issue": "付款截止时间早于服务完成时间，导致甲方在未获得交付成果前即需支付全款。",
+          "evidence_text": "条款 1：自受测件接收开始起 30 天完成。条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）...",
+          "main_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+          "factual_basis": "条款3.u5约定“合同签订后30日内”一次性付款；条款1约定“自受测件接收开始起30天完成”。若受测件接收时间晚于合同签订时间，或两者时间相近，付款期限将早于或紧邻交付期限。",
+          "reasoning_basis": "条款3.u5与条款1的组合导致甲方在乙方完成测试并交付报告前即需支付全款，甲方丧失以付款作为督促乙方履约的手段，且若后续交付存在质量问题，甲方处于被动地位。",
+          "normative_basis": {
+            "basis_type": "contract_logic_rule",
+            "basis_title": "付款节奏应与服务进度相匹配",
+            "basis_detail": "合同逻辑上，委托方支付对价应以受托方完成相应服务为前提，形成合理的付款节奏。当前合同约定一次性先付款再交付成果，违背了服务类合同的一般交易习惯，使甲方在履约过程中丧失主动权。"
+          },
+          "suggestion_minimal": "调整付款节奏，将一次性付款改为分阶段付款，约定合同签订后支付部分预付款（如50%），验收合格后支付尾款。",
+          "suggestion_optimized": "进一步优化付款条件：合同签订后支付30%预付款；乙方完成检测并提交初稿报告后支付30%；甲方验收合格后支付40%尾款；或设置验收合格后一次性支付全款，但明确付款时间应在收到合格检测报告之后。",
+          "suggestion_basis": "分阶段付款可将付款与服务进度挂钩，使甲方在支付对价前能够确认乙方已按约履行测试义务，若乙方逾期交付或交付不合格，甲方可暂停支付后续款项，形成有效的履约约束机制。",
+          "related_clause_ids": [
+            "1",
+            "3.u5"
+          ],
+          "related_clause_uids": [
+            "segment_1::1",
+            "segment_3::3.u5"
+          ],
+          "needs_human_review": true,
+          "workflow_sources": [
+            "missing_multi"
+          ],
+          "suggestion": "调整付款节奏，将一次性付款改为分阶段付款，约定合同签订后支付部分预付款（如50%），验收合格后支付尾款。",
+          "evidence_confidence": null,
+          "quality_flags": [],
+          "clause_uid": "segment_1::1",
+          "display_clause_id": "1",
+          "clause_id": "1",
+          "clause_uids": [
+            "segment_1::1"
+          ],
+          "display_clause_ids": [
+            "1"
+          ],
+          "clause_ids": [
+            "1"
+          ],
+          "is_multi_clause_risk": true,
+          "status": "pending",
+          "auto_apply_allowed": false,
+          "mapping_conflict": false,
+          "anchor_text": "条款 1：自受测件接收开始起 30 天完成。条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00）...",
+          "basis_rule_id": "RULE_PAYMENT_79E3",
+          "basis_summary": "条款3.u5约定“合同签订后30日内”一次性付款；条款1约定“自受测件接收开始起30天完成”。若受测件接收时间晚于合同签订时间，或两者时间相近，付款期限将早于或紧邻交付期限。；付款节奏应与服务进度相匹配",
+          "basis": "[RULE_PAYMENT_79E3] 条款3.u5约定“合同签订后30日内”一次性付款；条款1约定“自受测件接收开始起30天完成”。若受测件接收时间晚于合同签订时间，或两者时间相近，付款期限将早于或紧邻交付期限。；条款3.u5与条款1的组合导致甲方在乙方完成测试并交付报告前即需支付全款，甲方丧失以付款作为督促乙方履约的手段，且若后续交付存在质量问题，甲方处于被动地位。；付款节奏应与服务进度相匹配；合同逻辑上，委托方支付对价应以受托方完成相应服务为前提，形成合理的付款节奏。当前合同约定一次性先付款再交付成果，违背了服务类合同的一般交易习惯，使甲方在履约过程中丧失主动权。",
+          "review_required_reason": [
+            "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+          ],
+          "is_boilerplate_related": false,
+          "merged_from_risk_ids": [
+            null
+          ],
+          "risk_id": 17
+        }
+      ],
+      "target_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+      "target_text_source": "host_clause_text",
+      "clause_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+      "status": "pending",
+      "ai_rewrite": {
+        "state": "succeeded",
+        "target_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+        "revised_text": "合同签订后30日内，甲方向乙方支付检测费用人民币贰万伍仟元整（￥25,000.00）的50%作为预付款；验收合格后30日内，甲方向乙方支付剩余50%款项。项目款到账后，乙方向甲方开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+        "comment_text": "将“一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，”修改为“向乙方支付检测费用人民币贰万伍仟元整（￥25,000.00）的50%作为预付款；验收合格后30日内，甲方向乙方支付剩余50%款项。项目款到账后，乙方向甲方”。",
+        "rationale": "将一次性支付改为分阶段支付（合同签订后付50%，验收合格后付50%），将付款与乙方履约进度挂钩，确保甲方在乙方违约时享有履行抗辩权，降低资金风险。",
+        "edit_type": "replace",
+        "workflow_kind": "aggregate",
+        "created_at": "2026-04-09T02:20:04Z"
+      },
+      "ai_rewrite_decision": "proposed"
+    }
+  ]
+}

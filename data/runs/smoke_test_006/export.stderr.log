@@ -1,0 +1,5 @@
+[ai_patch]
+
+[risk_comments]
+/Volumes/samsang/workflow/一站式v8/contract_review_poc_ui_dynamic_gap_no_bottom_comments/src/docx_comments.py:104: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  c.set(w("date"), _dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z")

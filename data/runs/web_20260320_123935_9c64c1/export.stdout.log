@@ -1,0 +1,68 @@
+[ai_patch]
+{
+  "output_docx": "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/data/runs/web_20260320_123935_9c64c1/ai_patched.docx",
+  "applied": 3,
+  "failed": 0,
+  "unmatched": [],
+  "items": [
+    {
+      "risk_id": 13,
+      "paragraph_index": 57,
+      "target_text": "项目验收合格后甲方向乙方支付合同总额的40%货款。",
+      "revised_text": "乙方提交项目成果后，甲方在10日内完成验收审查，逾期未提出书面异议视为验收合格，甲方向乙方支付合同总额的40%货款。",
+      "revision_id": 0
+    },
+    {
+      "risk_id": 16,
+      "paragraph_index": 72,
+      "target_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
+      "revised_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有，但乙方在项目实施前已拥有的知识产权除外，且乙方保留对通用技术工具和方法论的使用权。",
+      "revision_id": 1
+    },
+    {
+      "risk_id": 31,
+      "paragraph_index": 72,
+      "target_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有",
+      "revised_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有，但乙方在项目实施前已拥有的知识产权仍归乙方所有。",
+      "revision_id": 2
+    }
+  ]
+}
+
+[risk_comments]
+{
+  "output_docx": "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/data/runs/web_20260320_123935_9c64c1/reviewed_comments.docx",
+  "added_comments": 1,
+  "unmatched": [
+    {
+      "risk_id": 13,
+      "clause_uid": "segment_5::5.1",
+      "display_clause_id": "5.1",
+      "risk_label": "验收标准未约定，可能引发验收争议导致尾款无法收取"
+    },
+    {
+      "risk_id": 31,
+      "clause_uid": null,
+      "display_clause_id": "",
+      "risk_label": "知识产权归属边界不清"
+    },
+    {
+      "risk_id": 31,
+      "clause_uid": "",
+      "display_clause_id": "",
+      "risk_label": "知识产权归属边界不清"
+    }
+  ],
+  "comments": [
+    {
+      "comment_id": 0,
+      "risk_id": 16,
+      "paragraph_index": 72,
+      "matched_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
+      "clause_uid": "segment_7::7.1",
+      "display_clause_id": "7.1"
+    }
+  ],
+  "missing_clause_skipped_count": 0,
+  "missing_clause_items": []
+}

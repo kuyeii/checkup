@@ -1,0 +1,11 @@
+{
+  "status": "failed",
+  "file_name": "2.docx",
+  "review_side": "supplier",
+  "contract_type_hint": "service_agreement",
+  "step": "主流程执行失败",
+  "run_id": "web_20260318_152659_83fe93",
+  "updated_at": "2026-03-18T07:29:57.447093Z",
+  "run_dir": "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/data/runs/web_20260318_152659_83fe93",
+  "error": "Traceback (most recent call last):\n  File \"/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/app.py\", line 247, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/app.py\", line 202, in main\n    missing_multi_outputs, missing_multi_payload = runner.run_risk_reviewer_missing_multi(merged_clauses)\n                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^\n  File \"/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/src/workflow_runner.py\", line 835, in run_risk_reviewer_missing_multi\n    sent_inputs, outputs, payload = self._run_risk_workflow(\n                                    ~~~~~~~~~~~~~~~~~~~~~~~^\n        clauses=clauses,\n        ^^^^^^^^^^^^^^^^\n    ...<2 lines>...\n        inputs=inputs,\n        ^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/src/workflow_runner.py\", line 358, in _run_risk_workflow\n    outputs = extract_blocking_outputs(response)\n  File \"/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/src/dify_client.py\", line 59, in extract_blocking_outputs\n    raise DifyWorkflowError(f\"Workflow returned error: {error}\")\nsrc.dify_client.DifyWorkflowError: Workflow returned error: req_id: a87325f3d7 PluginInvokeError: {\"args\":{\"description\":\"[models] Error: API request failed with status code 503: {\\\"code\\\":50508,\\\"message\\\":\\\"System is too busy now. Please try again later.\\\",\\\"data\\\":null}\"},\"error_type\":\"InvokeError\",\"message\":\"[models] Error: API request failed with status code 503: {\\\"code\\\":50508,\\\"message\\\":\\\"System is too busy now. Please try again later.\\\",\\\"data\\\":null}\"}"
+}

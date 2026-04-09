@@ -1,0 +1,126 @@
+{
+  "output_docx": "/Volumes/samsang/workflow/4.7/merged_dyn_fix12fe 2/data/runs/web_20260407_153654_013eb8/reviewed_comments.docx",
+  "added_comments": 13,
+  "unmatched": [],
+  "comments": [
+    {
+      "comment_id": 0,
+      "risk_id": 1,
+      "paragraph_index": 6,
+      "matched_text": "第一条 测试周期 自受测件接收开始起 30 天完成。",
+      "clause_uid": "segment_1::1",
+      "display_clause_id": "1"
+    },
+    {
+      "comment_id": 1,
+      "risk_id": 2,
+      "paragraph_index": 8,
+      "matched_text": "甲方委托乙方,参照“甲方提供的验收指标”（详见附件），针对甲方提供的基于可信执行环境的同态加密计算加速系统V1.0，完成基于TEE和异构计算的同态加密加速技术（2022YFB4501502）中对应指标1.6的关键技术验证测试，并向甲方出具1份检测报告（检测报告要求加盖CNAS测试章）。测试依据为GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》及“机密计算与可信执行环境关键技术和应用研究项目”第三方测试大纲V1.0版本。",
+      "clause_uid": "segment_2::2.u2",
+      "display_clause_id": "2.u2"
+    },
+    {
+      "comment_id": 2,
+      "risk_id": 3,
+      "paragraph_index": 21,
+      "matched_text": "合同签订后30日内，甲方一次性向乙方支付检测费用人民币：人民币贰万伍仟元整（￥25,000.00），项目款到账后，开具同等金额的☑增值税电子专用发票□增值税电子普通发票。",
+      "clause_uid": "segment_3::3.u5",
+      "display_clause_id": "3.u5"
+    },
+    {
+      "comment_id": 3,
+      "risk_id": 4,
+      "paragraph_index": 39,
+      "matched_text": "甲方向乙方提供“机密计算与可信执行环境关键技术和应用研究项目”所研发的“可信执行环境和同态加密混合国产异构系统”中的“基于可信执行环境的同态加密计算加速系统”系统/产品样品、乙方所要求的技术资料、辅助工具和设备，由乙方独立对送检样品进行验收检测。测试过程中受测样品会进行破拆和存档，检测样品不会退换，大型设备在检测完成后退还。",
+      "clause_uid": "segment_4::4.u8",
+      "display_clause_id": "4.u8"
+    },
+    {
+      "comment_id": 4,
+      "risk_id": 5,
+      "paragraph_index": 39,
+      "matched_text": "甲方向乙方提供“机密计算与可信执行环境关键技术和应用研究项目”所研发的“可信执行环境和同态加密混合国产异构系统”中的“基于可信执行环境的同态加密计算加速系统”系统/产品样品、乙方所要求的技术资料、辅助工具和设备，由乙方独立对送检样品进行验收检测。测试过程中受测样品会进行破拆和存档，检测样品不会退换，大型设备在检测完成后退还。",
+      "clause_uid": "segment_4::4.u8",
+      "display_clause_id": "4.u8"
+    },
+    {
+      "comment_id": 5,
+      "risk_id": 6,
+      "paragraph_index": 41,
+      "matched_text": "双方应共同遵守保密条款，本合同书的内容不经对方书面许可，任何一方都不得以任何形式向第三方透露。",
+      "clause_uid": "segment_5::5.1",
+      "display_clause_id": "5.1"
+    },
+    {
+      "comment_id": 6,
+      "risk_id": 7,
+      "paragraph_index": 43,
+      "matched_text": "本保密条款在本合同书到期后3年内继续保持有效。",
+      "clause_uid": "segment_5::5.3",
+      "display_clause_id": "5.3"
+    },
+    {
+      "comment_id": 7,
+      "risk_id": 8,
+      "paragraph_index": 46,
+      "matched_text": "在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。",
+      "clause_uid": "segment_6::6.u12",
+      "display_clause_id": "6.u12"
+    },
+    {
+      "comment_id": 8,
+      "risk_id": 9,
+      "paragraph_index": 48,
+      "matched_text": "由于不可抗力（包括地震、台风、洪水、火灾、战争、罢工、政府禁令以及双方均不可预见、不能控制的事情或情况）导致本合同不能履行，任何一方均不会因此而承担违约责任。",
+      "clause_uid": "segment_7::7",
+      "display_clause_id": "7"
+    },
+    {
+      "comment_id": 9,
+      "risk_id": 10,
+      "paragraph_index": 50,
+      "matched_text": "1、甲方应当按照合同约定向乙方支付检测费用，如未按合同约定支付，每逾期一天应当以未付费用为基数，按每日万分之五向乙方支付违约金；逾期超过30天的，乙方有权书面通知甲方在规定期间内改正，甲方接到通知后仍未在乙方通知期限内改正的，乙方有权决定是否书面单方面通知甲方解除合同，乙方决定解除合同的，甲方除应支付未付款项本金外，仍应当向乙方支付违约金。",
+      "clause_uid": "segment_8::8.1",
+      "display_clause_id": "8.1"
+    },
+    {
+      "comment_id": 10,
+      "risk_id": 11,
+      "paragraph_index": 51,
+      "matched_text": "2 、乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付，每逾期一天应当以本阶段应付费用为基数，按每日万分之五向甲方支付违约金；逾期超过30天的，甲方有权书面通知乙方在规定期间内改正，乙方接到通知后仍未在通知期限内改正的，甲方有权决定是否书面单方面通知乙方解除合同，甲方决定解除合同的，除乙方应完成未完成检测外，仍应当向甲方支付违约金。",
+      "clause_uid": "segment_8::8.2",
+      "display_clause_id": "8.2"
+    },
+    {
+      "comment_id": 11,
+      "risk_id": 12,
+      "paragraph_index": 53,
+      "matched_text": "因合同产生的争议由甲乙双方协商解决。必要时可通过法律途径诉讼解决。双方一致同意，若履行产生争议，应当将争议提交至甲方所在地有管辖权的法院诉讼处理。没有争议的条款，双方应当继续履行。",
+      "clause_uid": "segment_9::9.u16",
+      "display_clause_id": "9.u16"
+    },
+    {
+      "comment_id": 12,
+      "risk_id": 13,
+      "paragraph_index": 6,
+      "matched_text": "条款 3.u5：合同签订后30日内，甲方一次性向乙方支付检测费用... 条款 1：自受测件接收开始起 30 天完成。",
+      "clause_uid": "",
+      "display_clause_id": ""
+    }
+  ],
+  "missing_clause_skipped_count": 2,
+  "missing_clause_items": [
+    {
+      "risk_id": 14,
+      "risk_label": "缺失验收程序及成果异议条款",
+      "issue": "合同仅约定了交付内容（检测报告）和逾期交付责任，未约定甲方对检测报告的验收程序、异议期及乙方整改义务。",
+      "evidence_text": "条款 2.u2：...并向甲方出具1份检测报告... 条款 8.2：乙方应当按照合同约定向甲方交付检测成果，如未按合同约定交付..."
+    },
+    {
+      "risk_id": 15,
+      "risk_label": "缺失检测报告知识产权归属约定",
+      "issue": "合同未约定检测报告及测试过程中产生的相关数据的知识产权归属及使用权限制。",
+      "evidence_text": "条款 2.u2：...向甲方出具1份检测报告... 条款 5.2：双方应互相保守对方的商业机密..."
+    }
+  ]
+}

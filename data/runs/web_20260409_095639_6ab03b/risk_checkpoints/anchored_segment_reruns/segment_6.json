@@ -1,0 +1,105 @@
+{
+  "segment_id": "segment_6",
+  "segment_start_idx": 11,
+  "segment_end_idx": 11,
+  "outputs": {
+    "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"termination_trigger_vague\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"解除、终止与续约机制\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"终止触发条件“无力偿付”定义模糊，赋予乙方单方解释权\",\n      \"issue\": \"条款将“无力偿付”列为即刻终止合同的触发条件，但未对其定义进行限定，导致乙方可能仅因甲方付款流程延迟即主张甲方“无力偿付”并单方终止合同。\",\n      \"evidence_text\": \"如一方出现破产、无力偿付、清算或公司解散的情况时\",\n      \"anchor_text\": \"无力偿付\",\n      \"factual_basis\": \"条款在破产、清算等法定终止情形外，并列加入了“无力偿付”这一非严格法律概念的状态描述，且未设定“经法院宣告”或“资不抵债”等法定门槛。\",\n      \"reasoning_basis\": \"甲方作为科研机构常受财政拨款周期影响，付款可能存在非恶意的短期延迟。乙方极易利用“无力偿付”概念的模糊性，将甲方的短期付款延迟解释为无力偿付，进而援引本条在无预警的情况下即刻终止服务，导致科研项目中断、数据丢失等不可逆损失。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"合同解除权的明确性与可预见性原则\",\n        \"basis_detail\": \"合同解除权作为终止权利义务关系的形成权，其触发条件应当清晰、客观且具有可预见性，避免使用模糊的主观判断标准，以防止一方滥用权利破坏交易的稳定性。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"建议删除“无力偿付”表述，或将其修改为“被人民法院宣告破产”或“进入破产清算程序”等具有明确法律界限的状态。\",\n      \"suggestion_minimal\": \"删除“无力偿付、”。\",\n      \"suggestion_optimized\": \"将“无力偿付”修改为“被法院受理破产申请”或“被列入失信被执行人名单且无法履行合同义务”，并增加“因政府财政拨款原因导致的付款延迟，不视为无力偿付”的除外约定。\",\n      \"suggestion_basis\": \"通过将模糊的商业状态替换为明确的司法或行政认定标准，消除乙方利用付款周期进行要挟或单方解约的法律空间，保障甲方科研工作的连续性。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_6::6.u12\",\n      \"display_clause_id\": \"6.u12\"\n    }\n  ]\n}"
+  },
+  "by_clause_records": [
+    {
+      "clause_uid": "segment_6::6.u12",
+      "input_payload": {
+        "review_side": "甲方",
+        "contract_type_hint": "service_agreement",
+        "clause_uid": "segment_6::6.u12",
+        "clause_id": "6.u12",
+        "display_clause_id": "6.u12",
+        "clause_title": "",
+        "clause_text": "在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。",
+        "clause_kind": "contract_clause",
+        "source_excerpt": "在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。",
+        "segment_id": "segment_6",
+        "segment_title": "第六条 合同终止",
+        "numbering_confidence": "0",
+        "title_confidence": "0",
+        "clause_context": "审查视角：甲方\n合同类型：service_agreement\n条款编号：6.u12\n条款标题：\n条款正文：在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。"
+      },
+      "outputs": {
+        "text": "{\n  \"risk_items\": [\n    {\n      \"risk_code\": \"termination_trigger_vague\",\n      \"risk_source_type\": \"anchored\",\n      \"dimension\": \"解除、终止与续约机制\",\n      \"risk_level\": \"high\",\n      \"risk_label\": \"终止触发条件“无力偿付”定义模糊，赋予乙方单方解释权\",\n      \"issue\": \"条款将“无力偿付”列为即刻终止合同的触发条件，但未对其定义进行限定，导致乙方可能仅因甲方付款流程延迟即主张甲方“无力偿付”并单方终止合同。\",\n      \"evidence_text\": \"如一方出现破产、无力偿付、清算或公司解散的情况时\",\n      \"anchor_text\": \"无力偿付\",\n      \"factual_basis\": \"条款在破产、清算等法定终止情形外，并列加入了“无力偿付”这一非严格法律概念的状态描述，且未设定“经法院宣告”或“资不抵债”等法定门槛。\",\n      \"reasoning_basis\": \"甲方作为科研机构常受财政拨款周期影响，付款可能存在非恶意的短期延迟。乙方极易利用“无力偿付”概念的模糊性，将甲方的短期付款延迟解释为无力偿付，进而援引本条在无预警的情况下即刻终止服务，导致科研项目中断、数据丢失等不可逆损失。\",\n      \"normative_basis\": {\n        \"basis_type\": \"contract_logic_rule\",\n        \"basis_title\": \"合同解除权的明确性与可预见性原则\",\n        \"basis_detail\": \"合同解除权作为终止权利义务关系的形成权，其触发条件应当清晰、客观且具有可预见性，避免使用模糊的主观判断标准，以防止一方滥用权利破坏交易的稳定性。\",\n        \"citation_text\": \"\"\n      },\n      \"suggestion\": \"建议删除“无力偿付”表述，或将其修改为“被人民法院宣告破产”或“进入破产清算程序”等具有明确法律界限的状态。\",\n      \"suggestion_minimal\": \"删除“无力偿付、”。\",\n      \"suggestion_optimized\": \"将“无力偿付”修改为“被法院受理破产申请”或“被列入失信被执行人名单且无法履行合同义务”，并增加“因政府财政拨款原因导致的付款延迟，不视为无力偿付”的除外约定。\",\n      \"suggestion_basis\": \"通过将模糊的商业状态替换为明确的司法或行政认定标准，消除乙方利用付款周期进行要挟或单方解约的法律空间，保障甲方科研工作的连续性。\",\n      \"needs_human_review\": true,\n      \"clause_uid\": \"segment_6::6.u12\",\n      \"display_clause_id\": \"6.u12\"\n    }\n  ]\n}"
+      },
+      "normalized_items": [
+        {
+          "risk_code": "termination_trigger_vague",
+          "risk_source_type": "anchored",
+          "dimension": "解除、终止与续约机制",
+          "risk_level": "high",
+          "risk_label": "终止触发条件“无力偿付”定义模糊，赋予乙方单方解释权",
+          "issue": "条款将“无力偿付”列为即刻终止合同的触发条件，但未对其定义进行限定，导致乙方可能仅因甲方付款流程延迟即主张甲方“无力偿付”并单方终止合同。",
+          "evidence_text": "如一方出现破产、无力偿付、清算或公司解散的情况时",
+          "anchor_text": "在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。",
+          "factual_basis": "条款在破产、清算等法定终止情形外，并列加入了“无力偿付”这一非严格法律概念的状态描述，且未设定“经法院宣告”或“资不抵债”等法定门槛。",
+          "reasoning_basis": "甲方作为科研机构常受财政拨款周期影响，付款可能存在非恶意的短期延迟。乙方极易利用“无力偿付”概念的模糊性，将甲方的短期付款延迟解释为无力偿付，进而援引本条在无预警的情况下即刻终止服务，导致科研项目中断、数据丢失等不可逆损失。",
+          "normative_basis": {
+            "basis_type": "contract_logic_rule",
+            "basis_title": "合同解除权的明确性与可预见性原则",
+            "basis_detail": "合同解除权作为终止权利义务关系的形成权，其触发条件应当清晰、客观且具有可预见性，避免使用模糊的主观判断标准，以防止一方滥用权利破坏交易的稳定性。",
+            "citation_text": ""
+          },
+          "suggestion": "建议删除“无力偿付”表述，或将其修改为“被人民法院宣告破产”或“进入破产清算程序”等具有明确法律界限的状态。",
+          "suggestion_minimal": "删除“无力偿付、”。",
+          "suggestion_optimized": "将“无力偿付”修改为“被法院受理破产申请”或“被列入失信被执行人名单且无法履行合同义务”，并增加“因政府财政拨款原因导致的付款延迟，不视为无力偿付”的除外约定。",
+          "suggestion_basis": "通过将模糊的商业状态替换为明确的司法或行政认定标准，消除乙方利用付款周期进行要挟或单方解约的法律空间，保障甲方科研工作的连续性。",
+          "needs_human_review": true,
+          "clause_uid": "segment_6::6.u12",
+          "display_clause_id": "6.u12",
+          "clause_uids": [
+            "segment_6::6.u12"
+          ],
+          "clause_id": "6.u12",
+          "related_clause_ids": [],
+          "related_clause_uids": [],
+          "quality_flags": []
+        }
+      ],
+      "dropped_items": [],
+      "validation_errors": []
+    }
+  ],
+  "accepted_items": [
+    {
+      "risk_code": "termination_trigger_vague",
+      "risk_source_type": "anchored",
+      "dimension": "解除、终止与续约机制",
+      "risk_level": "high",
+      "risk_label": "终止触发条件“无力偿付”定义模糊，赋予乙方单方解释权",
+      "issue": "条款将“无力偿付”列为即刻终止合同的触发条件，但未对其定义进行限定，导致乙方可能仅因甲方付款流程延迟即主张甲方“无力偿付”并单方终止合同。",
+      "evidence_text": "如一方出现破产、无力偿付、清算或公司解散的情况时",
+      "anchor_text": "在本合同有效期内如一方出现破产、无力偿付、清算或公司解散的情况时，则另一方有权在不提前给对方发出任何通知的前提下，即刻通知终止本合同的履行。",
+      "factual_basis": "条款在破产、清算等法定终止情形外，并列加入了“无力偿付”这一非严格法律概念的状态描述，且未设定“经法院宣告”或“资不抵债”等法定门槛。",
+      "reasoning_basis": "甲方作为科研机构常受财政拨款周期影响，付款可能存在非恶意的短期延迟。乙方极易利用“无力偿付”概念的模糊性，将甲方的短期付款延迟解释为无力偿付，进而援引本条在无预警的情况下即刻终止服务，导致科研项目中断、数据丢失等不可逆损失。",
+      "normative_basis": {
+        "basis_type": "contract_logic_rule",
+        "basis_title": "合同解除权的明确性与可预见性原则",
+        "basis_detail": "合同解除权作为终止权利义务关系的形成权，其触发条件应当清晰、客观且具有可预见性，避免使用模糊的主观判断标准，以防止一方滥用权利破坏交易的稳定性。",
+        "citation_text": ""
+      },
+      "suggestion": "建议删除“无力偿付”表述，或将其修改为“被人民法院宣告破产”或“进入破产清算程序”等具有明确法律界限的状态。",
+      "suggestion_minimal": "删除“无力偿付、”。",
+      "suggestion_optimized": "将“无力偿付”修改为“被法院受理破产申请”或“被列入失信被执行人名单且无法履行合同义务”，并增加“因政府财政拨款原因导致的付款延迟，不视为无力偿付”的除外约定。",
+      "suggestion_basis": "通过将模糊的商业状态替换为明确的司法或行政认定标准，消除乙方利用付款周期进行要挟或单方解约的法律空间，保障甲方科研工作的连续性。",
+      "needs_human_review": true,
+      "clause_uid": "segment_6::6.u12",
+      "display_clause_id": "6.u12",
+      "clause_uids": [
+        "segment_6::6.u12"
+      ],
+      "clause_id": "6.u12",
+      "related_clause_ids": [],
+      "related_clause_uids": [],
+      "quality_flags": []
+    }
+  ],
+  "error": null,
+  "duration_seconds": 123.41457666642964,
+  "skipped": []
+}

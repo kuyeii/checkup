@@ -1,0 +1,500 @@
+{
+  "risk_items": [
+    {
+      "risk_id": 1,
+      "dimension": "服务范围与交付内容",
+      "risk_label": "服务范围及交付内容未明确约定",
+      "risk_level": "medium",
+      "issue": "服务信息仅标注“详见投标（响应文件）”，无具体服务项、内容、技术参数等明确描述，易产生歧义",
+      "basis": "[RULE_SCOPE_DF06] 根据原文“| 1 | | 详见投标 （响应文件） | 详细清单及技术参数见后附表 | |”，服务范围与交付内容存在需要进一步人工审核的风险点。",
+      "evidence_text": "| 1 | | 详见投标\n（响应文件） | 详细清单及技术参数见后附表 | |",
+      "suggestion": "补充明确服务项的具体内容、技术参数、交付成果形式及数量等，避免依赖投标文件产生歧义",
+      "clause_id": "3.1",
+      "anchor_text": "详见投标（响应文件）",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_3::3.1",
+      "display_clause_id": "3.1",
+      "clause_uids": [
+        "segment_3::3.1"
+      ],
+      "display_clause_ids": [
+        "3.1"
+      ],
+      "clause_ids": [
+        "3.1"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_SCOPE_DF06",
+      "basis_summary": "根据原文“| 1 | | 详见投标 （响应文件） | 详细清单及技术参数见后附表 | |”，服务范围与交付内容存在需要进一步人工审核的风险点。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        1
+      ]
+    },
+    {
+      "risk_id": 2,
+      "dimension": "服务期限、里程碑与验收标准",
+      "risk_label": "服务期限未明确约定",
+      "risk_level": "medium",
+      "issue": "服务期限、起止日期均为空白，未明确具体服务时长",
+      "basis": "[RULE_ACCEPTANCE_728C] 服务期限、里程碑与验收标准相关条款存在缺失、留白或约定不明确，当前文本不足以支撑稳定履约与争议处理。",
+      "evidence_text": "本合同服务期限为 年；服务期限自 年 月 日起至 年 月 日止。",
+      "suggestion": "补充填写具体的服务期限起止日期及总时长，明确服务周期",
+      "clause_id": "5.1",
+      "anchor_text": "本合同服务期限为 年；服务期限自 年 月 日起至 年 月 日止。",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_5::5.1",
+      "display_clause_id": "5.1",
+      "clause_uids": [
+        "segment_5::5.1"
+      ],
+      "display_clause_ids": [
+        "5.1"
+      ],
+      "clause_ids": [
+        "5.1"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_ACCEPTANCE_728C",
+      "basis_summary": "服务期限、里程碑与验收标准相关条款存在缺失、留白或约定不明确，当前文本不足以支撑稳定履约与争议处理。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        2
+      ]
+    },
+    {
+      "risk_id": 3,
+      "dimension": "服务期限、里程碑与验收标准",
+      "risk_label": "服务质量标准未明确约定",
+      "risk_level": "high",
+      "issue": "条款为模板说明，未根据服务类型补充具体质量标准，无法作为验收依据",
+      "basis": "[RULE_TEMPLATE_001] 模板中存在留白或填写说明，表明正式合同文本尚未定稿，相关权利义务缺失或不确定。",
+      "evidence_text": "（此处需要根据服务的不同具体添加。）",
+      "suggestion": "结合服务类型补充明确服务质量标准（如行业标准、甲方要求等），作为验收核心依据",
+      "clause_id": "6",
+      "anchor_text": "（此处需要根据服务的不同具体添加。）",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_6::6",
+      "display_clause_id": "6",
+      "clause_uids": [
+        "segment_6::6"
+      ],
+      "display_clause_ids": [
+        "6"
+      ],
+      "clause_ids": [
+        "6"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_TEMPLATE_001",
+      "basis_summary": "模板中存在留白或填写说明，表明正式合同文本尚未定稿，相关权利义务缺失或不确定。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+        "命中的条款属于模板说明或留白提示，需要人工判断是否为正式合同内容。",
+        "高风险项默认进入人工复核。"
+      ],
+      "is_boilerplate_related": true,
+      "merged_from_risk_ids": [
+        3
+      ]
+    },
+    {
+      "risk_id": 4,
+      "dimension": "服务期限、里程碑与验收标准",
+      "risk_label": "验收办法未明确约定",
+      "risk_level": "high",
+      "issue": "条款为模板说明，未补充具体验收流程、标准、参与方等，易产生验收争议",
+      "basis": "[RULE_TEMPLATE_001] 模板中存在留白或填写说明，表明正式合同文本尚未定稿，相关权利义务缺失或不确定。",
+      "evidence_text": "七、验收办法（此处需要根据服务的不同具体添加。）",
+      "suggestion": "补充明确验收流程（如初验、终验）、验收标准（与质量标准一致）、验收参与方及异议处理机制",
+      "clause_id": "7",
+      "anchor_text": "七、验收办法（此处需要根据服务的不同具体添加。）",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_7::7",
+      "display_clause_id": "7",
+      "clause_uids": [
+        "segment_7::7"
+      ],
+      "display_clause_ids": [
+        "7"
+      ],
+      "clause_ids": [
+        "7"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_TEMPLATE_001",
+      "basis_summary": "模板中存在留白或填写说明，表明正式合同文本尚未定稿，相关权利义务缺失或不确定。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+        "命中的条款属于模板说明或留白提示，需要人工判断是否为正式合同内容。",
+        "高风险项默认进入人工复核。"
+      ],
+      "is_boilerplate_related": true,
+      "merged_from_risk_ids": [
+        4
+      ]
+    },
+    {
+      "risk_id": 5,
+      "dimension": "付款结算、发票与税费",
+      "risk_label": "合同总金额未明确填写",
+      "risk_level": "medium",
+      "issue": "合同总金额（大写、小写）均为空白，未明确具体合同价款",
+      "basis": "[RULE_PAYMENT_E647] 付款结算、发票与税费相关条款存在缺失、留白或约定不明确，当前文本不足以支撑稳定履约与争议处理。",
+      "evidence_text": "根据中标（成交）通知书中规定，合同总金额为人民币（大写）： （￥ ）",
+      "suggestion": "补充填写具体的合同总金额（大写、小写），与中标通知书一致",
+      "clause_id": "4.1",
+      "anchor_text": "人民币（大写）： （￥ ）",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_4::4.1",
+      "display_clause_id": "4.1",
+      "clause_uids": [
+        "segment_4::4.1"
+      ],
+      "display_clause_ids": [
+        "4.1"
+      ],
+      "clause_ids": [
+        "4.1"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_PAYMENT_E647",
+      "basis_summary": "付款结算、发票与税费相关条款存在缺失、留白或约定不明确，当前文本不足以支撑稳定履约与争议处理。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        5
+      ]
+    },
+    {
+      "risk_id": 6,
+      "dimension": "付款结算、发票与税费",
+      "risk_label": "付款方式存在冲突（两种备选未明确选择）",
+      "risk_level": "medium",
+      "issue": "两种不同付款方式未明确选择，导致付款条件不清晰",
+      "basis": "[RULE_PAYMENT_4804] 付款结算、发票与税费相关条款存在缺失、留白或约定不明确，当前文本不足以支撑稳定履约与争议处理。",
+      "evidence_text": "八、付款方式（二种方式，选择一种，正式合同中须删除此处填写说明）",
+      "suggestion": "明确选择其中一种付款方式，删除未选的付款方式条款，确保付款条件唯一明确",
+      "clause_id": "8.u1、8.1",
+      "anchor_text": "八、付款方式（二种方式，选择一种，正式合同中须删除此处填写说明）",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_8::8.u1",
+      "display_clause_id": "8.u1",
+      "clause_uids": [
+        "segment_8::8.u1",
+        "segment_8::8.1"
+      ],
+      "display_clause_ids": [
+        "8.u1",
+        "8.1"
+      ],
+      "clause_ids": [
+        "8.u1",
+        "8.1"
+      ],
+      "is_multi_clause_risk": true,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_PAYMENT_4804",
+      "basis_summary": "付款结算、发票与税费相关条款存在缺失、留白或约定不明确，当前文本不足以支撑稳定履约与争议处理。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+        "该风险关联多个条款，需要人工综合判断其交叉影响与修改方式。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        6
+      ]
+    },
+    {
+      "risk_id": 7,
+      "dimension": "付款结算、发票与税费",
+      "risk_label": "甲方迟延付款不担责且乙方不得抗辩",
+      "risk_level": "high",
+      "issue": "甲方有权迟延付款不承担违约责任，乙方不得以此抗辩，加重乙方责任",
+      "basis": "[RULE_PAYMENT_75A9] 根据原文“付款前，乙方应向甲方开具等额增值税发票。否则，甲方有权迟延付款并不承担逾期付款违约责任，且乙方不得以此作为拒绝或迟延履行…”，付款结算、发票与税费存在需要进一步人工审核的风险点。",
+      "evidence_text": "付款前，乙方应向甲方开具等额增值税发票。否则，甲方有权迟延付款并不承担逾期付款违约责任，且乙方不得以此作为拒绝或迟延履行本合同项下各项义务的抗辩理由。",
+      "suggestion": "修改为“甲方未按约定付款的，应承担逾期付款违约责任（如按日万分之五支付违约金）；乙方开具发票后，甲方逾期付款的，乙方有权暂停服务”",
+      "clause_id": "8.2",
+      "anchor_text": "甲方有权迟延付款并不承担逾期付款违约责任，且乙方不得以此作为拒绝或迟延履行本合同项下各项义务的抗辩理由",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_8::8.2",
+      "display_clause_id": "8.2",
+      "clause_uids": [
+        "segment_8::8.2"
+      ],
+      "display_clause_ids": [
+        "8.2"
+      ],
+      "clause_ids": [
+        "8.2"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_PAYMENT_75A9",
+      "basis_summary": "根据原文“付款前，乙方应向甲方开具等额增值税发票。否则，甲方有权迟延付款并不承担逾期付款违约责任，且乙方不得以此作为拒绝或迟延履行…”，付款结算、发票与税费存在需要进一步人工审核的风险点。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+        "高风险项默认进入人工复核。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        7
+      ]
+    },
+    {
+      "risk_id": 8,
+      "dimension": "解除、终止与续约机制",
+      "risk_label": "解除合同后资金占用利息过高（LPR四倍）",
+      "risk_level": "medium",
+      "issue": "利息按LPR四倍计取，远超市场合理水平",
+      "basis": "[RULE_TERMINATION_F790] 根据原文“乙方应于合同解除之日起15日内退还甲方全部已支付款项并按一年期贷款市场报价利率四倍计取的资金占用期间的利息”，解除、终止与续约机制存在需要进一步人工审核的风险点。",
+      "evidence_text": "乙方应于合同解除之日起15日内退还甲方全部已支付款项并按一年期贷款市场报价利率四倍计取的资金占用期间的利息",
+      "suggestion": "修改为“按一年期贷款市场报价利率（LPR）计取资金占用期间的利息”，符合市场合理水平",
+      "clause_id": "18.1.2",
+      "anchor_text": "按一年期贷款市场报价利率四倍计取的资金占用期间的利息",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_18::18.1.2",
+      "display_clause_id": "18.1.2",
+      "clause_uids": [
+        "segment_18::18.1.2"
+      ],
+      "display_clause_ids": [
+        "18.1.2"
+      ],
+      "clause_ids": [
+        "18.1.2"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_TERMINATION_F790",
+      "basis_summary": "根据原文“乙方应于合同解除之日起15日内退还甲方全部已支付款项并按一年期贷款市场报价利率四倍计取的资金占用期间的利息”，解除、终止与续约机制存在需要进一步人工审核的风险点。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+        "风险说明涉及法律判断、比例上限或法规口径，必须由人工确认。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        8
+      ]
+    },
+    {
+      "risk_id": 9,
+      "dimension": "违约责任与赔偿机制",
+      "risk_label": "解除合同违约金比例过高（30%）",
+      "risk_level": "high",
+      "issue": "违约金为合同总价款30%，远超通常合理比例（一般不超过20%）",
+      "basis": "[RULE_LIABILITY_2E6B] 根据原文“乙方应支付甲方合同总价款30%的违约金”，违约责任与赔偿机制存在需要进一步人工审核的风险点。",
+      "evidence_text": "乙方应支付甲方合同总价款30%的违约金",
+      "suggestion": "修改为“支付甲方合同总价款不超过20%的违约金”，或明确违约金以实际损失为限",
+      "clause_id": "18.1.4",
+      "anchor_text": "合同总价款30%的违约金",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_18::18.1.4",
+      "display_clause_id": "18.1.4",
+      "clause_uids": [
+        "segment_18::18.1.4"
+      ],
+      "display_clause_ids": [
+        "18.1.4"
+      ],
+      "clause_ids": [
+        "18.1.4"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_LIABILITY_2E6B",
+      "basis_summary": "根据原文“乙方应支付甲方合同总价款30%的违约金”，违约责任与赔偿机制存在需要进一步人工审核的风险点。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+        "高风险项默认进入人工复核。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        9
+      ]
+    },
+    {
+      "risk_id": 10,
+      "dimension": "违约责任与赔偿机制",
+      "risk_label": "违约赔偿范围包含间接损失且过宽",
+      "risk_level": "high",
+      "issue": "赔偿范围包含间接损失且无上限，加重乙方责任",
+      "basis": "[RULE_LIABILITY_BED7] 根据原文“乙方违反本合同的约定，除按本合同的约定承担违约责任外，还应赔偿甲方包括但不限于直接损失、甲方向第三方的违约或赔偿损失、误…”，违约责任与赔偿机制存在需要进一步人工审核的风险点。",
+      "evidence_text": "乙方违反本合同的约定，除按本合同的约定承担违约责任外，还应赔偿甲方包括但不限于直接损失、甲方向第三方的违约或赔偿损失、误工费、鉴定费、损失的评估费、律师费、诉讼费或仲裁费、保全费、保险费、公告费、执行费等全部损失。",
+      "suggestion": "修改为“赔偿甲方实际发生的直接损失，间接损失以可预见为限，且不超过合同总价款的20%”",
+      "clause_id": "15.10",
+      "anchor_text": "包括但不限于直接损失、甲方向第三方的违约或赔偿损失、误工费、鉴定费、损失的评估费、律师费、诉讼费或仲裁费、保全费、保险费、公告费、执行费等全部损失",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_15::15.10",
+      "display_clause_id": "15.10",
+      "clause_uids": [
+        "segment_15::15.10"
+      ],
+      "display_clause_ids": [
+        "15.10"
+      ],
+      "clause_ids": [
+        "15.10"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_LIABILITY_BED7",
+      "basis_summary": "根据原文“乙方违反本合同的约定，除按本合同的约定承担违约责任外，还应赔偿甲方包括但不限于直接损失、甲方向第三方的违约或赔偿损失、误…”，违约责任与赔偿机制存在需要进一步人工审核的风险点。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+        "风险说明涉及法律判断、比例上限或法规口径，必须由人工确认。",
+        "高风险项默认进入人工复核。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        10
+      ]
+    },
+    {
+      "risk_id": 11,
+      "dimension": "违约责任与赔偿机制",
+      "risk_label": "违约金直接扣除无限制",
+      "risk_level": "medium",
+      "issue": "甲方有权无限制从应付价款中扣除违约金，乙方无异议权",
+      "basis": "[RULE_LIABILITY_C857] 根据原文“本合同所涉及全部违约金，甲方均有权从未付合同价款中扣除，乙方对此无异议。”，违约责任与赔偿机制存在需要进一步人工审核的风险点。",
+      "evidence_text": "本合同所涉及全部违约金，甲方均有权从未付合同价款中扣除，乙方对此无异议。",
+      "suggestion": "修改为“甲方有权从未付合同价款中扣除违约金，但扣除金额不得超过应付未付金额的20%，且乙方有权对不合理扣除提出异议”",
+      "clause_id": "15.11",
+      "anchor_text": "甲方均有权从未付合同价款中扣除，乙方对此无异议",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_15::15.11",
+      "display_clause_id": "15.11",
+      "clause_uids": [
+        "segment_15::15.11"
+      ],
+      "display_clause_ids": [
+        "15.11"
+      ],
+      "clause_ids": [
+        "15.11"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_LIABILITY_C857",
+      "basis_summary": "根据原文“本合同所涉及全部违约金，甲方均有权从未付合同价款中扣除，乙方对此无异议。”，违约责任与赔偿机制存在需要进一步人工审核的风险点。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        11
+      ]
+    },
+    {
+      "risk_id": 12,
+      "dimension": "解除、终止与续约机制",
+      "risk_label": "甲方单方解除权过于宽泛且后果严苛",
+      "risk_level": "high",
+      "issue": "甲方单方解除权无明确限制，且乙方需承担多重责任，未平衡双方权利",
+      "basis": "[RULE_TERMINATION_75CF] 根据原文“甲方依据本合同约定或法律规定单方解除合同的，自解除合同的通知到达乙方时，合同自行终止。”，解除、终止与续约机制存在需要进一步人工审核的风险点。",
+      "evidence_text": "甲方依据本合同约定或法律规定单方解除合同的，自解除合同的通知到达乙方时，合同自行终止。",
+      "suggestion": "明确甲方单方解除合同的具体情形（如乙方严重违约），并平衡解除后果，避免过度加重乙方责任",
+      "clause_id": "18.1.1",
+      "anchor_text": "甲方依据本合同约定或法律规定单方解除合同的，自解除合同的通知到达乙方时，合同自行终止",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_18::18.1.1",
+      "display_clause_id": "18.1.1",
+      "clause_uids": [
+        "segment_18::18.1.1"
+      ],
+      "display_clause_ids": [
+        "18.1.1"
+      ],
+      "clause_ids": [
+        "18.1.1"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_TERMINATION_75CF",
+      "basis_summary": "根据原文“甲方依据本合同约定或法律规定单方解除合同的，自解除合同的通知到达乙方时，合同自行终止。”，解除、终止与续约机制存在需要进一步人工审核的风险点。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。",
+        "风险说明涉及法律判断、比例上限或法规口径，必须由人工确认。",
+        "高风险项默认进入人工复核。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        12
+      ]
+    },
+    {
+      "risk_id": 13,
+      "dimension": "付款结算、发票与税费",
+      "risk_label": "履约保证金退还条件不明确",
+      "risk_level": "medium",
+      "issue": "“无质量问题”判断标准模糊，易产生退还争议",
+      "basis": "[RULE_PAYMENT_009A] 根据原文“履约保证金以转帐、电汇或网汇形式汇转至招标人指定帐户并存于甲方处，待项目验收结束后无质量问题一次性无息退还。”，付款结算、发票与税费存在需要进一步人工审核的风险点。",
+      "evidence_text": "履约保证金以转帐、电汇或网汇形式汇转至招标人指定帐户并存于甲方处，待项目验收结束后无质量问题一次性无息退还。",
+      "suggestion": "明确履约保证金退还条件（如验收合格满X个月无质量问题，或质保期满无质量问题）",
+      "clause_id": "9.2",
+      "anchor_text": "待项目验收结束后无质量问题一次性无息退还",
+      "needs_human_review": true,
+      "status": "pending",
+      "clause_uid": "segment_9::9.2",
+      "display_clause_id": "9.2",
+      "clause_uids": [
+        "segment_9::9.2"
+      ],
+      "display_clause_ids": [
+        "9.2"
+      ],
+      "clause_ids": [
+        "9.2"
+      ],
+      "is_multi_clause_risk": false,
+      "auto_apply_allowed": false,
+      "mapping_conflict": false,
+      "basis_rule_id": "RULE_PAYMENT_009A",
+      "basis_summary": "根据原文“履约保证金以转帐、电汇或网汇形式汇转至招标人指定帐户并存于甲方处，待项目验收结束后无质量问题一次性无息退还。”，付款结算、发票与税费存在需要进一步人工审核的风险点。",
+      "review_required_reason": [
+        "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
+      ],
+      "is_boilerplate_related": false,
+      "merged_from_risk_ids": [
+        13
+      ]
+    }
+  ]
+}

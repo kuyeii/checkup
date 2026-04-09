@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/app.py", line 247, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/app.py", line 202, in main
+    missing_multi_outputs, missing_multi_payload = runner.run_risk_reviewer_missing_multi(merged_clauses)
+                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/src/workflow_runner.py", line 835, in run_risk_reviewer_missing_multi
+    sent_inputs, outputs, payload = self._run_risk_workflow(
+                                    ~~~~~~~~~~~~~~~~~~~~~~~^
+        clauses=clauses,
+        ^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        inputs=inputs,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/src/workflow_runner.py", line 358, in _run_risk_workflow
+    outputs = extract_blocking_outputs(response)
+  File "/Volumes/samsang/workflow/前端样式/merged_dyn_fix12fe/src/dify_client.py", line 59, in extract_blocking_outputs
+    raise DifyWorkflowError(f"Workflow returned error: {error}")
+src.dify_client.DifyWorkflowError: Workflow returned error: req_id: a87325f3d7 PluginInvokeError: {"args":{"description":"[models] Error: API request failed with status code 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"},"error_type":"InvokeError","message":"[models] Error: API request failed with status code 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"}

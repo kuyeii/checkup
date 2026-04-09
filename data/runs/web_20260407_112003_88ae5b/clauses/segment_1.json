@@ -1,0 +1,13 @@
+[
+  {
+    "clause_id": "第一条",
+    "clause_title": "测试周期",
+    "clause_text": "第一条 测试周期\n\n自受测件接收开始起 30 天完成。",
+    "segment_id": "segment_1",
+    "segment_title": "第一条 测试周期",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "第一条 测试周期\n\n自受测件接收开始起 30 天完成。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 1.0
+  }
+]

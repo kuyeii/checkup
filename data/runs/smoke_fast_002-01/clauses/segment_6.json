@@ -1,0 +1,46 @@
+[
+  {
+    "clause_id": "1",
+    "clause_title": "",
+    "clause_text": "如出现因乙方原因导致不能按时完成任务的情况，乙方应及时以书面的形式将不能按时完成任务的理由、延误时间通知甲方，并获得甲方同意。",
+    "segment_id": "segment_6",
+    "segment_title": "六、违约责任",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "如出现因乙方原因导致不能按时完成任务的情况，乙方应及时以书面的形式将不能按时完成任务的理由、延误时间通知甲方，并获得甲方同意。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "2",
+    "clause_title": "",
+    "clause_text": "因甲方原因导致乙方任务变更或延误完成，乙方不承担任何相关责任。",
+    "segment_id": "segment_6",
+    "segment_title": "六、违约责任",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "因甲方原因导致乙方任务变更或延误完成，乙方不承担任何相关责任。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "3",
+    "clause_title": "",
+    "clause_text": "乙方未能按本合同约定要求提供周到、及时服务，应向甲方承担违约责任，应向甲方支付违约金，即合同总额 5 %。",
+    "segment_id": "segment_6",
+    "segment_title": "六、违约责任",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "乙方未能按本合同约定要求提供周到、及时服务，应向甲方承担违约责任，应向甲方支付违约金，即合同总额 5 %。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "4",
+    "clause_title": "",
+    "clause_text": "乙方在服务过程中由于乙方原因出现重大安全责任事故的，乙方应向甲方支付合同总额 ％的违约金；给甲方造成重大损失的，乙方还应赔偿甲方因此遭受的实际损失，同时甲方有权解除本合同。",
+    "segment_id": "segment_6",
+    "segment_title": "六、违约责任",
+    "clause_kind": "placeholder_clause",
+    "source_excerpt": "乙方在服务过程中由于乙方原因出现重大安全责任事故的，乙方应向甲方支付合同总额 ％的违约金；给甲方造成重大损失的，乙方还应赔偿甲方因此遭受的实际损失，同时甲方有权解除本合同。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  }
+]

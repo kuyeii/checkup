@@ -1,0 +1,5 @@
+[ai_patch]
+/Volumes/samsang/workflow/4.7/merged_dyn_fix12fe 2/src/docx_apply_patches.py:492: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  revision_date = _dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+
+[risk_comments]

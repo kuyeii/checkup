@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "clause_split_max_concurrency": 3,
+  "dify_max_concurrency": 5,
+  "segment_results_summary": [
+    {
+      "segment_id": "segment_1",
+      "segment_start_idx": 0,
+      "status": "ok",
+      "duration_seconds": 56.072632582858205,
+      "risk_item_count": 2,
+      "by_clause_count": 6
+    },
+    {
+      "segment_id": "segment_2",
+      "segment_start_idx": 1,
+      "status": "ok",
+      "duration_seconds": 38.255211252719164,
+      "risk_item_count": 1,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_3",
+      "segment_start_idx": 2,
+      "status": "ok",
+      "duration_seconds": 53.09782583266497,
+      "risk_item_count": 2,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_4",
+      "segment_start_idx": 3,
+      "status": "ok",
+      "duration_seconds": 61.070901626721025,
+      "risk_item_count": 2,
+      "by_clause_count": 4
+    },
+    {
+      "segment_id": "segment_5",
+      "segment_start_idx": 4,
+      "status": "error",
+      "duration_seconds": 615.3986626677215,
+      "risk_item_count": 0,
+      "by_clause_count": 0
+    },
+    {
+      "segment_id": "segment_6",
+      "segment_start_idx": 5,
+      "status": "ok",
+      "duration_seconds": 53.13590408116579,
+      "risk_item_count": 2,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_7",
+      "segment_start_idx": 6,
+      "status": "ok",
+      "duration_seconds": 61.078243251889944,
+      "risk_item_count": 5,
+      "by_clause_count": 5
+    },
+    {
+      "segment_id": "segment_8",
+      "segment_start_idx": 7,
+      "status": "ok",
+      "duration_seconds": 58.77998262271285,
+      "risk_item_count": 2,
+      "by_clause_count": 1
+    },
+    {
+      "segment_id": "segment_9",
+      "segment_start_idx": 8,
+      "status": "ok",
+      "duration_seconds": 46.24407062679529,
+      "risk_item_count": 3,
+      "by_clause_count": 3
+    },
+    {
+      "segment_id": "segment_10",
+      "segment_start_idx": 9,
+      "status": "ok",
+      "duration_seconds": 18.880597749724984,
+      "risk_item_count": 2,
+      "by_clause_count": 4
+    },
+    {
+      "segment_id": "segment_11",
+      "segment_start_idx": 10,
+      "status": "ok",
+      "duration_seconds": 30.299002001062036,
+      "risk_item_count": 2,
+      "by_clause_count": 7
+    }
+  ],
+  "errors": [
+    {
+      "segment_id": "segment_5",
+      "segment_start_idx": 4,
+      "error_type": "DifyWorkflowError",
+      "error_message": "Workflow returned error: Request to Plugin Daemon Service failed-500",
+      "inputs": {
+        "review_side": "supplier",
+        "contract_type_hint": "service_agreement",
+        "segment_id": "segment_5",
+        "segment_title": "五、合同价款及支付",
+        "clauses_json": "[{\"review_side\": \"supplier\", \"contract_type_hint\": \"service_agreement\", \"clause_uid\": \"segment_5::5.u1\", \"clause_id\": \"5.u1\", \"display_clause_id\": \"5.u1\", \"clause_title\": \"\", \"clause_text\": \"本项目合同总价为人民币 贰拾肆万 元整（¥_240000_元），采取以下第 1 种方式：\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"本项目合同总价为人民币 贰拾肆万 元整（¥_240000_元），采取以下第 1 种方式：\", \"segment_id\": \"segment_5\", \"segment_title\": \"五、合同价款及支付\", \"numbering_confidence\": \"0\", \"title_confidence\": \"0\", \"clause_context\": \"审查视角：supplier\\n合同类型：service_agreement\\n条款编号：5.u1\\n条款标题：\\n条款正文：本项目合同总价为人民币 贰拾肆万 元整（¥_240000_元），采取以下第 1 种方式：\"}, {\"review_side\": \"supplier\", \"contract_type_hint\": \"service_agreement\", \"clause_uid\": \"segment_5::5.1\", \"clause_id\": \"5.1\", \"display_clause_id\": \"5.1\", \"clause_title\": \"\", \"clause_text\": \"1. 合同签订后10日内向中标供应商支付合同总额的60%；项目验收合格后甲方向乙方支付合同总额的40%货款。\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"1. 合同签订后10日内向中标供应商支付合同总额的60%；项目验收合格后甲方向乙方支付合同总额的40%货款。\", \"segment_id\": \"segment_5\", \"segment_title\": \"五、合同价款及支付\", \"numbering_confidence\": \"1\", \"title_confidence\": \"0\", \"clause_context\": \"审查视角：supplier\\n合同类型：service_agreement\\n条款编号：5.1\\n条款标题：\\n条款正文：1. 合同签订后10日内向中标供应商支付合同总额的60%；项目验收合格后甲方向乙方支付合同总额的40%货款。\"}, {\"review_side\": \"supplier\", \"contract_type_hint\": \"service_agreement\", \"clause_uid\": \"segment_5::5.3\", \"clause_id\": \"5.3\", \"display_clause_id\": \"5.3\", \"clause_title\": \"\", \"clause_text\": \"3. 其他付款方式\\n\\n付款条件成就后，甲方将相应款项付至乙方下列指定账户，视为完成付款义务。\\n\\n户名： 浙江永鼎律师事务所 开户行: 中国工商银行朝晖支行\\n\\n账号： 1202022109900115275\", \"clause_kind\": \"contract_clause\", \"source_excerpt\": \"3. 其他付款方式\\n\\n付款条件成就后，甲方将相应款项付至乙方下列指定账户，视为完成付款义务。\\n\\n户名： 浙江永鼎律师事务所 开户行: 中国工商银行朝晖支行\\n\\n账号： 1202022109900115275\", \"segment_id\": \"segment_5\", \"segment_title\": \"五、合同价款及支付\", \"numbering_confidence\": \"1\", \"title_confidence\": \"0\", \"clause_context\": \"审查视角：supplier\\n合同类型：service_agreement\\n条款编号：5.3\\n条款标题：\\n条款正文：3. 其他付款方式\\n\\n付款条件成就后，甲方将相应款项付至乙方下列指定账户，视为完成付款义务。\\n\\n户名： 浙江永鼎律师事务所 开户行: 中国工商银行朝晖支行\\n\\n账号： 1202022109900115275\"}]",
+        "clause_count": "3",
+        "risk_stream": "anchored"
+      },
+      "raw_preview": "{}"
+    }
+  ]
+}

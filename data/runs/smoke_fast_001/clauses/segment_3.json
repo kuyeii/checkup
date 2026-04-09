@@ -1,0 +1,46 @@
+[
+  {
+    "clause_id": "1",
+    "clause_title": "",
+    "clause_text": "甲方指定专人指导乙方的系统运维工作的开展，并提供_必要的支持和方便_。",
+    "segment_id": "segment_3",
+    "segment_title": "三、甲方权利义务",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "甲方指定专人指导乙方的系统运维工作的开展，并提供_必要的支持和方便_。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "2",
+    "clause_title": "",
+    "clause_text": "在合同期内，甲方有权随时对乙方的工作进行监控。如日常工作中或抽检时发现因乙方原因造成的未按合同要求及时提供服务的，甲方有权提出限期整改意见。",
+    "segment_id": "segment_3",
+    "segment_title": "三、甲方权利义务",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "在合同期内，甲方有权随时对乙方的工作进行监控。如日常工作中或抽检时发现因乙方原因造成的未按合同要求及时提供服务的，甲方有权提出限期整改意见。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "3",
+    "clause_title": "",
+    "clause_text": "每_1年_综合验收一次。如验收不合格，乙方须按照甲方验收结果限期整改，如乙方不进行整改或整改后甲方再次验收仍不合格的，甲方有权要求乙方按每追加验收一次按合同价款_5 %的标准支付违约金，直至终止合同。",
+    "segment_id": "segment_3",
+    "segment_title": "三、甲方权利义务",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "每_1年_综合验收一次。如验收不合格，乙方须按照甲方验收结果限期整改，如乙方不进行整改或整改后甲方再次验收仍不合格的，甲方有权要求乙方按每追加验收一次按合同价款_5 %的标准支付违约金，直至终止合同。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "4",
+    "clause_title": "",
+    "clause_text": "_",
+    "segment_id": "segment_3",
+    "segment_title": "三、甲方权利义务",
+    "clause_kind": "placeholder_clause",
+    "source_excerpt": "_",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  }
+]

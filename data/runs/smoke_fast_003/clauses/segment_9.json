@@ -1,0 +1,46 @@
+[
+  {
+    "clause_id": "1",
+    "clause_title": "",
+    "clause_text": "对甲方在履行本合同过程中向乙方提供的业务资料、技术资料等，以及乙方在履行本合同过程中知悉的甲方的所有秘密信息，乙方均应严格保密，未经甲方同意不得自行使用或披露给任何第三方。",
+    "segment_id": "segment_9",
+    "segment_title": "九、保密条款",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "对甲方在履行本合同过程中向乙方提供的业务资料、技术资料等，以及乙方在履行本合同过程中知悉的甲方的所有秘密信息，乙方均应严格保密，未经甲方同意不得自行使用或披露给任何第三方。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "2",
+    "clause_title": "",
+    "clause_text": "乙方如违反上述保密义务，应向甲方支付违约金（合同价款的_5_%）。如给甲方造成的损失超过违约金额，乙方应赔偿甲方实际损失。",
+    "segment_id": "segment_9",
+    "segment_title": "九、保密条款",
+    "clause_kind": "placeholder_clause",
+    "source_excerpt": "乙方如违反上述保密义务，应向甲方支付违约金（合同价款的_5_%）。如给甲方造成的损失超过违约金额，乙方应赔偿甲方实际损失。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "3",
+    "clause_title": "",
+    "clause_text": "乙方违反保密法及相关法律，应承担相应法律责任。",
+    "segment_id": "segment_9",
+    "segment_title": "九、保密条款",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "乙方违反保密法及相关法律，应承担相应法律责任。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "4",
+    "clause_title": "",
+    "clause_text": "本条规定的效力不受本合同效力的影响。",
+    "segment_id": "segment_9",
+    "segment_title": "九、保密条款",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "本条规定的效力不受本合同效力的影响。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  }
+]

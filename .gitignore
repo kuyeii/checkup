@@ -1,0 +1,26 @@
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*/__pycache__/
+*.py[cod]
+.venv/
+
+# Environment files
+.env
+.env.bak
+
+# Frontend build and dependencies
+frontend/node_modules/
+frontend/dist/
+frontend/tsconfig.tsbuildinfo
+
+# Local data and temp artifacts
+data/uploads/
+/.~*.docx
+/1.docx
+/2.docx

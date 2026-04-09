@@ -1,0 +1,57 @@
+[
+  {
+    "clause_id": "1",
+    "clause_title": "",
+    "clause_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
+    "segment_id": "segment_7",
+    "segment_title": "七、知识产权",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "2",
+    "clause_title": "",
+    "clause_text": "未经甲方书面授权，乙方不得将上述文件、资料、数据信息等应用到项目以外的用途。",
+    "segment_id": "segment_7",
+    "segment_title": "七、知识产权",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "未经甲方书面授权，乙方不得将上述文件、资料、数据信息等应用到项目以外的用途。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "3",
+    "clause_title": "",
+    "clause_text": "由于乙方原因造成甲方知识产权被侵害，由乙方负责赔偿与之相关的一切损失。",
+    "segment_id": "segment_7",
+    "segment_title": "七、知识产权",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "由于乙方原因造成甲方知识产权被侵害，由乙方负责赔偿与之相关的一切损失。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "4",
+    "clause_title": "",
+    "clause_text": "当合同期满或合同终止时，乙方应负责按照甲方的要求对资料、数据信息进行移交。",
+    "segment_id": "segment_7",
+    "segment_title": "七、知识产权",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "当合同期满或合同终止时，乙方应负责按照甲方的要求对资料、数据信息进行移交。",
+    "numbering_confidence": 0.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "5",
+    "clause_title": "",
+    "clause_text": "对乙方在履行本合同过程中所涉及的因乙方原因引起的对任何版权和其他知识产权的侵犯，应由乙方自行承担可能发生的一切法律责任费用，甲方不承担任何相关责任和费用。",
+    "segment_id": "segment_7",
+    "segment_title": "七、知识产权",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "对乙方在履行本合同过程中所涉及的因乙方原因引起的对任何版权和其他知识产权的侵犯，应由乙方自行承担可能发生的一切法律责任费用，甲方不承担任何相关责任和费用。",
+    "numbering_confidence": 0.9,
+    "title_confidence": 0.0
+  }
+]

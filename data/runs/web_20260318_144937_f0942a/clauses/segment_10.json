@@ -1,0 +1,46 @@
+[
+  {
+    "clause_id": "",
+    "clause_title": "",
+    "clause_text": "双方在履行合同时如有争议，都应尽最大的努力友好协商解决，如友好协商不能解决时，应按照以下第 1 种方式处理：",
+    "segment_id": "segment_10",
+    "segment_title": "十、争端的解决方法",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "双方在履行合同时如有争议，都应尽最大的努力友好协商解决，如友好协商不能解决时，应按照以下第 1 种方式处理：",
+    "numbering_confidence": 0.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "1",
+    "clause_title": "",
+    "clause_text": "1. 依法向甲方所在地人民法院起诉；",
+    "segment_id": "segment_10",
+    "segment_title": "十、争端的解决方法",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "1. 依法向甲方所在地人民法院起诉；",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "2",
+    "clause_title": "",
+    "clause_text": "2. 提交嘉兴市仲裁委员会申请仲裁。",
+    "segment_id": "segment_10",
+    "segment_title": "十、争端的解决方法",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "2. 提交嘉兴市仲裁委员会申请仲裁。",
+    "numbering_confidence": 1.0,
+    "title_confidence": 0.0
+  },
+  {
+    "clause_id": "",
+    "clause_title": "",
+    "clause_text": "在争议解决的过程中，除受争端影响的部分外，本合同其他部分应继续执行。",
+    "segment_id": "segment_10",
+    "segment_title": "十、争端的解决方法",
+    "clause_kind": "contract_clause",
+    "source_excerpt": "在争议解决的过程中，除受争端影响的部分外，本合同其他部分应继续执行。",
+    "numbering_confidence": 0.0,
+    "title_confidence": 0.0
+  }
+]

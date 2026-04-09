@@ -1,0 +1,39 @@
+[1/6] Extracting DOCX text...
+[2/6] Cleaning text...
+[3/6] Splitting top-level segments...
+Segments: 10 | heading_style=article
+[4/6] Running clause splitter in parallel with anchored pipeline...
+  - clause done segment_1 (1 clauses), submit anchored
+[anchored-parallel] start segment_1
+  - clause done segment_4 (1 clauses), submit anchored
+[anchored-parallel] start segment_4
+  - clause done segment_3 (4 clauses), submit anchored
+[anchored-parallel] start segment_3
+  - clause done segment_2 (2 clauses), submit anchored
+[anchored-parallel] start segment_2
+  - clause done segment_6 (1 clauses), submit anchored
+[anchored-parallel] start segment_6
+  - clause done segment_7 (1 clauses), submit anchored
+  - clause done segment_5 (3 clauses), submit anchored
+  - clause done segment_9 (1 clauses), submit anchored
+  - clause done segment_8 (2 clauses), submit anchored
+[anchored-parallel] end segment_1
+[anchored-parallel] start segment_7
+[anchored-parallel] end segment_3
+[anchored-parallel] start segment_5
+[anchored-parallel] end segment_2
+[anchored-parallel] start segment_9
+[anchored-parallel] end segment_4
+[anchored-parallel] start segment_8
+[anchored-parallel] end segment_9
+[anchored-parallel] end segment_7
+[anchored-parallel] end segment_6
+  - clause done segment_10 (9 clauses), submit anchored
+[anchored-parallel] start segment_10
+[anchored-parallel] end segment_5
+[anchored-parallel] end segment_10
+[anchored-parallel] end segment_8
+Merged clauses: 25
+[5/6] Running risk reviewer workflow...
+[6/6] Validating risk result...
+Run complete. Outputs saved under: /Volumes/samsang/workflow/4.5/merged_dyn_fix12fe 2/data/runs/web_20260407_114404_a1d8c2

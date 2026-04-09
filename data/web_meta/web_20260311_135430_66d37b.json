@@ -1,0 +1,11 @@
+{
+  "status": "failed",
+  "file_name": "批注版_南湖实验室知识产权平台建设项目合同-永鼎.docx",
+  "review_side": "supplier",
+  "contract_type_hint": "service_agreement",
+  "step": "主流程执行失败",
+  "run_id": "web_20260311_135430_66d37b",
+  "updated_at": "2026-03-11T06:00:25.401442Z",
+  "run_dir": "/Volumes/samsang/workflow/一站式v7/contract_review_poc_ui_dynamic_gap_no_bottom_comments/data/runs/web_20260311_135430_66d37b",
+  "error": "Risk result validation failed: 第 7 条风险 clause_uid 不能为空"
+}

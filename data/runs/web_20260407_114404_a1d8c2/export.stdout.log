@@ -1,0 +1,18 @@
+[ai_patch]
+{
+  "output_docx": "/Volumes/samsang/workflow/4.7/merged_dyn_fix12fe 2/data/runs/web_20260407_114404_a1d8c2/ai_patched.docx",
+  "applied": 0,
+  "failed": 0,
+  "unmatched": [],
+  "items": []
+}
+
+[risk_comments]
+{
+  "output_docx": "/Volumes/samsang/workflow/4.7/merged_dyn_fix12fe 2/data/runs/web_20260407_114404_a1d8c2/reviewed_comments.docx",
+  "added_comments": 0,
+  "unmatched": [],
+  "comments": [],
+  "missing_clause_skipped_count": 0,
+  "missing_clause_items": []
+}
