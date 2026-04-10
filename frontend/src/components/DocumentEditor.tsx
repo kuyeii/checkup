@@ -109,28 +109,49 @@ function sanitizeLocatorText(value: string) {
 }
 
 const TERMINAL_PUNCT_SET = new Set(['。', '！', '？', '；', '.', '!', '?', ';', ':', '：'])
+const ENUMERATION_DELIM_SET = new Set(['、', '，', ','])
 
-function dedupeTrailingPunctuationAtBoundary(
+function adjustPatchBoundary(
   fullText: string,
   start: number,
   end: number,
   revisedText: string
 ) {
+  let effectiveStart = start
   let effectiveEnd = end
-  if (!fullText || !revisedText || effectiveEnd >= fullText.length) {
-    return { effectiveEnd, effectiveTargetText: fullText.slice(start, effectiveEnd) }
+
+  if (!fullText) {
+    return { effectiveStart, effectiveEnd, effectiveTargetText: fullText.slice(start, end) }
   }
-  const lastInsertedChar = revisedText[revisedText.length - 1]
-  const boundaryChar = fullText[effectiveEnd]
-  if (
-    lastInsertedChar &&
-    boundaryChar &&
-    lastInsertedChar === boundaryChar &&
-    TERMINAL_PUNCT_SET.has(lastInsertedChar)
-  ) {
-    effectiveEnd += 1
+
+  if (!revisedText) {
+    const leftChar = effectiveStart > 0 ? fullText[effectiveStart - 1] : ''
+    const rightChar = effectiveEnd < fullText.length ? fullText[effectiveEnd] : ''
+    if (rightChar && ENUMERATION_DELIM_SET.has(rightChar)) {
+      effectiveEnd += 1
+    } else if (leftChar && ENUMERATION_DELIM_SET.has(leftChar)) {
+      effectiveStart -= 1
+    }
   }
-  return { effectiveEnd, effectiveTargetText: fullText.slice(start, effectiveEnd) }
+
+  if (revisedText && effectiveEnd < fullText.length) {
+    const lastInsertedChar = revisedText[revisedText.length - 1]
+    const boundaryChar = fullText[effectiveEnd]
+    if (
+      lastInsertedChar &&
+      boundaryChar &&
+      lastInsertedChar === boundaryChar &&
+      TERMINAL_PUNCT_SET.has(lastInsertedChar)
+    ) {
+      effectiveEnd += 1
+    }
+  }
+
+  return {
+    effectiveStart,
+    effectiveEnd,
+    effectiveTargetText: fullText.slice(effectiveStart, effectiveEnd),
+  }
 }
 
 function clamp(n: number, min: number, max: number) {
@@ -934,9 +955,10 @@ export const DocumentEditor = forwardRef<
         }
       }
       startIndex = best.start
-      const deduped = dedupeTrailingPunctuationAtBoundary(currentText, best.start, best.end, revisedText)
-      endIndex = deduped.effectiveEnd
-      effectiveTargetText = deduped.effectiveTargetText
+      const adjusted = adjustPatchBoundary(currentText, best.start, best.end, revisedText)
+      startIndex = adjusted.effectiveStart
+      endIndex = adjusted.effectiveEnd
+      effectiveTargetText = adjusted.effectiveTargetText
       keepUnderlinedDigits = bestUnderline
       replaced = replaceTextRangePreserveStyle(matched, startIndex, endIndex, revisedText, keepUnderlinedDigits, patchId || undefined)
       if (replaced) {
