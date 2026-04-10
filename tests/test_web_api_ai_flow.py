@@ -154,6 +154,21 @@ class WebApiAiFlowTests(unittest.TestCase):
         finally:
             td.cleanup()
 
+    def test_ai_edit_allows_empty_revised_text_for_delete(self):
+        td, run_root, upload_root, meta_root, run_dir = self._setup_run()
+        try:
+            with patch.object(web_api, "RUN_ROOT", run_root), patch.object(web_api, "UPLOAD_ROOT", upload_root), patch.object(
+                web_api, "WEB_META_ROOT", meta_root
+            ), patch.object(web_api.settings, "dify_rewrite_workflow_api_key", "app-rewrite"), patch.object(
+                web_api, "DifyWorkflowClient", _FakeClient
+            ):
+                web_api.ai_apply_risk("smoke_test_006", "1")
+                body = web_api.ai_edit_risk("smoke_test_006", "1", web_api.AiEditBody(revised_text=""))
+                self.assertEqual(body["item"]["ai_rewrite"]["revised_text"], "")
+                self.assertEqual(body["item"]["ai_rewrite"]["comment_text"], "删除“原文A”。")
+        finally:
+            td.cleanup()
+
     def test_ai_reject_clears_ai_rewrite(self):
         td, run_root, upload_root, meta_root, run_dir = self._setup_run()
         try:

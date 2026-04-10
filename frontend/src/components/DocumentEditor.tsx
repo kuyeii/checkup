@@ -870,7 +870,7 @@ export const DocumentEditor = forwardRef<
       new Set([normalizedRawTargetText, sanitizedTargetText].filter(Boolean))
     )
     const revisedText = String(opts.revisedText || '').trim()
-    if (candidateTargets.length === 0 || !revisedText) return false
+    if (candidateTargets.length === 0) return false
     if (candidateTargets.some((candidate) => candidate === revisedText)) return false
 
     let matched: BlockEl | null = null

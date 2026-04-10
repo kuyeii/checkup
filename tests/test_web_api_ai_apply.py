@@ -208,6 +208,79 @@ class WebApiAiApplyTests(unittest.TestCase):
                 self.assertEqual(body["item"]["status"], "pending")
                 self.assertEqual(body["item"]["ai_rewrite"]["revised_text"], "扁平输出改写文本")
 
+    def test_ai_apply_allows_empty_revised_text_for_delete(self):
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            run_root = base / "runs"
+            upload_root = base / "uploads"
+            meta_root = base / "meta"
+            run_dir = run_root / "smoke_test_006"
+            run_dir.mkdir(parents=True, exist_ok=True)
+            upload_root.mkdir(parents=True, exist_ok=True)
+            meta_root.mkdir(parents=True, exist_ok=True)
+
+            (run_dir / "risk_result_validated.json").write_text(
+                json.dumps(_validated_payload(), ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            (run_dir / "merged_clauses.json").write_text(
+                json.dumps(
+                    [
+                        {
+                            "clause_uid": "segment_5::5.2",
+                            "source_excerpt": "乙方赔偿责任上限为合同总价20%。",
+                            "clause_text": "乙方赔偿责任上限为合同总价20%。",
+                        }
+                    ],
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+            (meta_root / "smoke_test_006.json").write_text(
+                json.dumps(
+                    {
+                        "run_id": "smoke_test_006",
+                        "status": "completed",
+                        "review_side": "supplier",
+                        "contract_type_hint": "service_agreement",
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            fake_client = type(
+                "FakeClientDelete",
+                (),
+                {
+                    "__init__": lambda self, **kwargs: None,
+                    "run_workflow": lambda self, **kwargs: {
+                        "data": {
+                            "status": "succeeded",
+                            "outputs": {
+                                "structured_output": {
+                                    "revised_text": "",
+                                    "rationale": "删除该条款",
+                                    "edit_type": "replace",
+                                }
+                            },
+                        }
+                    },
+                },
+            )
+
+            with patch.object(web_api, "RUN_ROOT", run_root), patch.object(web_api, "UPLOAD_ROOT", upload_root), patch.object(
+                web_api, "WEB_META_ROOT", meta_root
+            ), patch.object(web_api.settings, "dify_rewrite_workflow_api_key", "app-rewrite"), patch.object(
+                web_api, "DifyWorkflowClient", fake_client
+            ):
+                body = web_api.ai_apply_risk("smoke_test_006", "201")
+                self.assertTrue(body.get("ok"))
+                self.assertEqual(body["item"]["ai_rewrite"]["state"], "succeeded")
+                self.assertEqual(body["item"]["ai_rewrite"]["revised_text"], "")
+
 
 if __name__ == "__main__":
     unittest.main()

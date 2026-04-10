@@ -583,8 +583,17 @@ export function RiskPanel(props: {
 
                           <button
                             className="btnSmall"
-                            // Allow editing when we have any AI revised text (legacy or new), including locally persisted drafts.
-                            disabled={!Boolean(localDraftById[String(r.risk_id)] ?? (r.ai_rewrite || r.ai_apply)?.revised_text ?? suggestionInsertTextOf(r))}
+                            // Allow editing for succeeded AI suggestions, including delete-style rewrites whose revised_text is empty.
+                            disabled={
+                              !(
+                                String((r.ai_rewrite || r.ai_apply)?.state || '').toLowerCase() === 'succeeded' ||
+                                Boolean(
+                                  localDraftById[String(r.risk_id)] ??
+                                    (r.ai_rewrite || r.ai_apply)?.revised_text ??
+                                    suggestionInsertTextOf(r)
+                                )
+                              )
+                            }
                             onClick={() => {
                               props.onLocateRisk(locatePayloadOf(r))
                               const ai = r.ai_rewrite || r.ai_apply

@@ -1613,11 +1613,11 @@ export default function App() {
       let acceptedTargetText = targetText
       let acceptedRevisedText = revisedText
 
-      if (shouldApplyAi && revisedText && !targetText) {
+      if (shouldApplyAi && !targetText) {
         throw new Error('未能在文档中定位到可替换文本，接受已取消。请先点击“定位原文”确认后再试。')
       }
 
-      if (shouldApplyAi && targetText && revisedText) {
+      if (shouldApplyAi && targetText) {
         const applied =
           editorRef.current?.applyAiPatch({
             patchId: riskId,
@@ -1631,7 +1631,7 @@ export default function App() {
         appliedLocally = true
         const appliedPatch = editorRef.current?.getAppliedAiPatch(riskId)
         if (appliedPatch?.targetText) acceptedTargetText = appliedPatch.targetText
-        if (appliedPatch?.revisedText) acceptedRevisedText = appliedPatch.revisedText
+        if (appliedPatch) acceptedRevisedText = appliedPatch.revisedText
       }
 
       try {
@@ -1641,11 +1641,7 @@ export default function App() {
             const resp = await fetch(`/api/reviews/${runId}/risks/${encodeURIComponent(String(riskId))}/ai_accept`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(
-                acceptedRevisedText
-                  ? { revised_text: acceptedRevisedText, target_text: acceptedTargetText || undefined }
-                  : {}
-              )
+              body: JSON.stringify({ revised_text: acceptedRevisedText, target_text: acceptedTargetText || undefined })
             })
             if (!resp.ok) {
               throw new Error(await readErrorDetail(resp))
@@ -1706,10 +1702,10 @@ export default function App() {
 
       try {
         let acceptedByAiEndpoint = false
-        if (shouldApplyAi && revisedText && !targetText) {
+        if (shouldApplyAi && !targetText) {
           throw new Error('未能在文档中定位到可替换文本')
         }
-        if (shouldApplyAi && targetText && revisedText) {
+        if (shouldApplyAi && targetText) {
           const applied =
             editorRef.current?.applyAiPatch({
               patchId: riskId,
@@ -1723,18 +1719,14 @@ export default function App() {
           appliedLocally = true
           const appliedPatch = editorRef.current?.getAppliedAiPatch(riskId)
           if (appliedPatch?.targetText) acceptedTargetText = appliedPatch.targetText
-          if (appliedPatch?.revisedText) acceptedRevisedText = appliedPatch.revisedText
+          if (appliedPatch) acceptedRevisedText = appliedPatch.revisedText
         }
         if (shouldApplyAi) {
           if (!isPreview) {
             const resp = await fetch(`/api/reviews/${runId}/risks/${encodeURIComponent(String(riskId))}/ai_accept`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(
-                acceptedRevisedText
-                  ? { revised_text: acceptedRevisedText, target_text: acceptedTargetText || undefined }
-                  : {}
-              )
+              body: JSON.stringify({ revised_text: acceptedRevisedText, target_text: acceptedTargetText || undefined })
             })
             if (!resp.ok) {
               throw new Error(await readErrorDetail(resp))
@@ -1833,10 +1825,11 @@ export default function App() {
       if (riskId === undefined || riskId === null) continue
 
       const ai = (item?.ai_rewrite || item?.ai_apply || null) as any
+      const aiState = String(ai?.state || '').toLowerCase()
       const targetText = pickBestPatchTarget(item, String(ai?.target_text || ''))
       const revisedText = String(ai?.revised_text || '').trim()
       const suggestionInsertText = pickSuggestionInsertText(item)
-      const shouldRestorePatch = Boolean(revisedText && targetText)
+      const shouldRestorePatch = Boolean(targetText && (aiState === 'succeeded' || revisedText))
 
       if (shouldRestorePatch) {
         const applied = editor.applyAiPatch({

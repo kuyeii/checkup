@@ -483,6 +483,20 @@ def _clause_text_window(clause_text: str, target_text: str, limit: int = 1200) -
     return clause[:limit]
 
 
+def _parse_rewrite_payload(payload: dict[str, Any] | None) -> tuple[str, str, str] | None:
+    if not isinstance(payload, dict):
+        return None
+    if "revised_text" not in payload:
+        return None
+    revised_raw = payload.get("revised_text")
+    if revised_raw is None:
+        return None
+    revised_text = str(revised_raw).strip()
+    rationale = str(payload.get("rationale") or "").strip()
+    edit_type = str(payload.get("edit_type") or "").strip()
+    return revised_text, rationale, edit_type
+
+
 def _parse_rewrite_outputs(outputs: dict[str, Any]) -> tuple[str, str, str]:
     structured = outputs.get("structured_output")
     structured_dict: dict[str, Any] | None = None
@@ -494,18 +508,13 @@ def _parse_rewrite_outputs(outputs: dict[str, Any]) -> tuple[str, str, str]:
         if isinstance(parsed, dict):
             structured_dict = parsed
 
-    if structured_dict is not None:
-        revised_text = str(structured_dict.get("revised_text") or "").strip()
-        rationale = str(structured_dict.get("rationale") or "").strip()
-        edit_type = str(structured_dict.get("edit_type") or "").strip()
-        if revised_text:
-            return revised_text, rationale, edit_type
+    structured_payload = _parse_rewrite_payload(structured_dict)
+    if structured_payload is not None:
+        return structured_payload
 
-    revised_text = str(outputs.get("revised_text") or "").strip()
-    rationale = str(outputs.get("rationale") or "").strip()
-    edit_type = str(outputs.get("edit_type") or "").strip()
-    if revised_text:
-        return revised_text, rationale, edit_type
+    outputs_payload = _parse_rewrite_payload(outputs)
+    if outputs_payload is not None:
+        return outputs_payload
 
     text_payload = outputs.get("text")
     if not isinstance(text_payload, str):
@@ -514,12 +523,10 @@ def _parse_rewrite_outputs(outputs: dict[str, Any]) -> tuple[str, str, str]:
     parsed = _load_json_with_repair(cleaned)
     if not isinstance(parsed, dict):
         raise HTTPException(status_code=500, detail="rewrite workflow text 不是 JSON 对象")
-    revised_text = str(parsed.get("revised_text") or "").strip()
-    rationale = str(parsed.get("rationale") or "").strip()
-    edit_type = str(parsed.get("edit_type") or "").strip()
-    if not revised_text:
+    parsed_payload = _parse_rewrite_payload(parsed)
+    if parsed_payload is None:
         raise HTTPException(status_code=500, detail="rewrite workflow 返回 revised_text 为空")
-    return revised_text, rationale, edit_type
+    return parsed_payload
 
 
 def _build_ai_comment_text(
@@ -529,6 +536,10 @@ def _build_ai_comment_text(
 ) -> str:
     before = str(target_text or "").strip()
     after = str(revised_text or "").strip()
+    if before and not after:
+        before_piece = _short_text(before, 120) or "原文片段"
+        suffix = "" if before_piece[-1:] in "。！？!?" else "。"
+        return f"删除“{before_piece}”{suffix}"
 
     prefix = 0
     max_prefix = min(len(before), len(after))
@@ -1908,8 +1919,6 @@ def ai_edit_risk(run_id: str, risk_id: str, body: AiEditBody) -> dict[str, Any]:
         raise HTTPException(status_code=409, detail="当前风险不存在可编辑的 AI 改写建议")
 
     revised_text = str(body.revised_text or "").strip()
-    if not revised_text:
-        raise HTTPException(status_code=400, detail="revised_text 不能为空")
 
     preserve_full_clause = _use_full_clause_target(target)
     current_target = _normalize_target_text(

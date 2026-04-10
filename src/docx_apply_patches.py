@@ -481,6 +481,19 @@ def _replace_paragraph_with_revision(
     return changed
 
 
+def _first_explicit_text(payloads: list[tuple[dict[str, Any], str]]) -> str | None:
+    for payload, field in payloads:
+        if not isinstance(payload, dict):
+            continue
+        if field not in payload:
+            continue
+        value = payload.get(field)
+        if value is None:
+            continue
+        return str(value).strip()
+    return None
+
+
 def export_ai_patches_to_docx(
     input_docx: Path,
     risk_path: Path,
@@ -518,9 +531,15 @@ def export_ai_patches_to_docx(
                 continue
 
             accepted_patch = risk.get("accepted_patch") if isinstance(risk.get("accepted_patch"), dict) else {}
-            revised_text = str(accepted_patch.get("after_text") or ai_rewrite.get("revised_text") or ai_apply.get("revised_text") or "").strip()
+            revised_text = _first_explicit_text(
+                [
+                    (accepted_patch, "after_text"),
+                    (ai_rewrite, "revised_text"),
+                    (ai_apply, "revised_text"),
+                ]
+            )
             candidates = _pick_candidates(risk)
-            if not revised_text or not candidates:
+            if revised_text is None or not candidates:
                 failed += 1
                 unmatched.append({"risk_id": risk.get("risk_id"), "reason": "missing_revised_or_target"})
                 continue

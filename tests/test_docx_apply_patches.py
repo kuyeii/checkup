@@ -255,6 +255,53 @@ class DocxApplyPatchesTests(unittest.TestCase):
             self.assertNotIn("。。", visible_text)
             self.assertIn("，甲方向乙方支付合同总额的40%货款。", visible_text)
 
+    def test_export_supports_delete_rewrite_with_empty_revised_text(self):
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            input_docx = base / "in.docx"
+            output_docx = base / "out.docx"
+            risk_json = base / "risk_result_reviewed.json"
+
+            paragraph = "甲乙双方协商解决争议。没有争议的条款，双方应当继续履行。后续按法院判决处理。"
+            target = "没有争议的条款，双方应当继续履行。"
+            _make_minimal_docx(input_docx, f"<w:r><w:t>{paragraph}</w:t></w:r>")
+
+            risk_json.write_text(
+                json.dumps(
+                    {
+                        "risk_result": {
+                            "risk_items": [
+                                {
+                                    "risk_id": 120,
+                                    "status": "accepted",
+                                    "ai_rewrite_decision": "accepted",
+                                    "ai_rewrite": {
+                                        "state": "succeeded",
+                                        "target_text": target,
+                                        "revised_text": "",
+                                    },
+                                }
+                            ]
+                        }
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            report = export_ai_patches_to_docx(input_docx=input_docx, risk_path=risk_json, output_docx=output_docx)
+            self.assertEqual(report["applied"], 1)
+            self.assertEqual(report["failed"], 0)
+
+            root = _read_doc_root(output_docx)
+            visible_text = "".join(
+                root.xpath(".//w:r[not(ancestor::w:del)]//w:t/text()", namespaces=NS)
+            )
+            deleted_text = "".join(root.xpath(".//w:del//w:delText/text()", namespaces=NS))
+            self.assertEqual(visible_text, "甲乙双方协商解决争议。后续按法院判决处理。")
+            self.assertEqual(deleted_text, target)
+
     def test_export_splits_replace_like_frontend_for_acceptance_phrase(self):
         with tempfile.TemporaryDirectory() as td:
             base = Path(td)
