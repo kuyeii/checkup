@@ -2158,7 +2158,7 @@ export default function App() {
           }}
         />
 
-        <main className="contentShell">
+        <main className={`contentShell ${activeNav === 'upload' ? 'contentShell--noScroll' : ''}`}>
           <GlobalTopBar />
 
           {activeNav === 'upload' ? (
