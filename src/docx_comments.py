@@ -256,13 +256,19 @@ def _build_comment_text(risk: dict[str, Any], clauses: list[dict[str, Any]]) -> 
         ]
     )
 
+def _is_included_status(status: str, include_statuses: tuple[str, ...]) -> bool:
+    normalized = str(status or "").strip().lower()
+    allowed = {str(x or "").strip().lower() for x in include_statuses}
+    return normalized in allowed
+
+
 def export_comments_to_docx(
     input_docx: Path,
     output_docx: Path,
     clauses_path: Path,
     risk_path: Path,
     author: str = "合同审查系统",
-    include_statuses: tuple[str, ...] = ("pending", "accepted"),
+    include_statuses: tuple[str, ...] = ("pending", "accepted", "ai_applied"),
 ) -> dict[str, Any]:
     clauses = _unwrap_clauses(_load_json(clauses_path))
     risks = _unwrap_risk_payload(_load_json(risk_path))
@@ -296,7 +302,7 @@ def export_comments_to_docx(
 
         for risk in risks:
             status = str(risk.get("status") or "pending").lower()
-            if status not in include_statuses:
+            if not _is_included_status(status, include_statuses):
                 continue
             risk_source_type = str(risk.get("risk_source_type", "anchored") or "anchored").strip().lower()
             clause_metas = _resolve_clauses_for_risk(risk, by_uid, by_id)
@@ -382,7 +388,7 @@ def main() -> None:
     ap.add_argument("risk_json")
     ap.add_argument("--out", required=True)
     ap.add_argument("--author", default="合同审查系统")
-    ap.add_argument("--statuses", default="pending,accepted")
+    ap.add_argument("--statuses", default="pending,accepted,ai_applied")
     args = ap.parse_args()
 
     statuses = tuple(s.strip() for s in args.statuses.split(",") if s.strip())

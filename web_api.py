@@ -1588,7 +1588,7 @@ def _export_docx_with_reviewed_risks(run_id: str) -> Path:
         "--author",
         "合同审查系统",
         "--statuses",
-        "accepted",
+        "accepted,ai_applied",
     ]
     comment_proc = subprocess.run(
         comment_cmd,
@@ -1889,7 +1889,7 @@ def ai_accept_risk(run_id: str, risk_id: str, body: AiAcceptBody) -> dict[str, A
         target_text=str(ai_rewrite.get("target_text") or current_target or ""),
         revised_text=str(ai_rewrite.get("revised_text") or ""),
     )
-    target["status"] = "ai_applied"
+    target["status"] = "accepted"
     target["ai_rewrite_decision"] = "accepted"
 
     _persist_reviewed_payload(run_dir, reviewed)

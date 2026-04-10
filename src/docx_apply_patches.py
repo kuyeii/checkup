@@ -22,6 +22,7 @@ from .docx_comments import (
 
 XML_SPACE = "{http://www.w3.org/XML/1998/namespace}space"
 TERMINAL_PUNCT = set("。！？；:：.!?;")
+ENUMERATION_DELIMS = set("、，,")
 
 
 def _load_json(path: Path) -> Any:
@@ -42,6 +43,10 @@ def _unwrap_risks(payload: Any) -> list[dict[str, Any]]:
     raise ValueError("Unsupported risk payload structure")
 
 
+def _is_accepted_status(value: Any) -> bool:
+    return str(value or "").strip().lower() in {"accepted", "ai_applied"}
+
+
 def _pick_candidates(risk: dict[str, Any]) -> list[str]:
     accepted_patch = risk.get("accepted_patch") if isinstance(risk.get("accepted_patch"), dict) else {}
     accepted_before = str(accepted_patch.get("before_text") or "").strip()
@@ -54,7 +59,7 @@ def _pick_candidates(risk: dict[str, Any]) -> list[str]:
     status = str(risk.get("status") or "").strip().lower()
     decision = str(risk.get("ai_rewrite_decision") or "").strip().lower()
     ai_state = str(ai_rewrite.get("state") or ai_apply.get("state") or "").strip().lower()
-    ai_first = status == "accepted" and ai_state == "succeeded" and (not decision or decision == "accepted")
+    ai_first = _is_accepted_status(status) and ai_state == "succeeded" and (not decision or decision == "accepted")
 
     locator_resolved_target_text = str(risk.get("locator_resolved_target_text") or "").strip()
 
@@ -97,10 +102,26 @@ def _pick_candidates(risk: dict[str, Any]) -> list[str]:
         return []
 
     ranked = [(rank, text, _compact_text(text)) for rank, text in by_compact.values()]
+    explicit_ai_targets = [
+        text
+        for rank, text, compact in ranked
+        if rank == 0 and len(compact) >= 1
+    ] if ai_first else []
+    explicit_ai_targets.sort(key=lambda item: -len(_compact_text(item)))
+
     strong = [it for it in ranked if len(it[2]) >= 4]
     pool = strong if strong else ranked
     pool.sort(key=lambda item: (item[0], -len(item[2])))
-    return [text for _rank, text, _compact in pool]
+
+    ordered: list[str] = []
+    seen: set[str] = set()
+    for text in explicit_ai_targets + [text for _rank, text, _compact in pool]:
+        compact = _compact_text(text)
+        if not compact or compact in seen:
+            continue
+        seen.add(compact)
+        ordered.append(text)
+    return ordered
 
 
 def _set_text(node: etree._Element, text: str) -> None:
@@ -403,6 +424,24 @@ def _cleanup_short_equal_between_inserts(
     return out
 
 
+def _expand_delete_span_for_enumeration(old_text: str, start: int, end: int, revised_text: str) -> tuple[int, int]:
+    if str(revised_text or ""):
+        return start, end
+    if start < 0 or end <= start or end > len(old_text):
+        return start, end
+
+    left = old_text[start - 1] if start > 0 else ""
+    right = old_text[end] if end < len(old_text) else ""
+
+    if right and right in ENUMERATION_DELIMS:
+        return start, min(len(old_text), end + 1)
+
+    if left and left in ENUMERATION_DELIMS:
+        return max(0, start - 1), end
+
+    return start, end
+
+
 def _replace_paragraph_with_revision(
     paragraph: etree._Element,
     old_text: str,
@@ -423,9 +462,11 @@ def _replace_paragraph_with_revision(
     if end > total_len:
         return False
 
-    # Dedupe trailing punctuation at right boundary (avoid "。。")
     revised_for_diff = revised_text
+    idx, end = _expand_delete_span_for_enumeration(old_text, idx, end, revised_for_diff)
     effective_end = end
+
+    # Dedupe trailing punctuation at right boundary (avoid "。。")
     if revised_for_diff and end < len(old_text):
         tail = revised_for_diff[-1]
         boundary = old_text[end]
@@ -523,7 +564,7 @@ def export_ai_patches_to_docx(
             ai_apply = risk.get("ai_apply") if isinstance(risk.get("ai_apply"), dict) else {}
             ai_state = str(ai_rewrite.get("state") or ai_apply.get("state") or "").strip().lower()
 
-            if status != "accepted":
+            if not _is_accepted_status(status):
                 continue
             if decision and decision != "accepted":
                 continue
