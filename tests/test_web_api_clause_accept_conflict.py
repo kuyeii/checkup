@@ -45,7 +45,7 @@ class WebApiClauseAcceptConflictTests(unittest.TestCase):
         )
         return td, run_root, upload_root, meta_root
 
-    def test_patch_accept_is_blocked_when_same_clause_already_accepted(self):
+    def test_patch_accept_is_allowed_when_same_clause_already_accepted(self):
         td, run_root, upload_root, meta_root = self._setup_run(
             [
                 {"risk_id": 1, "status": "accepted", "clause_uids": ["segment_1::1.1"]},
@@ -56,14 +56,13 @@ class WebApiClauseAcceptConflictTests(unittest.TestCase):
             with patch.object(web_api, "RUN_ROOT", run_root), patch.object(web_api, "UPLOAD_ROOT", upload_root), patch.object(
                 web_api, "WEB_META_ROOT", meta_root
             ):
-                with self.assertRaises(web_api.HTTPException) as ctx:
-                    web_api.patch_risk_status("smoke_test_006", "2", web_api.RiskPatchBody(status="accepted"))
-                self.assertEqual(ctx.exception.status_code, 409)
-                self.assertEqual(ctx.exception.detail, web_api._ACCEPT_OVERLAP_DETAIL)
+                body = web_api.patch_risk_status("smoke_test_006", "2", web_api.RiskPatchBody(status="accepted"))
+                self.assertTrue(body.get("ok"))
+                self.assertEqual(body["item"]["status"], "ai_applied")
         finally:
             td.cleanup()
 
-    def test_ai_accept_is_blocked_when_same_clause_already_accepted(self):
+    def test_ai_accept_is_allowed_when_same_clause_already_accepted(self):
         td, run_root, upload_root, meta_root = self._setup_run(
             [
                 {"risk_id": 1, "status": "accepted", "clause_uids": ["segment_1::1.1"]},
@@ -85,10 +84,10 @@ class WebApiClauseAcceptConflictTests(unittest.TestCase):
             with patch.object(web_api, "RUN_ROOT", run_root), patch.object(web_api, "UPLOAD_ROOT", upload_root), patch.object(
                 web_api, "WEB_META_ROOT", meta_root
             ):
-                with self.assertRaises(web_api.HTTPException) as ctx:
-                    web_api.ai_accept_risk("smoke_test_006", "2", web_api.AiAcceptBody())
-                self.assertEqual(ctx.exception.status_code, 409)
-                self.assertEqual(ctx.exception.detail, web_api._ACCEPT_OVERLAP_DETAIL)
+                body = web_api.ai_accept_risk("smoke_test_006", "2", web_api.AiAcceptBody())
+                self.assertTrue(body.get("ok"))
+                self.assertEqual(body["item"]["status"], "ai_applied")
+                self.assertEqual(body["item"]["ai_rewrite_decision"], "accepted")
         finally:
             td.cleanup()
 
@@ -106,6 +105,25 @@ class WebApiClauseAcceptConflictTests(unittest.TestCase):
                 body = web_api.patch_risk_status("smoke_test_006", "2", web_api.RiskPatchBody(status="accepted"))
                 self.assertTrue(body.get("ok"))
                 self.assertEqual(body["item"]["status"], "accepted")
+        finally:
+            td.cleanup()
+
+    def test_accept_all_accepts_multiple_pending_risks_in_same_clause(self):
+        td, run_root, upload_root, meta_root = self._setup_run(
+            [
+                {"risk_id": 1, "status": "pending", "clause_uids": ["segment_1::1.1"]},
+                {"risk_id": 2, "status": "pending", "clause_uids": ["segment_1::1.1"]},
+            ]
+        )
+        try:
+            with patch.object(web_api, "RUN_ROOT", run_root), patch.object(web_api, "UPLOAD_ROOT", upload_root), patch.object(
+                web_api, "WEB_META_ROOT", meta_root
+            ):
+                body = web_api.accept_all_risks("smoke_test_006")
+                self.assertTrue(body.get("ok"))
+                self.assertEqual(body["summary"], {"accepted": 2, "skipped": 0})
+                statuses = {str(item["risk_id"]): item["status"] for item in body["risk_items"]}
+                self.assertEqual(statuses, {"1": "accepted", "2": "accepted"})
         finally:
             td.cleanup()
 
