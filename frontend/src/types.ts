@@ -1,3 +1,5 @@
+export type ReviewSideOption = '甲方' | '乙方'
+
 export type ReviewMeta = {
   run_id: string
   status: 'queued' | 'running' | 'completed' | 'failed'

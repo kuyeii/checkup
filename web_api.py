@@ -1237,6 +1237,24 @@ def _list_history_items(limit: int) -> list[dict[str, Any]]:
     return items[:limit]
 
 
+def _normalize_review_side(value: str | None) -> str:
+    raw = str(value or "").strip()
+    mapping = {
+        "supplier": "乙方",
+        "vendor": "乙方",
+        "party_b": "乙方",
+        "乙方": "乙方",
+        "customer": "甲方",
+        "buyer": "甲方",
+        "party_a": "甲方",
+        "甲方": "甲方",
+    }
+    normalized = mapping.get(raw.lower(), mapping.get(raw, ""))
+    if normalized:
+        return normalized
+    raise HTTPException(status_code=400, detail='review_side 仅支持"甲方"或"乙方"')
+
+
 def _run_pipeline(*, run_id: str, file_path: Path, file_name: str, review_side: str, contract_type_hint: str) -> None:
     run_dir = RUN_ROOT / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -1400,8 +1418,13 @@ def _run_pipeline(*, run_id: str, file_path: Path, file_name: str, review_side: 
 
 @app.get("/api/config")
 def get_config() -> dict[str, str]:
+    normalized_review_side = '乙方'
+    try:
+        normalized_review_side = _normalize_review_side(settings.review_side) if str(settings.review_side or '').strip() else '乙方'
+    except HTTPException:
+        normalized_review_side = '乙方'
     return {
-        "review_side": settings.review_side,
+        "review_side": normalized_review_side,
         "contract_type_hint": settings.contract_type_hint,
     }
 
@@ -1417,6 +1440,7 @@ async def create_review(
     review_side: str = Form(settings.review_side),
     contract_type_hint: str = Form("service_agreement"),
 ) -> dict[str, Any]:
+    normalized_review_side = _normalize_review_side(review_side or settings.review_side)
     suffix = Path(file.filename or "contract.docx").suffix.lower()
     if suffix != ".docx":
         raise HTTPException(status_code=400, detail="目前仅支持 .docx 文件")
@@ -1437,7 +1461,7 @@ async def create_review(
         {
             "status": "queued",
             "file_name": file.filename,
-            "review_side": review_side,
+            "review_side": normalized_review_side,
             "contract_type_hint": contract_type_hint,
             "step": "任务已创建，等待执行",
             "progress": 8,
@@ -1449,7 +1473,7 @@ async def create_review(
             run_id=run_id,
             file_path=upload_path,
             file_name=file.filename or upload_path.name,
-            review_side=review_side,
+            review_side=normalized_review_side,
             contract_type_hint=contract_type_hint,
         ),
         daemon=True,

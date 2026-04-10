@@ -1,11 +1,24 @@
 import React, { useRef, useState } from 'react'
 import { UploadCloud, FileText, ShieldCheck, Zap, Lightbulb, PenTool, CheckCircle2 } from 'lucide-react'
-import type { ReviewHistoryItem } from '../types'
+import type { ReviewHistoryItem, ReviewSideOption } from '../types'
+
+const reviewSideCopy: Record<ReviewSideOption, { title: string; description: string }> = {
+  甲方: {
+    title: '甲方视角',
+    description: '更关注权利保障、交付标准、验收条件与违约追责。'
+  },
+  乙方: {
+    title: '乙方视角',
+    description: '更关注责任边界、付款安排、履约压力与风险限制。'
+  }
+}
 
 export function UploadDashboard(props: {
   file: File | null
   setFile: (file: File | null) => void
   isReviewing: boolean
+  reviewSide: ReviewSideOption | null
+  onReviewSideChange: (side: ReviewSideOption) => void
   onStartReview: () => void
   latestReview: ReviewHistoryItem | null
   recentItems: ReviewHistoryItem[]
@@ -67,7 +80,7 @@ export function UploadDashboard(props: {
               className="hiddenInput"
               onChange={(event) => pickFile(event.target.files?.[0] || null)}
             />
-            
+
             <div className="uploadIconWrap">
               <UploadCloud size={32} className="text-[#00b365]" />
             </div>
@@ -78,9 +91,43 @@ export function UploadDashboard(props: {
               支持 <span className="inline-flex items-center gap-1 bg-gray-50 px-2 py-1 rounded border border-gray-200 text-[10px] md:text-xs font-medium mx-1"><FileText size={12} className="text-blue-600" /> DOCX</span>
             </div>
             {props.file && (
-              <div className="selectedFilePill">
-                已选择: {props.file.name}
-              </div>
+              <>
+                <div className="selectedFilePill">
+                  已选择: {props.file.name}
+                </div>
+
+                <div
+                  className="reviewSidePanel"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div className="reviewSidePanelHeader">
+                    <div className="reviewSidePanelLabel">请选择本次审查立场</div>
+                    <div className="reviewSidePanelSubtext">不同立场会影响风险识别与建议表达的侧重点。</div>
+                  </div>
+                  <div className="reviewSideToggle" role="radiogroup" aria-label="审查立场选择">
+                    {(['甲方', '乙方'] as ReviewSideOption[]).map((side) => {
+                      const active = props.reviewSide === side
+                      const copy = reviewSideCopy[side]
+                      return (
+                        <button
+                          key={side}
+                          type="button"
+                          role="radio"
+                          aria-checked={active}
+                          className={`reviewSideToggleBtn ${active ? 'reviewSideToggleBtn--active' : ''}`}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            props.onReviewSideChange(side)
+                          }}
+                        >
+                          <span className="reviewSideToggleTitle">{copy.title}</span>
+                          <span className="reviewSideToggleDesc">{copy.description}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -88,7 +135,7 @@ export function UploadDashboard(props: {
         <div className="uploadActions shrink-0">
           <button
             className="startReviewBtn"
-            disabled={!props.file || props.isReviewing}
+            disabled={!props.file || !props.reviewSide || props.isReviewing}
             onClick={props.onStartReview}
           >
             {props.isReviewing ? '审查中…' : '开始审查'}

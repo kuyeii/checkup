@@ -9,7 +9,7 @@ import { TopBar } from './components/TopBar'
 import { GlobalTopBar } from './components/GlobalTopBar'
 import { UploadDashboard } from './components/UploadDashboard'
 import { ReviewProgress } from './components/ReviewProgress'
-import type { EditSummary, ReviewHistoryItem, ReviewMeta, ReviewResultPayload } from './types'
+import type { EditSummary, ReviewHistoryItem, ReviewMeta, ReviewResultPayload, ReviewSideOption } from './types'
 
 async function sleep(ms: number) {
   await new Promise((r) => setTimeout(r, ms))
@@ -537,6 +537,7 @@ export default function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const prevNavRef = useRef<NavKey>('upload')
   const [file, setFile] = useState<File | null>(null)
+  const [selectedReviewSide, setSelectedReviewSide] = useState<ReviewSideOption | null>(null)
   const [runId, setRunId] = useState<string | null>(null)
   const [meta, setMeta] = useState<ReviewMeta | null>(null)
   const [result, setResult] = useState<ReviewResultPayload | null>(null)
@@ -595,6 +596,11 @@ export default function App() {
       title,
       message: String(message || '请求失败')
     })
+  }, [])
+
+  const handleUploadFileChange = useCallback((nextFile: File | null) => {
+    setFile(nextFile)
+    setSelectedReviewSide(null)
   }, [])
 
   useEffect(() => {
@@ -814,7 +820,7 @@ export default function App() {
       progress: 36,
       file_name: '示例合同.docx'
     })
-  }, [navigate])
+  }, [handleUploadFileChange, navigate])
 
   useEffect(() => {
     if (!previewWaitingRef.current || !previewAutoCompleteRef.current) return
@@ -1118,7 +1124,7 @@ export default function App() {
   }, [applyLoadedReviewWorkspace, loadReviewWorkspace, maybeAutoApplyAllForRun, navigate])
 
   const startReview = useCallback(async () => {
-    if (!file) return
+    if (!file || !selectedReviewSide) return
     setIsReviewing(true)
     setResult(null)
     setMeta(null)
@@ -1127,7 +1133,7 @@ export default function App() {
 
     const form = new FormData()
     form.append('file', file)
-    form.append('review_side', serverConfig?.review_side ?? 'supplier')
+    form.append('review_side', selectedReviewSide)
     form.append('contract_type_hint', serverConfig?.contract_type_hint ?? 'service_agreement')
 
     const resp = await fetch('/api/reviews', { method: 'POST', body: form })
@@ -1167,7 +1173,7 @@ export default function App() {
       )
     )
     navigate(buildReviewPath(data.run_id))
-  }, [file, navigate, serverConfig])
+  }, [file, navigate, selectedReviewSide, serverConfig])
 
   useEffect(() => {
     let cancelled = false
@@ -1228,7 +1234,7 @@ export default function App() {
               nextFile = new File([blob], fileName, { type: blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
             }
             if (cancelled) return
-            setFile(nextFile)
+            handleUploadFileChange(nextFile)
             setResult(payload)
             setIsReviewing(false)
             navigate(buildReviewPath(runId), { replace: true })
@@ -1309,7 +1315,7 @@ export default function App() {
       cancelled = true
       abortController.abort()
     }
-  }, [runId, file, activeNav, result, maybeAutoApplyAllForRun, refreshHistoryFromApi, navigate])
+  }, [runId, file, activeNav, result, maybeAutoApplyAllForRun, refreshHistoryFromApi, navigate, selectedReviewSide])
 
   useEffect(() => {
     if (historyFetchOnceRef.current) return
@@ -2020,7 +2026,7 @@ export default function App() {
     navigate(pathForNav('upload'))
     setRouteHydratingRunId(null)
     setIsReviewing(false)
-    setFile(null)
+    handleUploadFileChange(null)
     setRunId(null)
     setMeta(null)
     setResult(null)
@@ -2159,14 +2165,16 @@ export default function App() {
           }}
         />
 
-        <main className={`contentShell ${activeNav === 'upload' ? 'contentShell--noScroll' : ''}`}>
+        <main className="contentShell">
           <GlobalTopBar />
 
           {activeNav === 'upload' ? (
             <UploadDashboard
               file={file}
-              setFile={setFile}
+              setFile={handleUploadFileChange}
               isReviewing={isReviewing}
+              reviewSide={selectedReviewSide}
+              onReviewSideChange={setSelectedReviewSide}
               onStartReview={async () => {
                 try {
                   await startReview()
