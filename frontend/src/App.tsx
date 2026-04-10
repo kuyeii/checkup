@@ -546,12 +546,14 @@ export default function App() {
   const [historyEntries, setHistoryEntries] = useState<SessionReviewEntry[]>([])
   const [serverConfig, setServerConfig] = useState<{ review_side: string; contract_type_hint: string } | null>(null)
   const [lastAcceptAllRiskIds, setLastAcceptAllRiskIds] = useState<string[]>([])
+  const [docEditorReady, setDocEditorReady] = useState(false)
   const [dialog, setDialog] = useState<{ open: boolean; title: string; message: string }>({
     open: false,
     title: '提示',
     message: ''
   })
   const historyEntriesRef = useRef<SessionReviewEntry[]>([])
+  const restoredAcceptedCommentRunRef = useRef<string | null>(null)
 
   // Some deployments only support the legacy AI endpoint (/ai_apply).
   // We auto-detect support for the newer AI rewrite endpoints once and cache the result
@@ -730,7 +732,15 @@ export default function App() {
 
   useEffect(() => {
     setLastAcceptAllRiskIds([])
+    restoredAcceptedCommentRunRef.current = null
+    setDocEditorReady(false)
   }, [runId])
+
+  useEffect(() => {
+    if (activeNav !== 'result') {
+      setDocEditorReady(false)
+    }
+  }, [activeNav])
 
   useEffect(() => {
     historyEntriesRef.current = historyEntries
@@ -1794,6 +1804,66 @@ export default function App() {
     setLastAcceptAllRiskIds([])
   }, [lastAcceptAllRiskIds, acceptedRiskIds, onSetRiskStatus])
 
+  useEffect(() => {
+    if (!runId || !file || !result || !docEditorReady) return
+    const items = (result.risk_result_validated?.risk_result?.risk_items || []) as any[]
+    const acceptedItems = items.filter((item) => item && isAcceptedRiskStatus(item.status))
+    if (acceptedItems.length === 0) {
+      restoredAcceptedCommentRunRef.current = null
+      return
+    }
+
+    const restoreKey = `${runId}:${acceptedItems
+      .map((item) => `${item.risk_id}:${String(item.status || '')}:${String(item.ai_rewrite_decision || '')}`)
+      .join('|')}`
+    if (restoredAcceptedCommentRunRef.current === restoreKey) return
+
+    const editor = editorRef.current
+    if (!editor) return
+
+    let restoredCount = 0
+    for (const item of acceptedItems) {
+      const riskId = item?.risk_id
+      if (riskId === undefined || riskId === null) continue
+
+      const ai = (item?.ai_rewrite || item?.ai_apply || null) as any
+      const targetText = pickBestPatchTarget(item, String(ai?.target_text || ''))
+      const revisedText = String(ai?.revised_text || '').trim()
+      const suggestionInsertText = pickSuggestionInsertText(item)
+      const shouldRestorePatch = Boolean(revisedText && targetText)
+
+      if (shouldRestorePatch) {
+        const applied = editor.applyAiPatch({
+          patchId: riskId,
+          targetText,
+          revisedText,
+          preserveRawTarget: isAggregateRiskLike(item)
+        })
+        if (applied || editor.getAppliedAiPatch(riskId)) {
+          restoredCount += 1
+          continue
+        }
+      }
+
+      if (suggestionInsertText) {
+        const inserted = editor.addSuggestionInsertComment({
+          riskId,
+          suggestionText: suggestionInsertText,
+          targetText,
+          anchorText: String(item?.anchor_text || ''),
+          evidenceText: String(item?.evidence_text || ''),
+          clauseUids:
+            (item?.clause_uids && item?.clause_uids.length > 0 ? item.clause_uids : item?.related_clause_uids) || []
+        })
+        if (inserted) restoredCount += 1
+      }
+    }
+
+    if (restoredCount > 0 || acceptedItems.length === 0) {
+      restoredAcceptedCommentRunRef.current = restoreKey
+    }
+  }, [runId, file, result, docEditorReady])
+
   const onAiEditRisk = useCallback(
     async (riskId: number | string, revisedText: string) => {
       if (!runId) throw new Error('当前没有可操作的 run_id')
@@ -2019,9 +2089,7 @@ export default function App() {
                 onGoHistory={goHistoryPage}
                 downloadUrl={result?.download_url || null}
                 onAcceptAllRisks={onAcceptAllRisks}
-                onUndoAcceptAllRisks={onUndoAcceptAllRisks}
                 canAcceptAllRisks={pendingRiskCount > 0}
-                canUndoAcceptAllRisks={lastAcceptAllRiskIds.length > 0 || acceptedRiskIds.length > 0}
               />
 
               <div className="mainGrid">
@@ -2035,6 +2103,7 @@ export default function App() {
                     file={file}
                     edits={edits}
                     onEditsChange={setEdits}
+                    onReadyChange={setDocEditorReady}
                     riskHighlights={riskHighlights}
                     clauseTextByUid={clauseTextByUid}
                     className="docEditor"

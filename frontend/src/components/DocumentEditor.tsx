@@ -331,6 +331,7 @@ export const DocumentEditor = forwardRef<
     file: File | null
     edits: EditSummary[]
     onEditsChange: (edits: EditSummary[]) => void
+    onReadyChange?: (ready: boolean) => void
     riskHighlights?: string[]
     clauseTextByUid?: Record<string, string>
     className?: string
@@ -362,6 +363,10 @@ export const DocumentEditor = forwardRef<
   const cardElsRef = useRef<Map<string, HTMLButtonElement>>(new Map())
   const sourceElsRef = useRef<Map<string, HTMLElement>>(new Map())
   const appliedAiPatchMapRef = useRef<Map<string, AppliedAiPatchRecord>>(new Map())
+
+  useEffect(() => {
+    props.onReadyChange?.(ready)
+  }, [ready, props.onReadyChange])
 
   const applyRiskHighlights = () => {
     const highlights = (props.riskHighlights || []).map((t) => normalizeSearchText(t)).filter(Boolean)

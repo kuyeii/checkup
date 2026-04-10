@@ -656,7 +656,7 @@ export function RiskPanel(props: {
                 </div>
                 {acceptedCount > 0 ? (
                   <>
-                    <div className="riskEmptyStateDesc">本次风险已全部接受。你可以点击下方按钮，或使用顶部操作栏恢复全部到未接受状态。</div>
+                    <div className="riskEmptyStateDesc">本次风险已全部接受。如需继续调整，可以先恢复为待处理，再重新逐条处理。</div>
                     {props.onUndoAcceptAllRisks ? (
                       <button
                         className="btnSmall btnSmall--primary"
@@ -669,7 +669,7 @@ export function RiskPanel(props: {
                           }
                         }}
                       >
-                        恢复全部到未接受
+                        恢复全部为待处理
                       </button>
                     ) : null}
                   </>
