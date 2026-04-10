@@ -269,8 +269,6 @@ const LEADING_CLAUSE_LABEL_PATTERNS = [
   /^\s*[A-Za-z]+[0-9][A-Za-z0-9]*\s*[:：，,]\s*/u,
 ]
 const CLAUSE_REF_SPLIT_RE = /\s*[、，,；;/]\s*/
-const ACCEPT_OVERLAP_MESSAGE = '该风险点与已接受修改存在重叠，请手动处理或先撤销前一条修改。'
-
 function stripLeadingClauseLabel(value: string) {
   let cleaned = String(value || '').trim()
   let changed = true
@@ -888,6 +886,20 @@ export default function App() {
   }, [result])
 
   const riskCount = result?.risk_result_validated?.risk_result?.risk_items?.length || 0
+  const pendingRiskCount = useMemo(() => {
+    const items = result?.risk_result_validated?.risk_result?.risk_items || []
+    return items.filter((r) => {
+      const status = String(r?.status || 'pending').trim().toLowerCase()
+      return status === '' || status === 'pending'
+    }).length
+  }, [result])
+  const acceptedRiskIds = useMemo(() => {
+    const items = result?.risk_result_validated?.risk_result?.risk_items || []
+    return items
+      .filter((r) => isAcceptedRiskStatus(r?.status))
+      .map((r) => String(r.risk_id))
+      .filter(Boolean)
+  }, [result])
   const riskStats = useMemo(() => {
     const items = result?.risk_result_validated?.risk_result?.risk_items || []
     const next = { total: items.length, high: 0, medium: 0, low: 0 }
@@ -1514,17 +1526,6 @@ export default function App() {
     [runId, result]
   )
 
-  const assertRiskAcceptAllowed = useCallback(
-    (riskId: number | string, riskItems?: any[]) => {
-      const items = (riskItems || result?.risk_result_validated?.risk_result?.risk_items || []) as any[]
-      const clauseAliasMap = buildClauseUidAliasMap(result?.merged_clauses || [])
-      if (hasClauseAcceptOverlap(items, String(riskId), clauseAliasMap)) {
-        throw new Error(ACCEPT_OVERLAP_MESSAGE)
-      }
-    },
-    [result]
-  )
-
   const onRejectRisk = useCallback(
     async (riskId: number | string) => {
       if (!runId) throw new Error('当前没有可操作的 run_id')
@@ -1549,9 +1550,6 @@ export default function App() {
   const onSetRiskStatus = useCallback(
     async (riskId: number | string, status: 'pending' | 'accepted' | 'rejected') => {
       if (!runId) throw new Error('当前没有可操作的 run_id')
-      if (status === 'accepted') {
-        assertRiskAcceptAllowed(riskId)
-      }
       let handledByPayload = false
       if (!String(runId).startsWith('preview_')) {
         const resp = await fetch(`/api/reviews/${runId}/risks/${encodeURIComponent(String(riskId))}`, {
@@ -1579,7 +1577,7 @@ export default function App() {
         editorRef.current?.removeSuggestionInsertComment(riskId)
       }
     },
-    [runId, mergeUpdatedRisk, assertRiskAcceptAllowed]
+    [runId, mergeUpdatedRisk]
   )
 
   const onAcceptRisk = useCallback(
@@ -1587,7 +1585,6 @@ export default function App() {
       if (!runId) throw new Error('当前没有可操作的 run_id')
       const isPreview = String(runId).startsWith('preview_')
       const items = (result?.risk_result_validated?.risk_result?.risk_items || []) as any[]
-      assertRiskAcceptAllowed(riskId, items)
       const found = items.find((it) => String(it?.risk_id) === String(riskId))
       const ai = (found?.ai_rewrite || found?.ai_apply || null) as any
       const targetText = pickBestPatchTarget(found, String(ai?.target_text || ''))
@@ -1665,23 +1662,14 @@ export default function App() {
         throw error
       }
     },
-    [onSetRiskStatus, runId, result, mergeUpdatedRisk, assertRiskAcceptAllowed]
+    [onSetRiskStatus, runId, result, mergeUpdatedRisk]
   )
 
   const onAcceptAllRisks = useCallback(async () => {
     if (!runId) throw new Error('当前没有可操作的 run_id')
     const isPreview = String(runId).startsWith('preview_')
     const currentItems = (result?.risk_result_validated?.risk_result?.risk_items || []) as any[]
-    const clauseAliasMap = buildClauseUidAliasMap(result?.merged_clauses || [])
-    const acceptedClauseKeys = new Set<string>()
-    let hasOverlapConflict = false
     const acceptedRiskIds: string[] = []
-    for (const item of currentItems) {
-      if (!item || typeof item !== 'object') continue
-      if (!isAcceptedRiskStatus(item.status)) continue
-      if (isMissingClauseRisk(item)) continue
-      for (const key of collectRiskClauseKeys(item, clauseAliasMap)) acceptedClauseKeys.add(key)
-    }
     const failedRiskIds: string[] = []
 
     for (const item of currentItems) {
@@ -1699,12 +1687,8 @@ export default function App() {
       let appliedLocally = false
       let acceptedTargetText = targetText
       let acceptedRevisedText = revisedText
-      const clauseKeys = isMissingClauseRisk(item) ? [] : collectRiskClauseKeys(item, clauseAliasMap)
 
       try {
-        if (clauseKeys.length > 0 && clauseKeys.some((key) => acceptedClauseKeys.has(key))) {
-          throw new Error(ACCEPT_OVERLAP_MESSAGE)
-        }
         let acceptedByAiEndpoint = false
         if (shouldApplyAi && revisedText && !targetText) {
           throw new Error('未能在文档中定位到可替换文本')
@@ -1761,12 +1745,7 @@ export default function App() {
           }
         }
         acceptedRiskIds.push(String(riskId))
-        for (const key of clauseKeys) acceptedClauseKeys.add(key)
       } catch (error) {
-        const message = String((error as any)?.message || error || '')
-        if (message.includes('该风险点与已接受修改存在重叠')) {
-          hasOverlapConflict = true
-        }
         if (appliedLocally) {
           editorRef.current?.revertAiPatch(riskId)
         }
@@ -1779,9 +1758,6 @@ export default function App() {
       if (acceptedRiskIds.length > 0) {
         // Even if some items fail, allow "一键撤销接受全部" to rollback succeeded ones.
         setLastAcceptAllRiskIds(acceptedRiskIds)
-      }
-      if (hasOverlapConflict) {
-        throw new Error(ACCEPT_OVERLAP_MESSAGE)
       }
       throw new Error(`以下风险未接受成功：${failedRiskIds.join('、')}`)
     }
@@ -1801,9 +1777,10 @@ export default function App() {
   )
 
   const onUndoAcceptAllRisks = useCallback(async () => {
-    if (lastAcceptAllRiskIds.length === 0) return
+    const targetRiskIds = lastAcceptAllRiskIds.length > 0 ? lastAcceptAllRiskIds : acceptedRiskIds
+    if (targetRiskIds.length === 0) return
     const failed: string[] = []
-    for (const riskId of lastAcceptAllRiskIds) {
+    for (const riskId of targetRiskIds) {
       try {
         await onSetRiskStatus(riskId, 'pending')
       } catch {
@@ -1815,7 +1792,7 @@ export default function App() {
       throw new Error(`以下风险撤销失败：${failed.join('、')}`)
     }
     setLastAcceptAllRiskIds([])
-  }, [lastAcceptAllRiskIds, onSetRiskStatus])
+  }, [lastAcceptAllRiskIds, acceptedRiskIds, onSetRiskStatus])
 
   const onAiEditRisk = useCallback(
     async (riskId: number | string, revisedText: string) => {
@@ -2043,8 +2020,8 @@ export default function App() {
                 downloadUrl={result?.download_url || null}
                 onAcceptAllRisks={onAcceptAllRisks}
                 onUndoAcceptAllRisks={onUndoAcceptAllRisks}
-                canAcceptAllRisks={riskStats.total > 0}
-                canUndoAcceptAllRisks={lastAcceptAllRiskIds.length > 0}
+                canAcceptAllRisks={pendingRiskCount > 0}
+                canUndoAcceptAllRisks={lastAcceptAllRiskIds.length > 0 || acceptedRiskIds.length > 0}
               />
 
               <div className="mainGrid">
@@ -2083,6 +2060,8 @@ export default function App() {
                       onRejectRisk={onRejectRisk}
                       onSetRiskStatus={onSetRiskStatus}
                       onAcceptAllRisks={onAcceptAllRisks}
+                      onUndoAcceptAllRisks={onUndoAcceptAllRisks}
+                      canUndoAcceptAllRisks={lastAcceptAllRiskIds.length > 0 || acceptedRiskIds.length > 0}
                       onAiApplyRisk={onAiApplyRisk}
                       onAiAcceptRisk={onAiAcceptRisk}
                       onAiEditRisk={onAiEditRisk}

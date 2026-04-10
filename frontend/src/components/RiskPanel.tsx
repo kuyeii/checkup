@@ -2,13 +2,16 @@ import React, { useEffect, useMemo, useState } from 'react'
 import DiffMatchPatch from 'diff-match-patch'
 import type { ReviewResultPayload, RiskItem } from '../types'
 
-const ACCEPT_OVERLAP_MESSAGE = '该风险点与已接受修改存在重叠，请手动处理或先撤销前一条修改。'
-
 function levelLabel(level: string) {
   if (level === 'high') return '高'
   if (level === 'medium') return '中'
   if (level === 'low') return '低'
   return level
+}
+
+function isAcceptedRiskStatus(status?: string) {
+  const normalized = String(status || '').trim().toLowerCase()
+  return normalized === 'accepted' || normalized === 'ai_applied'
 }
 
 function stripRuleCodes(text?: string) {
@@ -155,10 +158,6 @@ function primarySortAnchorRefOf(r: Partial<RiskItem> | null | undefined) {
 
 function showAcceptError(error: unknown, fallbackPrefix: string) {
   const msg = String((error as any)?.message || error || '').trim()
-  if (msg.includes('该风险点与已接受修改存在重叠')) {
-    alert(ACCEPT_OVERLAP_MESSAGE)
-    return
-  }
   alert(`${fallbackPrefix}${msg || '请求失败'}`)
 }
 
@@ -306,6 +305,8 @@ export function RiskPanel(props: {
   onRejectRisk?: (riskId: number | string) => Promise<void>
   onSetRiskStatus?: (riskId: number | string, status: 'pending' | 'accepted' | 'rejected') => Promise<void>
   onAcceptAllRisks?: () => Promise<void>
+  onUndoAcceptAllRisks?: () => Promise<void>
+  canUndoAcceptAllRisks?: boolean
 
   /** Legacy APIs (old backend) */
   onAiApplyRisk?: (riskId: number | string) => Promise<void>
@@ -365,6 +366,10 @@ export function RiskPanel(props: {
     const st = String(r.status || 'pending')
     return st === 'pending' || st === ''
   })
+  const acceptedCount = useMemo(() => {
+    const items = props.result?.risk_result_validated?.risk_result?.risk_items || []
+    return items.filter((r) => isAcceptedRiskStatus(String(r.status || ''))).length
+  }, [props.result])
 
   const clauseOrder = useMemo(() => {
     const map = new Map<string, number>()
@@ -453,7 +458,7 @@ export function RiskPanel(props: {
       </div>
 
       {!props.result ? (
-        <div className="emptyState">请先在左侧进入“文件上传”，开始新的合同审查。</div>
+        <div className="riskEmptyState">请先在左侧进入“文件上传”，开始新的合同审查。</div>
       ) : (
         <>
           {lastAction && props.onSetRiskStatus ? (
@@ -644,7 +649,33 @@ export function RiskPanel(props: {
                 </div>
               </details>
             ))}
-            {grouped.length === 0 ? <div className="emptyState">当前筛选条件下没有风险项。</div> : null}
+            {grouped.length === 0 ? (
+              <div className="riskEmptyState">
+                <div className="riskEmptyStateTitle">
+                  {acceptedCount > 0 ? '当前没有待处理风险点' : '当前筛选条件下没有风险项。'}
+                </div>
+                {acceptedCount > 0 ? (
+                  <>
+                    <div className="riskEmptyStateDesc">本次风险已全部接受。你可以点击下方按钮，或使用顶部操作栏恢复全部到未接受状态。</div>
+                    {props.onUndoAcceptAllRisks ? (
+                      <button
+                        className="btnSmall btnSmall--primary"
+                        disabled={!props.canUndoAcceptAllRisks}
+                        onClick={async () => {
+                          try {
+                            await props.onUndoAcceptAllRisks?.()
+                          } catch (e) {
+                            alert(`恢复失败：${String(e)}`)
+                          }
+                        }}
+                      >
+                        恢复全部到未接受
+                      </button>
+                    ) : null}
+                  </>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </>
       )}

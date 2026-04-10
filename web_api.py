@@ -60,7 +60,6 @@ _QUOTED_TEXT_RE_LIST = [
     re.compile(r'"([^"\n]{4,})"'),
 ]
 _ACCEPTED_RISK_STATUSES = {"accepted", "ai_applied"}
-_ACCEPT_OVERLAP_DETAIL = "该风险点与已接受修改存在重叠，请手动处理或先撤销前一条修改。"
 
 
 
@@ -619,38 +618,6 @@ def _collect_risk_clause_keys(risk: dict[str, Any], clause_alias_map: dict[str, 
             keys.add(alias_map.get(ref) or ref)
 
     return keys
-
-
-def _find_accepted_clause_conflict(
-    risk_items: list[dict[str, Any]],
-    target_risk_id: str,
-    clause_alias_map: dict[str, str] | None = None,
-) -> dict[str, Any] | None:
-    target: dict[str, Any] | None = None
-    for item in risk_items:
-        if isinstance(item, dict) and str(item.get("risk_id", "")) == str(target_risk_id):
-            target = item
-            break
-    if target is None or _is_missing_clause_risk(target):
-        return None
-
-    target_clause_keys = _collect_risk_clause_keys(target, clause_alias_map)
-    if not target_clause_keys:
-        return None
-
-    for item in risk_items:
-        if not isinstance(item, dict):
-            continue
-        if str(item.get("risk_id", "")) == str(target_risk_id):
-            continue
-        if _is_missing_clause_risk(item):
-            continue
-        if not _is_accepted_risk_status(item.get("status")):
-            continue
-        clause_keys = _collect_risk_clause_keys(item, clause_alias_map)
-        if clause_keys and target_clause_keys.intersection(clause_keys):
-            return item
-    return None
 
 
 def _sanitize_reviewed_ai_payload(payload: dict[str, Any]) -> bool:
@@ -1660,13 +1627,6 @@ def patch_risk_status(run_id: str, risk_id: str, body: RiskPatchBody) -> dict[st
     if target is None:
         raise HTTPException(status_code=404, detail="risk_id 不存在")
 
-    current_status = str(target.get("status") or "pending").strip().lower()
-    if status == "accepted" and not _is_accepted_risk_status(current_status) and not _is_missing_clause_risk(target):
-        clause_alias_map = _build_clause_uid_alias_map(_load_run_clauses(run_dir))
-        conflict = _find_accepted_clause_conflict(risk_items, str(risk_id), clause_alias_map)
-        if conflict is not None:
-            raise HTTPException(status_code=409, detail=_ACCEPT_OVERLAP_DETAIL)
-
     target["status"] = status
     if status == "accepted":
         ai_rewrite = target.get("ai_rewrite") if isinstance(target.get("ai_rewrite"), dict) else {}
@@ -1693,16 +1653,6 @@ def accept_all_risks(run_id: str) -> dict[str, Any]:
     if not isinstance(risk_items, list):
         raise HTTPException(status_code=500, detail="reviewed 风险数据格式错误")
 
-    clause_alias_map = _build_clause_uid_alias_map(_load_run_clauses(run_dir))
-    accepted_clause_keys: set[str] = set()
-    for item in risk_items:
-        if not isinstance(item, dict):
-            continue
-        if _is_missing_clause_risk(item):
-            continue
-        if _is_accepted_risk_status(item.get("status")):
-            accepted_clause_keys.update(_collect_risk_clause_keys(item, clause_alias_map))
-
     accepted = 0
     skipped = 0
     for item in risk_items:
@@ -1716,17 +1666,12 @@ def accept_all_risks(run_id: str) -> dict[str, Any]:
         if _is_accepted_risk_status(status):
             skipped += 1
             continue
-        clause_keys = [] if _is_missing_clause_risk(item) else list(_collect_risk_clause_keys(item, clause_alias_map))
-        if clause_keys and accepted_clause_keys.intersection(clause_keys):
-            skipped += 1
-            continue
         item["status"] = "accepted"
         ai_rewrite = item.get("ai_rewrite") if isinstance(item.get("ai_rewrite"), dict) else {}
         ai_state = str(ai_rewrite.get("state") or "").strip().lower()
         if ai_state == "succeeded":
             item["ai_rewrite_decision"] = "accepted"
         accepted += 1
-        accepted_clause_keys.update(clause_keys)
 
     _persist_reviewed_payload(run_dir, reviewed)
     return {"ok": True, "summary": {"accepted": accepted, "skipped": skipped}, "risk_items": risk_items}
@@ -1882,13 +1827,6 @@ def ai_accept_risk(run_id: str, risk_id: str, body: AiAcceptBody) -> dict[str, A
     ai_rewrite = target.get("ai_rewrite") if isinstance(target.get("ai_rewrite"), dict) else None
     if not ai_rewrite or str(ai_rewrite.get("state") or "") != "succeeded":
         raise HTTPException(status_code=409, detail="当前风险不存在可接受的 AI 改写建议")
-
-    current_status = str(target.get("status") or "pending").strip().lower()
-    if not _is_accepted_risk_status(current_status) and not _is_missing_clause_risk(target):
-        clause_alias_map = _build_clause_uid_alias_map(_load_run_clauses(run_dir))
-        conflict = _find_accepted_clause_conflict(risk_items, str(risk_id), clause_alias_map)
-        if conflict is not None:
-            raise HTTPException(status_code=409, detail=_ACCEPT_OVERLAP_DETAIL)
 
     revised_text = str(body.revised_text or "").strip()
     preserve_full_clause = _use_full_clause_target(target)
