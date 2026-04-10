@@ -107,8 +107,51 @@ const NEW_RUN_ID_STORAGE_KEY = 'markup:newRunId'
 const AUTO_AI_DISABLED_STORAGE_KEY = 'markup:autoAiApplyAllDisabled'
 const AUTO_AI_TRIGGERED_STORAGE_KEY = 'markup:autoAiApplyAllTriggeredRunIds'
 const ACTIVE_RUN_ID_STORAGE_KEY = 'markup:activeRunId'
+const REVIEW_SNAPSHOT_STORAGE_KEY = 'markup:reviewSnapshotByRun'
 const PREVIEW_WAITING_QUERY_KEY = 'preview_waiting'
 const PREVIEW_AUTO_COMPLETE_QUERY_KEY = 'preview_auto_complete'
+
+type PersistedReviewSnapshot = {
+  runId: string
+  meta: ReviewMeta
+  result: ReviewResultPayload
+  savedAt: string
+}
+
+function readAllReviewSnapshots(): Record<string, PersistedReviewSnapshot> {
+  const raw = readSessionValue(REVIEW_SNAPSHOT_STORAGE_KEY)
+  if (!raw) return {}
+  try {
+    const parsed = JSON.parse(raw) as Record<string, PersistedReviewSnapshot>
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
+function readReviewSnapshot(runId?: string | null): PersistedReviewSnapshot | null {
+  const key = String(runId || '').trim()
+  if (!key) return null
+  const snapshots = readAllReviewSnapshots()
+  const snapshot = snapshots[key]
+  if (!snapshot) return null
+  if (snapshot.runId !== key) return null
+  if (snapshot.meta?.status !== 'completed') return null
+  return snapshot.result ? snapshot : null
+}
+
+function writeReviewSnapshot(runId: string, meta: ReviewMeta, result: ReviewResultPayload) {
+  const key = String(runId || '').trim()
+  if (!key || meta.status !== 'completed') return
+  const snapshots = readAllReviewSnapshots()
+  snapshots[key] = {
+    runId: key,
+    meta,
+    result,
+    savedAt: new Date().toISOString()
+  }
+  writeSessionValue(REVIEW_SNAPSHOT_STORAGE_KEY, JSON.stringify(snapshots))
+}
 
 function navFromPathname(pathname: string): NavKey {
   const normalized = pathname !== '/' && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
@@ -500,7 +543,7 @@ export default function App() {
   const [meta, setMeta] = useState<ReviewMeta | null>(null)
   const [result, setResult] = useState<ReviewResultPayload | null>(null)
   const [isReviewing, setIsReviewing] = useState(false)
-  const [isHydratingReview, setIsHydratingReview] = useState(false)
+  const [routeHydratingRunId, setRouteHydratingRunId] = useState<string | null>(null)
   const [edits, setEdits] = useState<EditSummary[]>([])
   const [historyEntries, setHistoryEntries] = useState<SessionReviewEntry[]>([])
   const [serverConfig, setServerConfig] = useState<{ review_side: string; contract_type_hint: string } | null>(null)
@@ -530,13 +573,20 @@ export default function App() {
   const previewWaitingRef = useRef<boolean>(isPreviewWaitingMode())
   const previewAutoCompleteRef = useRef<boolean>(isPreviewAutoCompleteMode())
   const routeRunId = parseReviewRunId(location.pathname)
-  const isBootstrappingRouteReview =
+  const isRouteHydrating =
     !!routeRunId &&
     !previewWaitingRef.current &&
-    (isHydratingReview || (routeRunId !== runId && result == null))
+    routeHydratingRunId === routeRunId &&
+    routeRunId !== runId
 
   const persistTriggeredRunIds = useCallback(() => {
     writeSessionValue(AUTO_AI_TRIGGERED_STORAGE_KEY, JSON.stringify(Array.from(autoAiTriggeredRef.current)))
+  }, [])
+
+  const persistCompletedReviewSnapshot = useCallback((targetRunId: string | null | undefined, nextMeta: ReviewMeta | null | undefined, nextResult: ReviewResultPayload | null | undefined) => {
+    if (!targetRunId || !nextMeta || !nextResult) return
+    if (String(nextMeta.status || '').toLowerCase() !== 'completed') return
+    writeReviewSnapshot(targetRunId, nextMeta, nextResult)
   }, [])
 
   const openDialog = useCallback((message: string, title = '提示') => {
@@ -687,6 +737,10 @@ export default function App() {
   useEffect(() => {
     historyEntriesRef.current = historyEntries
   }, [historyEntries])
+
+  useEffect(() => {
+    persistCompletedReviewSnapshot(runId, meta, result)
+  }, [runId, meta, result, persistCompletedReviewSnapshot])
 
   useEffect(() => {
     setActiveNav(navFromPathname(location.pathname))
@@ -898,73 +952,104 @@ export default function App() {
     }
   }, [])
 
-  const openSessionReview = useCallback(async (item: ReviewHistoryItem) => {
-    if (item.available === false) {
-      alert('该审查记录缺少原始合同文件（后端返回 document_ready=false），无法打开。')
-      return
+  const loadReviewWorkspace = useCallback(async (params: {
+    runId: string
+    file: File | null
+    meta: ReviewMeta | null
+    result: ReviewResultPayload | null
+    fileName?: string | null
+  }) => {
+    const { runId: targetRunId, file: seedFile, meta: seedMeta, result: seedResult, fileName } = params
+
+    let nextMeta = seedMeta
+    let nextFile = seedFile
+    let nextResult = seedResult
+
+    const statusResp = await fetchNoStore(`/api/reviews/${targetRunId}`)
+    if (!statusResp.ok) {
+      const text = await statusResp.text()
+      throw new Error(text || `获取审查状态失败（${statusResp.status}）`)
     }
+    nextMeta = (await statusResp.json()) as ReviewMeta
 
-    setEdits([])
-
-    let nextMeta = item.meta ?? null
-    let nextFile = item.file ?? null
-    let nextResult = item.result ?? null
-
-    const statusResp = await fetchNoStore(`/api/reviews/${item.run_id}`)
-    if (statusResp.ok) {
-      nextMeta = (await statusResp.json()) as ReviewMeta
-    }
-
-    const effectiveStatus = nextMeta?.status || item.status
-    // History review must never trigger auto ai_apply_all.
-    newRunIdRef.current = null
+    const effectiveStatus = String(nextMeta?.status || '').toLowerCase()
 
     if (!nextFile) {
-      const docResp = await fetchNoStore(`/api/reviews/${item.run_id}/document`)
+      const docResp = await fetchNoStore(`/api/reviews/${targetRunId}/document`)
       if (docResp.ok) {
         const blob = await docResp.blob()
-        const fallbackName = nextMeta?.file_name || item.file_name || `${item.run_id}.docx`
-        const fileName = pickFilenameFromDisposition(docResp.headers.get('content-disposition'), fallbackName)
-        nextFile = new File([blob], fileName, { type: blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+        const fallbackName = nextMeta?.file_name || fileName || `${targetRunId}.docx`
+        const resolvedFileName = pickFilenameFromDisposition(docResp.headers.get('content-disposition'), fallbackName)
+        nextFile = new File([blob], resolvedFileName, {
+          type: blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        })
       }
     }
 
     if (effectiveStatus === 'completed') {
-      const resultResp = await fetchNoStore(`/api/reviews/${item.run_id}/result`)
-      if (resultResp.ok) {
-        nextResult = (await resultResp.json()) as ReviewResultPayload
+      const resultResp = await fetchNoStore(`/api/reviews/${targetRunId}/result`)
+      if (!resultResp.ok) {
+        const text = await resultResp.text()
+        throw new Error(text || `获取审查结果失败（${resultResp.status}）`)
       }
+      nextResult = (await resultResp.json()) as ReviewResultPayload
     }
 
-    navigate(buildReviewPath(item.run_id))
+    return {
+      nextMeta,
+      nextFile,
+      nextResult,
+      effectiveStatus
+    }
+  }, [])
+
+  const applyLoadedReviewWorkspace = useCallback((params: {
+    runId: string
+    file: File | null
+    meta: ReviewMeta | null
+    result: ReviewResultPayload | null
+    effectiveStatus: string
+    fallbackFileName?: string | null
+  }) => {
+    const { runId: targetRunId, file: nextFile, meta: nextMeta, result: nextResult, effectiveStatus, fallbackFileName } = params
+
     setFile(nextFile)
-    setRunId(item.run_id)
+    setRunId(targetRunId)
     setMeta(nextMeta)
+
     if (effectiveStatus === 'queued' || effectiveStatus === 'running') {
       setResult(null)
       setIsReviewing(true)
-      writeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY, item.run_id)
+      writeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY, targetRunId)
     } else {
       setResult(nextResult)
       setIsReviewing(false)
       removeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY)
+      if (nextMeta && nextResult) {
+        persistCompletedReviewSnapshot(targetRunId, nextMeta, nextResult)
+      }
     }
 
     setHistoryEntries((entries) =>
       upsertHistory(
         entries,
-        item.run_id,
+        targetRunId,
         (prev) => ({
           ...prev,
           file: nextFile,
           meta: nextMeta,
-          result: nextResult,
-          file_name: prev.file_name || nextFile?.name || nextMeta?.file_name || item.file_name,
+          result: effectiveStatus === 'completed' ? nextResult : null,
+          file_name: prev.file_name || nextFile?.name || nextMeta?.file_name || fallbackFileName || targetRunId,
           status: (nextMeta?.status || prev.status) as ReviewMeta['status'],
-          summary: nextMeta?.step || prev.summary || prev.status,
+          summary:
+            nextMeta?.error ||
+            nextMeta?.warning ||
+            nextMeta?.step ||
+            prev.summary ||
+            prev.status,
           updated_at: resolveHistoryUpdatedAt({
             status: nextMeta?.status || prev.status,
-            remoteUpdatedAt: nextMeta?.updated_at || item.updated_at,
+            remoteUpdatedAt: nextMeta?.updated_at,
             previousUpdatedAt: prev.updated_at
           }),
           available: true
@@ -973,8 +1058,42 @@ export default function App() {
         nextMeta
       )
     )
+  }, [persistCompletedReviewSnapshot])
 
-  }, [navigate])
+  const openSessionReview = useCallback(async (item: ReviewHistoryItem) => {
+    if (item.available === false) {
+      alert('该审查记录缺少原始合同文件（后端返回 document_ready=false），无法打开。')
+      return
+    }
+
+    setEdits([])
+
+    const { nextMeta, nextFile, nextResult, effectiveStatus } = await loadReviewWorkspace({
+      runId: item.run_id,
+      file: item.file ?? null,
+      meta: item.meta ?? null,
+      result: item.result ?? null,
+      fileName: item.file_name
+    })
+
+    navigate(buildReviewPath(item.run_id))
+    applyLoadedReviewWorkspace({
+      runId: item.run_id,
+      file: nextFile,
+      meta: nextMeta,
+      result: nextResult,
+      effectiveStatus,
+      fallbackFileName: item.file_name
+    })
+
+    await maybeAutoApplyAllForRun({
+      runId: item.run_id,
+      meta: nextMeta,
+      resultLoaded: effectiveStatus === 'completed' && nextResult != null,
+      fallbackFile: nextFile
+    })
+
+  }, [applyLoadedReviewWorkspace, loadReviewWorkspace, maybeAutoApplyAllForRun, navigate])
 
   const startReview = useCallback(async () => {
     if (!file) return
@@ -1197,82 +1316,38 @@ export default function App() {
     if (routeLoadingRunIdRef.current === routeRunId) return
 
     routeLoadingRunIdRef.current = routeRunId
-    setIsHydratingReview(true)
+    setRouteHydratingRunId(routeRunId)
     let cancelled = false
 
     ;(async () => {
       try {
         const cached = historyEntriesRef.current.find((it) => it.run_id === routeRunId) || null
-        let nextMeta = cached?.meta ?? null
-        let nextFile = cached?.file ?? null
-        let nextResult = cached?.result ?? null
-
-        const statusResp = await fetchNoStore(`/api/reviews/${routeRunId}`)
-        if (!statusResp.ok) {
-          const text = await statusResp.text()
-          throw new Error(text || `获取审查状态失败（${statusResp.status}）`)
-        }
-        nextMeta = (await statusResp.json()) as ReviewMeta
-        const effectiveStatus = String(nextMeta?.status || '').toLowerCase()
-
-        if (!nextFile) {
-          const docResp = await fetchNoStore(`/api/reviews/${routeRunId}/document`)
-          if (docResp.ok) {
-            const blob = await docResp.blob()
-            const fallbackName = nextMeta?.file_name || cached?.file_name || `${routeRunId}.docx`
-            const fileName = pickFilenameFromDisposition(docResp.headers.get('content-disposition'), fallbackName)
-            nextFile = new File([blob], fileName, { type: blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
-          }
-        }
-
-        if (effectiveStatus === 'completed') {
-          const resultResp = await fetchNoStore(`/api/reviews/${routeRunId}/result`)
-          if (!resultResp.ok) {
-            const text = await resultResp.text()
-            throw new Error(text || `获取审查结果失败（${resultResp.status}）`)
-          }
-          nextResult = (await resultResp.json()) as ReviewResultPayload
-        }
+        const snapshot = readReviewSnapshot(routeRunId)
+        const { nextMeta, nextFile, nextResult, effectiveStatus } = await loadReviewWorkspace({
+          runId: routeRunId,
+          file: cached?.file ?? null,
+          meta: cached?.meta ?? snapshot?.meta ?? null,
+          result: cached?.result ?? snapshot?.result ?? null,
+          fileName: cached?.file_name || snapshot?.meta?.file_name || null
+        })
 
         if (cancelled) return
 
-        setRunId(routeRunId)
-        setMeta(nextMeta)
-        setFile(nextFile)
+        applyLoadedReviewWorkspace({
+          runId: routeRunId,
+          file: nextFile,
+          meta: nextMeta,
+          result: nextResult,
+          effectiveStatus,
+          fallbackFileName: cached?.file_name || snapshot?.meta?.file_name || routeRunId
+        })
 
-        if (effectiveStatus === 'queued' || effectiveStatus === 'running') {
-          setResult(null)
-          setIsReviewing(true)
-          writeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY, routeRunId)
-        } else {
-          setResult(nextResult)
-          setIsReviewing(false)
-          removeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY)
-        }
-
-        setHistoryEntries((entries) =>
-          upsertHistory(
-            entries,
-            routeRunId,
-            (prev) => ({
-              ...prev,
-              file: nextFile,
-              meta: nextMeta,
-              result: effectiveStatus === 'completed' ? nextResult : prev.result,
-              file_name: prev.file_name || nextFile?.name || nextMeta?.file_name || routeRunId,
-              status: (nextMeta?.status || prev.status) as ReviewMeta['status'],
-              summary: nextMeta?.error || nextMeta?.warning || nextMeta?.step || prev.summary || prev.status,
-              updated_at: resolveHistoryUpdatedAt({
-                status: nextMeta?.status || prev.status,
-                remoteUpdatedAt: nextMeta?.updated_at,
-                previousUpdatedAt: prev.updated_at
-              }),
-              available: true
-            }),
-            nextFile,
-            nextMeta
-          )
-        )
+        await maybeAutoApplyAllForRun({
+          runId: routeRunId,
+          meta: nextMeta,
+          resultLoaded: effectiveStatus === 'completed' && nextResult != null,
+          fallbackFile: nextFile
+        })
       } catch (e) {
         if (cancelled) return
         console.warn(`[review-route] failed to load run ${routeRunId}:`, e)
@@ -1280,7 +1355,7 @@ export default function App() {
         alert(`无法打开审查记录 ${routeRunId}：${String(e)}`)
       } finally {
         if (!cancelled) {
-          setIsHydratingReview(false)
+          setRouteHydratingRunId((current) => (current === routeRunId ? null : current))
         }
         if (routeLoadingRunIdRef.current === routeRunId) {
           routeLoadingRunIdRef.current = null
@@ -1290,9 +1365,12 @@ export default function App() {
 
     return () => {
       cancelled = true
-      setIsHydratingReview(false)
+      if (routeLoadingRunIdRef.current === routeRunId) {
+        routeLoadingRunIdRef.current = null
+      }
+      setRouteHydratingRunId((current) => (current === routeRunId ? null : current))
     }
-  }, [routeRunId, runId, navigate])
+  }, [routeRunId, runId, navigate, loadReviewWorkspace, applyLoadedReviewWorkspace, maybeAutoApplyAllForRun])
 
   useEffect(() => {
     if (!runId || !result || !meta || meta.status !== 'completed') return
@@ -1888,13 +1966,12 @@ export default function App() {
     [runId]
   )
 
-  // IMPORTANT: Do NOT auto-trigger AI generation when opening history.
-  // Some deployments generate AI suggestions lazily and may overwrite previously reviewed
-  // suggestions or cause unnecessary backend work. AI generation should be user-driven.
+  // Auto AI generation is allowed only for the run started in the current session.
+  // Arbitrary historical records remain guarded by newRunIdRef + autoAiTriggeredRef.
 
   const goUploadPage = useCallback(() => {
     navigate(pathForNav('upload'))
-    setIsHydratingReview(false)
+    setRouteHydratingRunId(null)
     setIsReviewing(false)
     setFile(null)
     setRunId(null)
@@ -1954,9 +2031,9 @@ export default function App() {
             <div className="reviewWorkspace">
               <TopBar
                 file={file}
-                fileName={result?.file_name || meta?.file_name || file?.name || null}
-                statusText={statusText}
-                runId={runId}
+                fileName={result?.file_name || meta?.file_name || file?.name || routeRunId || null}
+                statusText={isRouteHydrating ? '' : statusText}
+                runId={runId || routeRunId}
                 riskCount={riskCount}
                 riskStats={riskStats}
                 isReviewing={isReviewing}
@@ -1988,13 +2065,7 @@ export default function App() {
                 </section>
 
                 <aside className="riskPane glassPane">
-                  {isBootstrappingRouteReview ? (
-                    <div className="reviewProgressCard">
-                      <div className="reviewProgressBadge">正在载入</div>
-                      <div className="reviewProgressTitle">正在恢复审查结果工作区…</div>
-                      <div className="reviewProgressMeta">已完成的审查记录正在加载文档与结果，不会重新进入等待队列。</div>
-                    </div>
-                  ) : result == null ? (
+                  {isRouteHydrating ? null : result == null ? (
                     <ReviewProgress
                       meta={meta}
                       runId={runId}

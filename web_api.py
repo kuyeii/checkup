@@ -313,6 +313,21 @@ def _read_meta(run_id: str) -> dict[str, Any]:
                 payload["file_name"] = str(inferred.get("file_name") or "").strip()
             except Exception:
                 payload["file_name"] = f"{run_id}.docx"
+
+        current_status = str(payload.get("status") or "").strip().lower()
+        if current_status in {"queued", "running"}:
+            try:
+                inferred = _infer_meta_from_run(run_id)
+            except Exception:
+                inferred = None
+            payload_updated_at = _parse_iso_datetime(str(payload.get("updated_at") or ""))
+            is_stale_running = payload_updated_at and (time.time() - payload_updated_at >= 300)
+            if isinstance(inferred, dict) and str(inferred.get("status") or "") in {"completed", "failed"} and is_stale_running:
+                payload["status"] = inferred.get("status")
+                payload["step"] = inferred.get("step")
+                payload["progress"] = inferred.get("progress")
+                payload["error"] = inferred.get("error")
+                payload["updated_at"] = inferred.get("updated_at")
         return payload
     return _infer_meta_from_run(run_id)
 
@@ -1384,26 +1399,36 @@ def _run_pipeline(*, run_id: str, file_path: Path, file_name: str, review_side: 
     (run_dir / "export.stdout.log").write_text(export_proc.stdout or "", encoding="utf-8")
     (run_dir / "export.stderr.log").write_text(export_proc.stderr or "", encoding="utf-8")
 
-    if export_proc.returncode != 0:
-        _write_meta(
-            run_id,
-            {
-                "status": "completed",
-                "step": "审查完成，但 DOCX 导出失败",
-                "progress": 100,
-                "warning": (export_proc.stderr or export_proc.stdout or "DOCX 导出失败").strip(),
-            },
-        )
-        return
+    export_warning = ""
+    export_completed = export_proc.returncode == 0
+    if not export_completed:
+        export_warning = (export_proc.stderr or export_proc.stdout or "DOCX 导出失败").strip()
 
     _write_meta(
         run_id,
         {
-            "status": "completed",
-            "step": "审查与 DOCX 批注导出已完成",
-            "progress": 100,
+            "status": "running",
+            "step": "风险识别完成，正在生成 AI 改写建议",
+            "progress": 96,
+            "warning": export_warning or None,
         },
     )
+
+    ai_summary, ai_warning = _maybe_auto_generate_ai_rewrites(run_id)
+
+    final_warnings = [part for part in [export_warning, ai_warning] if str(part or "").strip()]
+    final_payload: dict[str, Any] = {
+        "status": "completed",
+        "progress": 100,
+        "warning": "；".join(final_warnings) if final_warnings else None,
+        "ai_rewrite_summary": (ai_summary or {}).get("summary") if isinstance(ai_summary, dict) else None,
+    }
+    if export_completed:
+        final_payload["step"] = "审查、AI 改写与 DOCX 批注导出已完成"
+    else:
+        final_payload["step"] = "审查与 AI 改写已完成，但 DOCX 导出失败"
+
+    _write_meta(run_id, final_payload)
 
 
 @app.get("/api/config")
@@ -1736,8 +1761,7 @@ def ai_apply_risk(run_id: str, risk_id: str) -> dict[str, Any]:
     return {"ok": True, "item": target}
 
 
-@app.post("/api/reviews/{run_id}/ai_apply_all")
-def ai_apply_all_risks(run_id: str) -> dict[str, Any]:
+def _ai_apply_all_risks_impl(run_id: str) -> dict[str, Any]:
     run_dir = RUN_ROOT / run_id
     if not run_dir.exists():
         raise HTTPException(status_code=404, detail="run_id 不存在")
@@ -1817,6 +1841,24 @@ def ai_apply_all_risks(run_id: str) -> dict[str, Any]:
         },
         "risk_items": risk_items,
     }
+
+
+def _maybe_auto_generate_ai_rewrites(run_id: str) -> tuple[dict[str, Any] | None, str | None]:
+    api_key = str(settings.dify_rewrite_workflow_api_key or "").strip()
+    if not api_key:
+        return None, "未配置 DIFY_REWRITE_WORKFLOW_API_KEY，已跳过 AI 改写建议生成"
+    try:
+        return _ai_apply_all_risks_impl(run_id), None
+    except HTTPException as exc:
+        detail = exc.detail if isinstance(exc.detail, str) else json.dumps(exc.detail, ensure_ascii=False)
+        return None, str(detail or exc)
+    except Exception as exc:
+        return None, str(exc)
+
+
+@app.post("/api/reviews/{run_id}/ai_apply_all")
+def ai_apply_all_risks(run_id: str) -> dict[str, Any]:
+    return _ai_apply_all_risks_impl(run_id)
 
 
 @app.post("/api/reviews/{run_id}/risks/{risk_id}/ai_accept")

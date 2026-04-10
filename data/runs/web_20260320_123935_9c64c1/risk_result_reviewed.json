@@ -1049,7 +1049,7 @@
       },
       {
         "risk_code": "ip_ownership_over_broad",
-        "risk_source_type": "anchored",
+        "risk_source_type": "anchored_multi_clause",
         "dimension": "知识产权归属与使用权",
         "risk_level": "high",
         "risk_label": "知识产权归属范围过宽，涵盖乙方自有成果",
@@ -1108,6 +1108,31 @@
           null
         ],
         "risk_id": 16,
+        "aggregate_id": "agg_segment_7::7.1_16",
+        "aggregate_scope": "clause",
+        "aggregate_type": "anchored_multi_clause",
+        "aggregate_source_types": [
+          "anchored",
+          "multi_clause"
+        ],
+        "aggregate_member_risk_ids": [
+          "16",
+          "31"
+        ],
+        "aggregate_anchored_risk_ids": [
+          "16"
+        ],
+        "aggregate_multi_clause_risk_ids": [
+          "31"
+        ],
+        "source_risk_ids": [
+          "16",
+          "31"
+        ],
+        "target_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
+        "target_text_source": "host_clause_text",
+        "host_clause_uid": "segment_7::7.1",
+        "host_clause_id": "7.1",
         "ai_rewrite": {
           "state": "succeeded",
           "target_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有。",
@@ -1119,7 +1144,7 @@
       },
       {
         "risk_code": "ip_usage_restriction_undefined",
-        "risk_source_type": "anchored",
+        "risk_source_type": "anchored_multi_clause",
         "dimension": "知识产权归属与使用权",
         "risk_level": "medium",
         "risk_label": "项目外用途范围未界定，授权机制缺失",
@@ -1177,6 +1202,31 @@
           null
         ],
         "risk_id": 17,
+        "aggregate_id": "agg_segment_7::7.2_17",
+        "aggregate_scope": "clause",
+        "aggregate_type": "anchored_multi_clause",
+        "aggregate_source_types": [
+          "anchored",
+          "multi_clause"
+        ],
+        "aggregate_member_risk_ids": [
+          "17",
+          "31"
+        ],
+        "aggregate_anchored_risk_ids": [
+          "17"
+        ],
+        "aggregate_multi_clause_risk_ids": [
+          "31"
+        ],
+        "source_risk_ids": [
+          "17",
+          "31"
+        ],
+        "target_text": "未经甲方书面授权，乙方不得将上述文件、资料、数据信息等应用到项目以外的用途。",
+        "target_text_source": "host_clause_text",
+        "host_clause_uid": "segment_7::7.2",
+        "host_clause_id": "7.2",
         "ai_rewrite": {
           "state": "succeeded",
           "target_text": "未经甲方书面授权，乙方不得将上述文件、资料、数据信息等应用到项目以外的用途。",
@@ -2064,72 +2114,6 @@
           null
         ],
         "risk_id": 30
-      },
-      {
-        "risk_code": "ip_ownership_boundary_unclear",
-        "risk_source_type": "multi_clause",
-        "risk_label": "知识产权归属边界不清",
-        "dimension": "知识产权归属与使用权",
-        "risk_level": "medium",
-        "issue": "合同约定项目成果所有权归甲方，但未明确界定乙方在服务过程中自有的方法论、分析工具、技术积累的归属",
-        "evidence_text": "segment_7::7.1约定「由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有」，但未区分乙方原有知识产权与项目衍生成果",
-        "factual_basis": "7.1条约定所有项目文件资料所有权归甲方，但未明确：1）乙方为完成项目而使用的自有专利分析工具、方法论、数据处理模型的归属；2）乙方在项目实施前已拥有的知识产权是否被纳入归属范围；3）乙方在项目执行过程中产生的改进、创新成果的归属",
-        "reasoning_basis": "对于供应商而言：1）若乙方在项目中使用自有专利分析系统或方法论，合同未明确约定这些自有成果的归属，可能导致甲方主张共有或独占许可；2）7.2条禁止未经授权将资料用于项目外用途，但未明确乙方自有成果的使用边界，可能限制乙方未来业务发展；3）知识产权归属不清可能引发后续争议，增加法律风险",
-        "normative_basis": {
-          "basis_type": "contract_logic_rule",
-          "basis_title": "知识产权与保密边界应区分清楚",
-          "basis_detail": "7.1条将所有项目文件资料所有权归甲方，但未区分乙方自有知识产权与项目衍生成果的边界。这种约定可能导致甲方对乙方自有方法论、工具的主张，混淆了服务成果与供应商自有资产的界限"
-        },
-        "suggestion_minimal": "在知识产权条款中增设乙方自有知识产权的保留约定，明确乙方在项目实施前已拥有的知识产权归乙方所有",
-        "suggestion_optimized": "增设知识产权归属明细条款，列明项目衍生成果归甲方、乙方自有知识产权归乙方、双方共有知识产权的界定方式及使用边界，并明确方法论、分析工具的授权使用范围",
-        "suggestion_basis": "明确知识产权归属边界能够保护供应商自有资产不被意外让渡，避免因权属不清导致的争议，同时保障供应商未来业务发展的空间",
-        "related_clause_ids": [
-          "7.1",
-          "7.2",
-          "7.4"
-        ],
-        "related_clause_uids": [
-          "segment_7::7.1",
-          "segment_7::7.2",
-          "segment_7::7.4"
-        ],
-        "needs_human_review": true,
-        "workflow_sources": [
-          "missing_multi"
-        ],
-        "suggestion": "在知识产权条款中增设乙方自有知识产权的保留约定，明确乙方在项目实施前已拥有的知识产权归乙方所有",
-        "evidence_confidence": null,
-        "quality_flags": [],
-        "clause_uid": "",
-        "display_clause_id": "",
-        "clause_id": "",
-        "clause_uids": [],
-        "display_clause_ids": [],
-        "clause_ids": [],
-        "is_multi_clause_risk": true,
-        "status": "accepted",
-        "auto_apply_allowed": false,
-        "mapping_conflict": false,
-        "anchor_text": "segment_7::7.1约定「由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有」，但未区分乙方原有知识产权与项目衍生成果",
-        "basis_rule_id": "RULE_IP_BB90",
-        "basis_summary": "7.1条约定所有项目文件资料所有权归甲方，但未明确：1）乙方为完成项目而使用的自有专利分析工具、方法论、数据处理模型的归属；2）乙方在项目实施前已拥有的知识产权是否被纳入归属范围；3）乙方在项目执行过程中产生的改进、创新成果的归属；知识产权与保密边界应区分清楚",
-        "basis": "[RULE_IP_BB90] 7.1条约定所有项目文件资料所有权归甲方，但未明确：1）乙方为完成项目而使用的自有专利分析工具、方法论、数据处理模型的归属；2）乙方在项目实施前已拥有的知识产权是否被纳入归属范围；3）乙方在项目执行过程中产生的改进、创新成果的归属；对于供应商而言：1）若乙方在项目中使用自有专利分析系统或方法论，合同未明确约定这些自有成果的归属，可能导致甲方主张共有或独占许可；2）7.2条禁止未经授权将资料用于项目外用途，但未明确乙方自有成果的使用边界，可能限制乙方未来业务发展；3）知识产权归属不清可能引发后续争议，增加法律风险；知识产权与保密边界应区分清楚；7.1条将所有项目文件资料所有权归甲方，但未区分乙方自有知识产权与项目衍生成果的边界。这种约定可能导致甲方对乙方自有方法论、工具的主张，混淆了服务成果与供应商自有资产的界限",
-        "review_required_reason": [
-          "POC阶段默认全量人工复核，禁止系统自动采纳或自动修改合同内容。"
-        ],
-        "is_boilerplate_related": false,
-        "merged_from_risk_ids": [
-          null
-        ],
-        "risk_id": 31,
-        "ai_rewrite": {
-          "state": "succeeded",
-          "target_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有",
-          "revised_text": "由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有，但乙方在项目实施前已拥有的知识产权仍归乙方所有。",
-          "comment_text": "将“由乙方组织实施的本项目中的所有文件、资料、数据信息等，其所有权均属甲方所有”修改为“，但乙方在项目实施前已拥有的知识产权仍归乙方所有。”。",
-          "created_at": "2026-03-20T04:49:08Z"
-        },
-        "ai_rewrite_decision": "accepted"
       },
       {
         "risk_code": "confidentiality_reciprocity_missing",
