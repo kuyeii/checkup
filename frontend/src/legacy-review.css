@@ -1123,6 +1123,31 @@ padding: 16px;
   font-size: 12px;
   color: #475467;
 }
+.legacyReview .riskUndoBarText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  flex: 1 1 auto;
+}
+.legacyReview .riskUndoBarTitle {
+  width: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #101828;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.legacyReview .riskUndoBarMeta {
+  font-size: 12px;
+  line-height: 1.35;
+  color: #475467;
+  text-align: left;
+}
 
 .legacyReview .riskList {
   flex: 1 1 auto;

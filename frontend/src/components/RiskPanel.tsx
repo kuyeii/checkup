@@ -321,7 +321,7 @@ export function RiskPanel(props: {
   const [editorDraftText, setEditorDraftText] = useState('')
   const [editorMode, setEditorMode] = useState<'ai' | 'suggest'>('ai')
   const [localDraftById, setLocalDraftById] = useState<Record<string, string>>({})
-  const [lastAction, setLastAction] = useState<{ riskId: string; action: 'accepted' | 'rejected' } | null>(null)
+  const [lastAction, setLastAction] = useState<{ riskId: string; riskLabel: string; action: 'accepted' | 'rejected' } | null>(null)
 
   // Persist edited AI suggestions locally so reopening history does NOT lose user edits.
   // This also provides a safe fallback when the backend doesn't support /ai_edit.
@@ -464,7 +464,10 @@ export function RiskPanel(props: {
           {lastAction && props.onSetRiskStatus ? (
             <div className="riskControls">
               <div className="riskUndoBar">
-                <span>{lastAction.action === 'accepted' ? '已接受 1 条风险点' : '已拒绝 1 条风险点'}</span>
+                <div className="riskUndoBarText">
+                  <span className="riskUndoBarTitle">{lastAction.riskLabel}</span>
+                  <span className="riskUndoBarMeta">{lastAction.action === 'accepted' ? '已接受 1 条风险点' : '已拒绝 1 条风险点'}</span>
+                </div>
                 <button
                   className="btnSmall"
                   onClick={async () => {
@@ -620,7 +623,7 @@ export function RiskPanel(props: {
                               if (r.risk_id === undefined || r.risk_id === null) return
                               try {
                                 await props.onRejectRisk?.(r.risk_id)
-                                setLastAction({ riskId: String(r.risk_id), action: 'rejected' })
+                                setLastAction({ riskId: String(r.risk_id), riskLabel: presentRiskLabel(r), action: 'rejected' })
                               } catch (e) {
                                 console.error('拒绝失败', e)
                                 alert(`拒绝失败：${String(e)}`)
@@ -643,7 +646,7 @@ export function RiskPanel(props: {
                               ).trim()
                               try {
                                 await props.onAcceptRisk?.(r.risk_id, { revisedText: effectiveRevised || undefined })
-                                setLastAction({ riskId: String(r.risk_id), action: 'accepted' })
+                                setLastAction({ riskId: String(r.risk_id), riskLabel: presentRiskLabel(r), action: 'accepted' })
                               } catch (e) {
                                 console.error('接受失败', e)
                                 showAcceptError(e, '接受失败：')

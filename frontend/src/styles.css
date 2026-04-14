@@ -989,6 +989,41 @@ button, input { font: inherit; }
   gap: 10px;
   background: #fff;
 }
+.riskUndoBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(15,23,42,0.08);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.riskUndoBarText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  flex: 1 1 auto;
+}
+.riskUndoBarTitle {
+  width: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #101828;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.riskUndoBarMeta {
+  font-size: 12px;
+  line-height: 1.35;
+  color: #667085;
+  text-align: left;
+}
 .riskTabs { display: flex; gap: 8px; flex-wrap: wrap; }
 .tab {
   height: 32px;
