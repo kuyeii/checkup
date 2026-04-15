@@ -63,35 +63,166 @@ _ACCEPTED_RISK_STATUSES = {"accepted", "ai_applied"}
 
 
 
-_TEXT_BOUNDARY_CHARS = "，,；;。!！？?：\n"
-def _expand_text_span_to_boundaries(text: str, start: int, end: int) -> tuple[int, int]:
+_STRONG_SENTENCE_BOUNDARY_CHARS = "。!！？?；;\n"
+_TERMINAL_STRONG_BOUNDARY_RE = re.compile(r"([。!！?？；;])\s*$")
+_TERMINAL_WEAK_PUNCT_RE = re.compile(r"[，,、：:]\s*$")
+_AGGREGATE_GENERIC_OVERLAP_FRAGMENTS = {
+    "甲方",
+    "乙方",
+    "双方",
+    "合同",
+    "项目",
+    "条款",
+    "规定",
+    "约定",
+    "样品",
+    "检测",
+    "验收",
+    "进行",
+    "过程",
+    "结果",
+    "完成",
+    "支付",
+    "解除",
+    "通知",
+    "期间",
+    "提供",
+    "技术资料",
+    "检测过程",
+    "检测结果",
+    "测试过程",
+    "送检样品",
+    "受测样品",
+    "验收检测",
+}
+
+
+def _split_text_into_sentence_spans(text: str) -> list[tuple[int, int]]:
     source = str(text or "")
     if not source:
-        return 0, 0
-    start = max(0, min(int(start), len(source)))
-    end = max(start, min(int(end), len(source)))
+        return []
 
-    if not (start > 0 and source[start - 1] in _TEXT_BOUNDARY_CHARS):
-        prev_positions = [source.rfind(ch, 0, start) for ch in _TEXT_BOUNDARY_CHARS]
-        prev_boundary = max(prev_positions) if prev_positions else -1
-        if prev_boundary >= 0:
-            start = prev_boundary + 1
-        else:
-            start = 0
+    spans: list[tuple[int, int]] = []
+    start = 0
+    for idx, ch in enumerate(source):
+        if ch in _STRONG_SENTENCE_BOUNDARY_CHARS:
+            end = idx + 1
+            if source[start:end].strip():
+                spans.append((start, end))
+            start = end
 
-    if not (end > 0 and source[end - 1] in _TEXT_BOUNDARY_CHARS):
-        next_positions = [source.find(ch, end) for ch in _TEXT_BOUNDARY_CHARS]
-        next_positions = [pos for pos in next_positions if pos >= 0]
-        if next_positions:
-            end = min(next_positions) + 1
-        else:
-            end = len(source)
+    if start < len(source) and source[start:].strip():
+        spans.append((start, len(source)))
 
-    while start < end and source[start].isspace():
-        start += 1
-    while end > start and source[end - 1].isspace():
-        end -= 1
-    return start, end
+    return spans or [(0, len(source))]
+
+
+def _sequence_match_stats(source: str, revised: str) -> tuple[int, int, list[Any]]:
+    matcher = SequenceMatcher(None, str(source or ""), str(revised or ""), autojunk=False)
+    blocks = [block for block in matcher.get_matching_blocks() if block.size > 0]
+    matched_chars = sum(block.size for block in blocks)
+    longest_block = max((block.size for block in blocks), default=0)
+    return matched_chars, longest_block, blocks
+
+
+def _aggregate_overlap_fragment(fragment: str) -> str:
+    return re.sub(r"[\s，,；;。!！？?：:、（）()【】\[\]{}《》“”\"'‘’]", "", str(fragment or ""))
+
+
+def _has_strong_sentence_overlap(sentence: str, revised: str) -> bool:
+    _, _, blocks = _sequence_match_stats(sentence, revised)
+    for block in blocks:
+        if block.size < 4:
+            continue
+        fragment = _aggregate_overlap_fragment(sentence[block.a : block.a + block.size])
+        if len(fragment) < 4:
+            continue
+        if fragment in _AGGREGATE_GENERIC_OVERLAP_FRAGMENTS:
+            continue
+        return True
+    return False
+
+
+def _select_aggregate_sentence_window(original: str, revised: str) -> tuple[int, int]:
+    spans = _split_text_into_sentence_spans(original)
+    if not spans:
+        return 0, len(original)
+    if len(spans) == 1:
+        return spans[0]
+
+    sentence_scores: list[tuple[tuple[int, int, int], int, int]] = []
+    for idx, (start, end) in enumerate(spans):
+        sentence_text = original[start:end].strip()
+        matched_chars, longest_block, _ = _sequence_match_stats(sentence_text, revised)
+        score = (longest_block, matched_chars, -len(sentence_text))
+        sentence_scores.append((score, idx, matched_chars))
+
+    best_score, anchor_idx, anchor_matched_chars = max(sentence_scores)
+    if best_score[0] < 2 and anchor_matched_chars < 6:
+        return 0, len(original)
+
+    anchor_start, anchor_end = spans[anchor_idx]
+    best_window = (anchor_start, anchor_end)
+    best_window_score = best_score
+    best_window_matched_chars = anchor_matched_chars
+
+    for neighbor_idx in (anchor_idx - 1, anchor_idx + 1):
+        if neighbor_idx < 0 or neighbor_idx >= len(spans):
+            continue
+        neighbor_start, neighbor_end = spans[neighbor_idx]
+        neighbor_text = original[neighbor_start:neighbor_end].strip()
+        if not _has_strong_sentence_overlap(neighbor_text, revised):
+            continue
+
+        window_start = min(anchor_start, neighbor_start)
+        window_end = max(anchor_end, neighbor_end)
+        window_text = original[window_start:window_end].strip()
+        matched_chars, longest_block, _ = _sequence_match_stats(window_text, revised)
+        improvement = matched_chars - best_window_matched_chars
+        if improvement < max(4, min(10, len(revised) // 6)) and longest_block <= best_window_score[0]:
+            continue
+
+        window_score = (longest_block, matched_chars, -len(window_text))
+        if window_score > best_window_score:
+            best_window = (window_start, window_end)
+            best_window_score = window_score
+            best_window_matched_chars = matched_chars
+
+    return best_window
+
+
+def _heal_aggregate_revised_text_tail(target_text: str | None, revised_text: str | None) -> str:
+    target = str(target_text or "").rstrip()
+    revised = str(revised_text or "").rstrip()
+    if not target or not revised:
+        return revised
+
+    target_boundary_match = _TERMINAL_STRONG_BOUNDARY_RE.search(target)
+    if not target_boundary_match:
+        return revised
+
+    if _TERMINAL_STRONG_BOUNDARY_RE.search(revised):
+        return revised
+
+    boundary = target_boundary_match.group(1)
+    revised = _TERMINAL_WEAK_PUNCT_RE.sub("", revised).rstrip()
+    if not revised:
+        return revised
+
+    return revised + boundary
+
+
+def _first_significant_match_start(source: str, revised: str) -> int | None:
+    _, longest_block, blocks = _sequence_match_stats(source, revised)
+    if not blocks:
+        return None
+
+    min_block_size = 2 if longest_block >= 4 else 3
+    significant_blocks = [block for block in blocks if block.size >= min_block_size]
+    use_blocks = significant_blocks or blocks
+    if not use_blocks:
+        return None
+    return use_blocks[0].a
 
 
 def _shrink_aggregate_target_text(original_target_text: str | None, revised_text: str | None) -> str:
@@ -102,32 +233,23 @@ def _shrink_aggregate_target_text(original_target_text: str | None, revised_text
     if len(revised) >= len(original):
         return original
 
-    matcher = SequenceMatcher(None, original, revised, autojunk=False)
-    blocks = [block for block in matcher.get_matching_blocks() if block.size > 0]
-    if not blocks:
+    window_start, window_end = _select_aggregate_sentence_window(original, revised)
+    window_text = original[window_start:window_end].strip()
+    if not window_text:
         return original
 
-    significant_blocks = [block for block in blocks if block.size >= 2]
-    use_blocks = significant_blocks or blocks
-    if len(use_blocks) < 2:
+    relative_start = _first_significant_match_start(window_text, revised)
+    if relative_start is None:
         return original
 
-    first = use_blocks[0]
-    last = use_blocks[-1]
-    start = first.a
-    end = last.a + last.size
-    if start >= end:
-        return original
-
-    start, end = _expand_text_span_to_boundaries(original, start, end)
-    candidate = original[start:end].strip()
+    start = window_start + relative_start
+    candidate = original[start:window_end].strip()
     if not candidate:
         return original
     if len(candidate) >= len(original):
         return original
 
-    candidate_matcher = SequenceMatcher(None, candidate, revised, autojunk=False)
-    matched_chars = sum(block.size for block in candidate_matcher.get_matching_blocks() if block.size > 0)
+    matched_chars, _, _ = _sequence_match_stats(candidate, revised)
     min_match_chars = max(6, min(len(revised), len(candidate)) // 3)
     if matched_chars < min_match_chars:
         return original
@@ -194,7 +316,10 @@ def _finalize_aggregate_patch_pair(item: dict[str, Any], ai_payload: dict[str, A
     next_revised = str(revised_text or ai_payload.get("revised_text") or "").strip()
     # Keep the resolved span as target and never re-minimize to a tiny token
     # (e.g. "参照"), otherwise replace may miss and append at tail.
-    # Also keep revised_text exactly as returned by Dify.
+    # When the resolved target ends with a strong sentence boundary but the
+    # model rewrite does not, inherit that terminal punctuation to avoid the
+    # replacement text sticking to the following original sentence.
+    next_revised = _heal_aggregate_revised_text_tail(resolved_target, next_revised)
     return resolved_target, next_revised
 
 
@@ -553,8 +678,12 @@ def _build_ai_comment_text(
 
     before_changed = before[prefix : len(before) - suffix if suffix > 0 else len(before)]
     after_changed = after[prefix : len(after) - suffix if suffix > 0 else len(after)]
-    before_piece = _short_text(before_changed or before, 120) or "原文片段"
-    after_piece = _short_text(after_changed or after, 120) or "修改后片段"
+    before_changed_core = _aggregate_overlap_fragment(before_changed)
+    after_changed_core = _aggregate_overlap_fragment(after_changed)
+    use_full_text = len(before_changed_core) < 4 or len(after_changed_core) < 4
+
+    before_piece = _short_text(before if use_full_text else (before_changed or before), 120) or "原文片段"
+    after_piece = _short_text(after if use_full_text else (after_changed or after), 120) or "修改后片段"
     return f"将“{before_piece}”修改为“{after_piece}”。"
 
 
@@ -766,6 +895,40 @@ def _select_group_representative_risk(anchored_risks: list[dict[str, Any]], mult
     return {}
 
 
+def _aggregate_group_source_types(anchored_risks: list[dict[str, Any]], multi_risks: list[dict[str, Any]]) -> list[str]:
+    source_types: list[str] = []
+    if anchored_risks:
+        source_types.append("anchored")
+    if multi_risks:
+        source_types.append("multi_clause")
+    return source_types
+
+
+def _aggregate_group_type(anchored_risks: list[dict[str, Any]], multi_risks: list[dict[str, Any]]) -> str:
+    if anchored_risks and multi_risks:
+        return "mixed_clause_risks"
+    if anchored_risks:
+        return "anchored_only"
+    if multi_risks:
+        return "multi_clause_only"
+    return "unknown"
+
+
+def _is_effective_aggregate_group(group: dict[str, Any] | None) -> bool:
+    if not isinstance(group, dict):
+        return False
+    source_ids = {
+        str(item or "").strip()
+        for item in (group.get("source_risk_ids") or [])
+        if str(item or "").strip()
+    }
+    if len(source_ids) >= 2:
+        return True
+    anchored_count = len(group.get("anchored_risks") or []) if isinstance(group.get("anchored_risks"), list) else 0
+    multi_count = len(group.get("multi_clause_risks") or []) if isinstance(group.get("multi_clause_risks"), list) else 0
+    return (anchored_count + multi_count) >= 2
+
+
 def _select_aggregate_target_text(
     host_risk: dict[str, Any],
     multi_risks: list[dict[str, Any]],
@@ -775,10 +938,13 @@ def _select_aggregate_target_text(
     if clause_text:
         return clause_text, "host_clause_text"
 
+    host_source_type = _risk_source_type(host_risk)
+    host_prefix = host_source_type if host_source_type in {"anchored", "multi_clause"} else "host"
     host_candidates = [
-        ("anchored.target_text", str(host_risk.get("target_text") or "").strip()),
-        ("anchored.evidence_text", str(host_risk.get("evidence_text") or "").strip()),
-        ("anchored.anchor_text", str(host_risk.get("anchor_text") or "").strip()),
+        (f"{host_prefix}.target_text", str(host_risk.get("target_text") or "").strip()),
+        (f"{host_prefix}.evidence_text", str(host_risk.get("evidence_text") or "").strip()),
+        (f"{host_prefix}.anchor_text", str(host_risk.get("anchor_text") or "").strip()),
+        (f"{host_prefix}.main_text", str(host_risk.get("main_text") or "").strip()),
     ]
     for source_name, raw in host_candidates:
         cleaned = _sanitize_ai_target_text(raw)
@@ -841,7 +1007,8 @@ def _build_ai_aggregation_groups(
         bucket = buckets[clause_key]
         anchored_risks = list(bucket.get("anchored_risks") or [])
         multi_risks = list(bucket.get("multi_clause_risks") or [])
-        if not anchored_risks or not multi_risks:
+        total_risks = len(anchored_risks) + len(multi_risks)
+        if total_risks < 2:
             continue
 
         representative = _select_group_representative_risk(anchored_risks, multi_risks)
@@ -857,7 +1024,8 @@ def _build_ai_aggregation_groups(
         group = {
             "aggregate_id": aggregate_id,
             "aggregate_scope": "clause",
-            "aggregate_type": "anchored_multi_clause",
+            "aggregate_type": _aggregate_group_type(anchored_risks, multi_risks),
+            "aggregate_source_types": _aggregate_group_source_types(anchored_risks, multi_risks),
             "host_risk_id": _risk_id_str(representative),
             "representative_risk_id": _risk_id_str(representative),
             "host_clause_uid": str((clause or {}).get("clause_uid") or representative.get("clause_uid") or clause_key or "").strip(),
@@ -939,8 +1107,8 @@ def _project_reviewed_risk_payload(
             aggregate_id = str(group.get("aggregate_id") or "").strip()
             item["aggregate_id"] = aggregate_id
             item["aggregate_scope"] = str(group.get("aggregate_scope") or "clause")
-            item["aggregate_type"] = str(group.get("aggregate_type") or "anchored_multi_clause")
-            item["aggregate_source_types"] = ["anchored", "multi_clause"]
+            item["aggregate_type"] = str(group.get("aggregate_type") or _aggregate_group_type([], []))
+            item["aggregate_source_types"] = list(group.get("aggregate_source_types") or [])
             item["aggregate_member_risk_ids"] = list(group.get("source_risk_ids") or [])
             item["aggregate_anchored_risk_ids"] = list(group.get("anchored_risk_ids") or [])
             item["aggregate_multi_clause_risk_ids"] = list(group.get("multi_clause_risk_ids") or [])
@@ -949,7 +1117,7 @@ def _project_reviewed_risk_payload(
             item["target_text_source"] = str(group.get("target_text_source") or "")
             item["host_clause_uid"] = str(group.get("host_clause_uid") or "")
             item["host_clause_id"] = str(group.get("host_clause_id") or "")
-            item["risk_source_type"] = "anchored_multi_clause"
+            item["risk_source_type"] = "aggregated"
             previous_state = previous_by_aggregate_id.get(aggregate_id) or previous_by_id.get(risk_id)
         else:
             previous_state = previous_by_id.get(risk_id)
@@ -1044,7 +1212,7 @@ def _build_rewrite_inputs(*, run_id: str, run_dir: Path, risk: dict[str, Any]) -
     aggregate_group = _load_ai_aggregation_group(run_dir, risk)
     meta = _read_meta(run_id)
 
-    if isinstance(aggregate_group, dict) and (aggregate_group.get("multi_clause_risks") or []):
+    if _is_effective_aggregate_group(aggregate_group):
         preserve_full_clause = _use_full_clause_target(aggregate_group)
         target_text = _normalize_target_text(
             str(aggregate_group.get("target_text") or ""),
@@ -1110,7 +1278,7 @@ def _generate_ai_rewrite(
     client: DifyWorkflowClient | None = None,
 ) -> dict[str, Any]:
     aggregate_group = _load_ai_aggregation_group(run_dir, risk)
-    is_aggregate = isinstance(aggregate_group, dict) and bool(aggregate_group.get("multi_clause_risks"))
+    is_aggregate = _is_effective_aggregate_group(aggregate_group)
     active_client = client or _rewrite_client(aggregate=is_aggregate)
     inputs = _build_rewrite_inputs(run_id=run_id, run_dir=run_dir, risk=risk)
     workflow_response = active_client.run_workflow(inputs=inputs, user=f"rewrite-{run_id}", response_mode="blocking")
@@ -1794,7 +1962,7 @@ def _ai_apply_all_risks_impl(run_id: str) -> dict[str, Any]:
                 failed += 1
                 failure_target = _extract_target_text(risk)
                 aggregate_group = _load_ai_aggregation_group(run_dir, risk)
-                if isinstance(aggregate_group, dict) and (aggregate_group.get("multi_clause_risks") or []):
+                if _is_effective_aggregate_group(aggregate_group):
                     preserve_full_clause = _use_full_clause_target(aggregate_group)
                     failure_target = _normalize_target_text(
                         str(aggregate_group.get("target_text") or ""),
