@@ -871,19 +871,6 @@ export default function App() {
     return () => window.clearTimeout(timer)
   }, [])
 
-  const riskHighlights = useMemo(() => {
-    const items = result?.risk_result_validated?.risk_result?.risk_items || []
-    const texts: string[] = []
-    for (const r of items) {
-      if (r.anchor_text) texts.push(r.anchor_text)
-      if (r.evidence_text) texts.push(r.evidence_text)
-    }
-    return texts
-      .map((t) => t.trim())
-      .filter((t) => t.length >= 4)
-      .slice(0, 200)
-  }, [result])
-
   const statusText = useMemo(() => {
     if (!meta) return ''
     if (meta.status === 'failed') return meta.error || '任务失败'
@@ -2103,7 +2090,6 @@ export default function App() {
                     edits={edits}
                     onEditsChange={setEdits}
                     onReadyChange={setDocEditorReady}
-                    riskHighlights={riskHighlights}
                     clauseTextByUid={clauseTextByUid}
                     className="docEditor"
                   />
