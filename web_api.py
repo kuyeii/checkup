@@ -212,17 +212,28 @@ def _heal_aggregate_revised_text_tail(target_text: str | None, revised_text: str
     return revised + boundary
 
 
-def _first_significant_match_start(source: str, revised: str) -> int | None:
+def _significant_match_blocks(source: str, revised: str) -> list[Any]:
     _, longest_block, blocks = _sequence_match_stats(source, revised)
     if not blocks:
-        return None
+        return []
 
     min_block_size = 2 if longest_block >= 4 else 3
     significant_blocks = [block for block in blocks if block.size >= min_block_size]
-    use_blocks = significant_blocks or blocks
+    return significant_blocks or blocks
+
+
+def _first_significant_match_start(source: str, revised: str) -> int | None:
+    use_blocks = _significant_match_blocks(source, revised)
     if not use_blocks:
         return None
     return use_blocks[0].a
+
+
+def _last_significant_match_end(source: str, revised: str) -> int | None:
+    use_blocks = _significant_match_blocks(source, revised)
+    if not use_blocks:
+        return None
+    return use_blocks[-1].a + use_blocks[-1].size
 
 
 def _shrink_aggregate_target_text(original_target_text: str | None, revised_text: str | None) -> str:
@@ -239,11 +250,13 @@ def _shrink_aggregate_target_text(original_target_text: str | None, revised_text
         return original
 
     relative_start = _first_significant_match_start(window_text, revised)
-    if relative_start is None:
+    relative_end = _last_significant_match_end(window_text, revised)
+    if relative_start is None or relative_end is None or relative_end <= relative_start:
         return original
 
     start = window_start + relative_start
-    candidate = original[start:window_end].strip()
+    end = window_start + relative_end
+    candidate = original[start:end].strip()
     if not candidate:
         return original
     if len(candidate) >= len(original):
@@ -260,6 +273,345 @@ def _shrink_aggregate_target_text(original_target_text: str | None, revised_text
     return candidate
 
 
+def _pick_narrow_aggregate_target(
+    item: dict[str, Any],
+    ai_payload: dict[str, Any],
+    revised_text: str | None = None,
+) -> str:
+    clause_text = str(item.get("clause_text") or item.get("target_text") or "").strip()
+    current_target = str(ai_payload.get("target_text") or "").strip()
+    evidence_text = str(item.get("evidence_text") or "").strip()
+    anchor_text = str(item.get("anchor_text") or "").strip()
+    aggregate_type = str(item.get("aggregate_type") or "").strip().lower()
+    revised = str(revised_text or ai_payload.get("revised_text") or "").strip()
+
+    if aggregate_type != "anchored_only":
+        return current_target or evidence_text or anchor_text or clause_text
+
+    # anchored_only 默认保留当前 AI target，避免把句级替换误缩成一个很短的尾部片段。
+    best = current_target or evidence_text or anchor_text or clause_text
+
+    # 仅当 current_target 明显过宽、且 evidence_text 可以形成稳定替换时，才缩到证据文本。
+    if current_target and evidence_text and evidence_text in current_target:
+        before_e, after_e = _minimize_patch_pair(evidence_text, revised)
+        current_is_overwide = len(current_target) >= max(len(evidence_text) * 2, len(evidence_text) + 12)
+        evidence_is_safe = bool(before_e.strip()) and bool(after_e.strip())
+        if current_is_overwide and evidence_is_safe:
+            return evidence_text
+
+    return best
+
+
+
+def _aggregate_group_fallback_text(item: dict[str, Any], field: str) -> str:
+    text = str(item.get(field) or "").strip()
+    if text:
+        return text
+
+    anchored_risk = item.get("anchored_risk")
+    if isinstance(anchored_risk, dict):
+        text = str(anchored_risk.get(field) or "").strip()
+        if text:
+            return text
+
+    anchored_risks = item.get("anchored_risks")
+    if isinstance(anchored_risks, list):
+        for anchored_item in anchored_risks:
+            if not isinstance(anchored_item, dict):
+                continue
+            text = str(anchored_item.get(field) or "").strip()
+            if text:
+                return text
+
+    return ""
+
+
+def _aggregate_suggestion_texts(item: dict[str, Any]) -> list[str]:
+    values = [
+        _aggregate_group_fallback_text(item, "suggestion"),
+        _aggregate_group_fallback_text(item, "suggestion_minimal"),
+        _aggregate_group_fallback_text(item, "suggestion_optimized"),
+    ]
+    out: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        text = str(value or "").strip()
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        out.append(text)
+    return out
+
+
+def _looks_placeholder_replace_text(text: str | None) -> bool:
+    value = str(text or "").strip()
+    if not value:
+        return True
+    placeholder_markers = ("……", "...", "…", "XXX", "xxx", "待补充")
+    return any(marker in value for marker in placeholder_markers)
+
+
+def _parse_aggregate_suggestion_ops(item: dict[str, Any]) -> dict[str, Any]:
+    quote_open = r"[“\"'‘「]"
+    quote_close = r"[”\"'’」]"
+    pair_patterns = [
+        re.compile(
+            rf"(?:将|把)\s*{quote_open}([^”\"'’」]{{1,80}}){quote_close}\s*(?:修改|改|替换)为\s*{quote_open}([^”\"'’」]{{1,120}}){quote_close}"
+        ),
+        re.compile(
+            rf"{quote_open}([^”\"'’」]{{1,80}}){quote_close}\s*(?:修改|改|替换)为\s*{quote_open}([^”\"'’」]{{1,120}}){quote_close}"
+        ),
+    ]
+    delete_pattern = re.compile(
+        rf"(?:删除|去掉|移除)\s*{quote_open}([^”\"'’」]{{1,80}}){quote_close}(?:字样|表述|内容)?"
+    )
+    replace_pattern = re.compile(
+        rf"(?:改为|修改为|替换为)\s*{quote_open}([^”\"'’」]{{1,120}}){quote_close}"
+    )
+
+    replace_pairs: list[tuple[str, str]] = []
+    delete_phrases: list[str] = []
+    replace_texts: list[str] = []
+    seen_pairs: set[tuple[str, str]] = set()
+    seen_delete: set[str] = set()
+    seen_replace: set[str] = set()
+
+    for suggestion in _aggregate_suggestion_texts(item):
+        for pattern in pair_patterns:
+            for match in pattern.finditer(suggestion):
+                from_text = str(match.group(1) or "").strip()
+                to_text = str(match.group(2) or "").strip()
+                if not from_text or not to_text:
+                    continue
+                pair = (from_text, to_text)
+                if pair in seen_pairs:
+                    continue
+                seen_pairs.add(pair)
+                replace_pairs.append(pair)
+        for match in delete_pattern.finditer(suggestion):
+            phrase = str(match.group(1) or "").strip()
+            if not phrase or phrase in seen_delete:
+                continue
+            seen_delete.add(phrase)
+            delete_phrases.append(phrase)
+        for match in replace_pattern.finditer(suggestion):
+            phrase = str(match.group(1) or "").strip()
+            if not phrase or phrase in seen_replace:
+                continue
+            seen_replace.add(phrase)
+            replace_texts.append(phrase)
+
+    return {
+        "replace_pairs": replace_pairs,
+        "delete_phrases": delete_phrases,
+        "replace_texts": replace_texts,
+    }
+
+
+def _clean_deleted_phrase_artifacts(text: str | None) -> str:
+    cleaned = str(text or "")
+    if not cleaned:
+        return ""
+
+    previous = None
+    while cleaned != previous:
+        previous = cleaned
+        cleaned = re.sub(r"[、，,]{2,}", lambda m: m.group(0)[0], cleaned)
+        cleaned = re.sub(r"([（(])\s*[、，,]\s*", r"\1", cleaned)
+        cleaned = re.sub(r"\s*[、，,]\s*([）)])", r"\1", cleaned)
+        cleaned = re.sub(r"\s{2,}", " ", cleaned)
+        cleaned = re.sub(r"^[、，,]\s*", "", cleaned)
+        cleaned = re.sub(r"\s*[、，,]$", "", cleaned)
+    return cleaned.strip()
+
+
+def _strip_leading_list_introducer(text: str | None) -> str:
+    cleaned = str(text or "").strip()
+    if not cleaned:
+        return ""
+
+    for prefix in ("包括但不限于", "包括", "包含", "例如", "比如", "如"):
+        if not cleaned.startswith(prefix):
+            continue
+        candidate = cleaned[len(prefix) :].strip()
+        if len(_aggregate_overlap_fragment(candidate)) < 4:
+            continue
+        if "、" in candidate or "，" in candidate or "," in candidate:
+            return candidate
+    return cleaned
+
+
+def _build_suggestion_guided_aggregate_patch(item: dict[str, Any]) -> tuple[str, str, dict[str, Any]] | None:
+    aggregate_type = str(item.get("aggregate_type") or "").strip().lower()
+    if aggregate_type != "anchored_only":
+        return None
+
+    evidence_text = _aggregate_group_fallback_text(item, "evidence_text")
+    if not evidence_text:
+        return None
+    if len(_aggregate_overlap_fragment(evidence_text)) < 6:
+        return None
+
+    ops = _parse_aggregate_suggestion_ops(item)
+    replace_pairs = list(ops.get("replace_pairs") or [])
+    delete_phrases = [str(v or "").strip() for v in (ops.get("delete_phrases") or []) if str(v or "").strip()]
+    replace_texts = [str(v or "").strip() for v in (ops.get("replace_texts") or []) if str(v or "").strip()]
+    if not replace_pairs and not delete_phrases and not replace_texts:
+        return None
+
+    target_text = str(evidence_text or "").strip()
+    revised_text = ""
+
+    for from_text, to_text in replace_pairs:
+        if _looks_placeholder_replace_text(to_text):
+            continue
+        if from_text in target_text:
+            revised_text = target_text.replace(from_text, to_text, 1)
+            break
+
+    if not revised_text and delete_phrases and not replace_pairs and not replace_texts:
+        revised_text = target_text
+        changed = False
+        for phrase in delete_phrases:
+            if phrase and phrase in revised_text:
+                revised_text = revised_text.replace(phrase, "", 1)
+                changed = True
+        if changed:
+            revised_text = _clean_deleted_phrase_artifacts(revised_text)
+        else:
+            revised_text = ""
+
+    if not revised_text:
+        for phrase in replace_texts:
+            if _looks_placeholder_replace_text(phrase):
+                continue
+            revised_text = phrase
+            break
+
+    revised_text = str(revised_text or "").strip()
+    if not revised_text or revised_text == target_text:
+        return None
+    return target_text, revised_text, ops
+
+
+def _should_prefer_suggestion_guided_patch(
+    current_target: str | None,
+    current_revised: str | None,
+    guided_target: str,
+    guided_revised: str,
+    ops: dict[str, Any],
+) -> bool:
+    target_text = str(current_target or "").strip()
+    revised_text = str(current_revised or "").strip()
+    if not guided_target or not guided_revised:
+        return False
+    if target_text == guided_target and revised_text == guided_revised:
+        return False
+    if not revised_text:
+        return True
+
+    delete_phrase_values = [str(phrase or "").strip() for phrase in (ops.get("delete_phrases") or []) if str(phrase or "").strip()]
+    replace_pairs = [(str(a or "").strip(), str(b or "").strip()) for a, b in (ops.get("replace_pairs") or [])]
+    replace_texts = [
+        str(value or "").strip()
+        for value in (ops.get("replace_texts") or [])
+        if str(value or "").strip() and not _looks_placeholder_replace_text(value)
+    ]
+
+    for phrase_text in delete_phrase_values:
+        if phrase_text and phrase_text in revised_text:
+            return True
+
+    delete_only = bool(delete_phrase_values) and not replace_pairs and not replace_texts
+    if delete_only:
+        current_without_boundary = _TERMINAL_STRONG_BOUNDARY_RE.sub("", revised_text).rstrip()
+        guided_without_boundary = _TERMINAL_STRONG_BOUNDARY_RE.sub("", guided_revised).rstrip()
+        if (
+            current_without_boundary
+            and guided_without_boundary != current_without_boundary
+            and guided_without_boundary.endswith(current_without_boundary)
+        ):
+            dropped_prefix = guided_without_boundary[: len(guided_without_boundary) - len(current_without_boundary)]
+            dropped_core = _aggregate_overlap_fragment(dropped_prefix)
+            if (
+                dropped_core
+                and len(dropped_core) <= 6
+                and not any(phrase and phrase in dropped_prefix for phrase in delete_phrase_values)
+            ):
+                return True
+
+    for from_text, to_text in replace_pairs:
+        if from_text and from_text in revised_text and to_text and to_text not in revised_text:
+            return True
+
+    if replace_texts and all(text not in revised_text for text in replace_texts):
+        overlap = SequenceMatcher(None, target_text, revised_text, autojunk=False).ratio() if target_text else 0.0
+        if overlap >= 0.75 or revised_text == target_text:
+            return True
+
+    return False
+
+
+def _strip_deleted_phrase_from_revised_change_head(item: dict[str, Any], target_text: str | None, revised_text: str | None) -> str:
+    target = str(target_text or "")
+    revised = str(revised_text or "")
+    if not target or not revised:
+        return revised
+
+    ops = _parse_aggregate_suggestion_ops(item)
+    delete_phrases = [str(value or "").strip() for value in (ops.get("delete_phrases") or []) if str(value or "").strip()]
+    if not delete_phrases:
+        return revised
+
+    prefix = 0
+    max_prefix = min(len(target), len(revised))
+    while prefix < max_prefix and target[prefix] == revised[prefix]:
+        prefix += 1
+
+    changed = False
+    revised_suffix = revised[prefix:]
+    for phrase in delete_phrases:
+        if phrase and revised_suffix.startswith(phrase):
+            revised_suffix = revised_suffix[len(phrase):].lstrip()
+            changed = True
+    if not changed:
+        return revised
+
+    normalized = revised[:prefix] + revised_suffix
+    return _clean_deleted_phrase_artifacts(normalized)
+
+
+def _apply_anchored_only_target_floor(
+    item: dict[str, Any],
+    baseline: str,
+    resolved: str,
+) -> str:
+    aggregate_type = str(item.get("aggregate_type") or "").strip().lower()
+    evidence_text = _aggregate_group_fallback_text(item, "evidence_text")
+
+    if aggregate_type != "anchored_only":
+        return resolved
+    if not evidence_text:
+        return resolved
+
+    # Once baseline has narrowed to evidence_text, do not allow later shrinkage
+    # to cut the span below that evidence floor.
+    if baseline == evidence_text:
+        return evidence_text
+
+    # If shrinking dropped a leading prefix from the anchored evidence span,
+    # keep the evidence span instead of a smaller token-like fragment.
+    if (
+        resolved
+        and len(resolved) < len(evidence_text)
+        and resolved in evidence_text
+        and not evidence_text.startswith(resolved)
+    ):
+        return evidence_text
+
+    return resolved
+
+
 def _resolve_aggregate_patch_target(item: dict[str, Any], ai_payload: dict[str, Any], revised_text: str | None = None) -> str:
     if not isinstance(item, dict) or not isinstance(ai_payload, dict):
         return str(ai_payload.get("target_text") or "").strip()
@@ -273,12 +625,14 @@ def _resolve_aggregate_patch_target(item: dict[str, Any], ai_payload: dict[str, 
     if not is_aggregate:
         return current_target or source_target
 
-    baseline = source_target or current_target
+    baseline = _pick_narrow_aggregate_target(item, ai_payload, next_revised)
     if not baseline:
-        return current_target
+        return current_target or source_target
 
     shrunk = _shrink_aggregate_target_text(baseline, next_revised)
-    return str(shrunk or current_target or baseline).strip()
+    resolved = str(shrunk or baseline).strip()
+    resolved = _apply_anchored_only_target_floor(item, baseline, resolved)
+    return resolved
 
 
 def _minimize_patch_pair(target_text: str | None, revised_text: str | None) -> tuple[str, str]:
@@ -311,17 +665,56 @@ def _minimize_patch_pair(target_text: str | None, revised_text: str | None) -> t
     return minimized_before, minimized_after
 
 
+def _strip_unsafe_aggregate_revised_tail(source_text: str | None, target_text: str | None, revised_text: str | None) -> str:
+    source = str(source_text or "")
+    target = str(target_text or "").rstrip()
+    revised = str(revised_text or "").rstrip()
+    if not source or not target or not revised:
+        return revised
+
+    if _TERMINAL_STRONG_BOUNDARY_RE.search(target):
+        return revised
+
+    if not _TERMINAL_STRONG_BOUNDARY_RE.search(revised):
+        return revised
+
+    target_index = source.find(target)
+    if target_index < 0:
+        return revised
+
+    suffix = source[target_index + len(target) :]
+    if not suffix.strip():
+        return revised
+
+    trimmed = _TERMINAL_STRONG_BOUNDARY_RE.sub("", revised).rstrip()
+    return trimmed or revised
+
+
+
 def _finalize_aggregate_patch_pair(item: dict[str, Any], ai_payload: dict[str, Any], revised_text: str | None = None) -> tuple[str, str]:
     resolved_target = _resolve_aggregate_patch_target(item, ai_payload, revised_text)
     next_revised = str(revised_text or ai_payload.get("revised_text") or "").strip()
+    source_target = str(item.get("clause_text") or item.get("target_text") or ai_payload.get("target_text") or "").strip()
+
+    guided_patch = _build_suggestion_guided_aggregate_patch(item)
+    if guided_patch is not None:
+        guided_target, guided_revised, guided_ops = guided_patch
+        if _should_prefer_suggestion_guided_patch(resolved_target, next_revised, guided_target, guided_revised, guided_ops):
+            resolved_target = guided_target
+            next_revised = guided_revised
+
+    next_revised = _strip_deleted_phrase_from_revised_change_head(item, resolved_target, next_revised)
     # Keep the resolved span as target and never re-minimize to a tiny token
     # (e.g. "参照"), otherwise replace may miss and append at tail.
     # When the resolved target ends with a strong sentence boundary but the
     # model rewrite does not, inherit that terminal punctuation to avoid the
     # replacement text sticking to the following original sentence.
     next_revised = _heal_aggregate_revised_text_tail(resolved_target, next_revised)
+    # When the resolved target does not consume the original tail, the
+    # replacement must not synthesize a new sentence boundary, otherwise the
+    # remaining original suffix will be duplicated or split into a new sentence.
+    next_revised = _strip_unsafe_aggregate_revised_tail(source_target, resolved_target, next_revised)
     return resolved_target, next_revised
-
 
 def _meta_path(run_id: str) -> Path:
     return WEB_META_ROOT / f"{run_id}.json"
@@ -793,6 +1186,9 @@ def _sanitize_reviewed_ai_payload(payload: dict[str, Any]) -> bool:
                 target_for_comment, next_revised = _finalize_aggregate_patch_pair(item, ai_payload, revised_text)
                 if target_for_comment and str(ai_payload.get("target_text") or "").strip() != target_for_comment:
                     ai_payload["target_text"] = target_for_comment
+                    changed = True
+                if str(ai_payload.get("revised_text") or "").strip() != next_revised:
+                    ai_payload["revised_text"] = next_revised
                     changed = True
                 revised_text = next_revised
             else:
@@ -2046,11 +2442,12 @@ def ai_accept_risk(run_id: str, risk_id: str, body: AiAcceptBody) -> dict[str, A
     if revised_text:
         ai_rewrite["revised_text"] = revised_text
     if is_aggregate:
-        current_target, _ = _finalize_aggregate_patch_pair(
+        current_target, normalized_revised = _finalize_aggregate_patch_pair(
             target,
             ai_rewrite,
             str(ai_rewrite.get("revised_text") or revised_text or ""),
         )
+        ai_rewrite["revised_text"] = normalized_revised
     if current_target:
         ai_rewrite["target_text"] = current_target
     ai_rewrite["comment_text"] = _build_ai_comment_text(
@@ -2097,7 +2494,8 @@ def ai_edit_risk(run_id: str, risk_id: str, body: AiEditBody) -> dict[str, Any]:
     workflow_kind = str(ai_rewrite.get("workflow_kind") or "").strip().lower()
     is_aggregate = workflow_kind == "aggregate" or bool(str(target.get("aggregate_id") or "").strip())
     if is_aggregate:
-        resolved_target, _ = _finalize_aggregate_patch_pair(target, ai_rewrite, revised_text)
+        resolved_target, normalized_revised = _finalize_aggregate_patch_pair(target, ai_rewrite, revised_text)
+        ai_rewrite["revised_text"] = normalized_revised
     else:
         resolved_target = current_target
     if resolved_target:

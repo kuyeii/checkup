@@ -439,73 +439,6 @@ function asClauseRefs(value: unknown): string[] {
   return refs
 }
 
-function buildClauseUidAliasMap(clauses: unknown): Record<string, string> {
-  const map: Record<string, string> = {}
-  if (!Array.isArray(clauses)) return map
-  for (const clause of clauses) {
-    if (!clause || typeof clause !== 'object') continue
-    const clauseObj = clause as Record<string, unknown>
-    const uid = String(clauseObj.clause_uid || '').trim()
-    if (!uid) continue
-    map[uid] = uid
-    for (const field of ['clause_id', 'display_clause_id', 'local_clause_id', 'source_clause_id']) {
-      for (const ref of asClauseRefs(clauseObj[field])) {
-        if (!map[ref]) map[ref] = uid
-      }
-    }
-  }
-  return map
-}
-
-function collectRiskClauseKeys(risk: any, clauseAliasMap: Record<string, string>): string[] {
-  if (!risk || typeof risk !== 'object') return []
-  const keys = new Set<string>()
-
-  for (const field of ['clause_uids', 'related_clause_uids', 'clause_uid']) {
-    for (const uid of asClauseRefs((risk as any)?.[field])) {
-      keys.add(clauseAliasMap[uid] || uid)
-    }
-  }
-
-  for (const field of ['clause_ids', 'related_clause_ids', 'display_clause_ids', 'clause_id', 'display_clause_id']) {
-    for (const ref of asClauseRefs((risk as any)?.[field])) {
-      keys.add(clauseAliasMap[ref] || ref)
-    }
-  }
-
-  return Array.from(keys)
-}
-
-function hasClauseAcceptOverlap(
-  risks: any[],
-  targetRiskId: string,
-  clauseAliasMap: Record<string, string>
-) {
-  return findClauseAcceptOverlapRiskIds(risks, targetRiskId, clauseAliasMap).length > 0
-}
-
-function findClauseAcceptOverlapRiskIds(
-  risks: any[],
-  targetRiskId: string,
-  clauseAliasMap: Record<string, string>
-) {
-  const target = risks.find((it) => String(it?.risk_id) === String(targetRiskId))
-  if (!target) return [] as string[]
-  const targetKeys = new Set(collectRiskClauseKeys(target, clauseAliasMap))
-  if (targetKeys.size === 0) return [] as string[]
-
-  const overlapIds: string[] = []
-  for (const it of risks) {
-    if (!it || typeof it !== 'object') continue
-    if (String(it.risk_id) === String(targetRiskId)) continue
-    if (!isAcceptedRiskStatus(it.status)) continue
-    const clauseKeys = collectRiskClauseKeys(it, clauseAliasMap)
-    if (!clauseKeys.some((key) => targetKeys.has(key))) continue
-    overlapIds.push(String(it.risk_id))
-  }
-  return overlapIds
-}
-
 function AlertDialog(props: { open: boolean; title?: string; message: string; onClose: () => void }) {
   if (!props.open) return null
   return (
@@ -1451,17 +1384,6 @@ export default function App() {
 
   const onLocateRisk = useCallback((opts: { riskId?: number | string; riskSourceType?: string; targetText?: string; anchorText?: string; evidenceText?: string; clauseUids?: string[] }) => {
     const { riskId, riskSourceType, ...locateOpts } = opts
-    if (riskId !== undefined && riskId !== null && String(riskSourceType || '').trim().toLowerCase() !== 'missing_clause') {
-      const items = (result?.risk_result_validated?.risk_result?.risk_items || []) as any[]
-      const clauseAliasMap = buildClauseUidAliasMap(result?.merged_clauses || [])
-      const overlapAcceptedIds = findClauseAcceptOverlapRiskIds(items, String(riskId), clauseAliasMap)
-      if (overlapAcceptedIds.length > 0) {
-        alert(
-          `该风险点对应条款已存在已接受修改（风险ID：${overlapAcceptedIds.join('、')}）。请先撤销已接受风险后再定位原文。`
-        )
-        return
-      }
-    }
     const items = (result?.risk_result_validated?.risk_result?.risk_items || []) as any[]
     const riskForLocate = riskId !== undefined && riskId !== null
       ? items.find((it) => String(it?.risk_id) === String(riskId))
