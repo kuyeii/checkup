@@ -1765,7 +1765,8 @@ export default function App() {
           patchId: riskId,
           targetText,
           revisedText,
-          preserveRawTarget: isAggregateRiskLike(item)
+          preserveRawTarget: isAggregateRiskLike(item),
+          scroll: false
         })
         if (applied || editor.getAppliedAiPatch(riskId)) {
           restoredCount += 1
@@ -1780,7 +1781,8 @@ export default function App() {
           targetText,
           anchorText: String(item?.anchor_text || ''),
           evidenceText: String(item?.evidence_text || ''),
-          clauseUids: getLocateClauseUidsForSuggestionInsert(item)
+          clauseUids: getLocateClauseUidsForSuggestionInsert(item),
+          scroll: false
         })
         if (inserted) restoredCount += 1
       }

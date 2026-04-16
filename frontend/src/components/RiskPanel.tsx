@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import DiffMatchPatch from 'diff-match-patch'
 import type { ReviewResultPayload, RiskItem } from '../types'
 
@@ -322,6 +322,18 @@ export function RiskPanel(props: {
   const [editorMode, setEditorMode] = useState<'ai' | 'suggest'>('ai')
   const [localDraftById, setLocalDraftById] = useState<Record<string, string>>({})
   const [lastAction, setLastAction] = useState<{ riskId: string; riskLabel: string; action: 'accepted' | 'rejected' } | null>(null)
+  const riskListRef = useRef<HTMLDivElement | null>(null)
+  const pendingRiskListScrollTopRef = useRef<number | null>(null)
+
+  const snapshotRiskListScroll = () => {
+    pendingRiskListScrollTopRef.current = riskListRef.current?.scrollTop ?? null
+  }
+
+  useLayoutEffect(() => {
+    if (pendingRiskListScrollTopRef.current == null || !riskListRef.current) return
+    riskListRef.current.scrollTop = pendingRiskListScrollTopRef.current
+    pendingRiskListScrollTopRef.current = null
+  })
 
   // Persist edited AI suggestions locally so reopening history does NOT lose user edits.
   // This also provides a safe fallback when the backend doesn't support /ai_edit.
@@ -472,6 +484,7 @@ export function RiskPanel(props: {
                   className="btnSmall"
                   onClick={async () => {
                     try {
+                      snapshotRiskListScroll()
                       await props.onSetRiskStatus?.(lastAction.riskId, 'pending')
                       setLastAction(null)
                     } catch (e) {
@@ -485,7 +498,7 @@ export function RiskPanel(props: {
             </div>
           ) : null}
 
-          <div className="riskList">
+          <div className="riskList" ref={riskListRef}>
             {grouped.map(([dim, items]) => (
               <details key={dim} className="riskGroup" open>
                 <summary className="riskGroupTitle">
@@ -622,6 +635,7 @@ export function RiskPanel(props: {
                             onClick={async () => {
                               if (r.risk_id === undefined || r.risk_id === null) return
                               try {
+                                snapshotRiskListScroll()
                                 await props.onRejectRisk?.(r.risk_id)
                                 setLastAction({ riskId: String(r.risk_id), riskLabel: presentRiskLabel(r), action: 'rejected' })
                               } catch (e) {
@@ -638,7 +652,7 @@ export function RiskPanel(props: {
                             disabled={r.risk_id === undefined || r.risk_id === null}
                             onClick={async () => {
                               if (r.risk_id === undefined || r.risk_id === null) return
-                              props.onLocateRisk(locatePayloadOf(r))
+                              snapshotRiskListScroll()
                               const ai = r.ai_rewrite || r.ai_apply
                               const localKey = String(r.risk_id)
                               const effectiveRevised = String(
@@ -675,6 +689,7 @@ export function RiskPanel(props: {
                         disabled={!props.canUndoAcceptAllRisks}
                         onClick={async () => {
                           try {
+                            snapshotRiskListScroll()
                             await props.onUndoAcceptAllRisks?.()
                           } catch (e) {
                             alert(`恢复失败：${String(e)}`)

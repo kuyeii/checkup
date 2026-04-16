@@ -46,6 +46,7 @@ export type DocumentEditorHandle = {
     targetText?: string
     revisedText?: string
     preserveRawTarget?: boolean
+    scroll?: boolean
   }) => boolean
   revertAiPatch: (patchId: string | number) => boolean
   getAppliedAiPatch: (patchId: string | number) => AppliedAiPatchSnapshot | null
@@ -57,6 +58,7 @@ export type DocumentEditorHandle = {
     anchorText?: string
     evidenceText?: string
     clauseUids?: string[]
+    scroll?: boolean
   }) => boolean
   removeSuggestionInsertComment: (riskId: string | number) => void
 }
@@ -766,13 +768,17 @@ export const DocumentEditor = forwardRef<
     }, 160)
   }
 
-  const scrollToEl = (el: HTMLElement) => {
+  const scrollToEl = (el: HTMLElement, opts?: { scroll?: boolean; pulse?: boolean }) => {
+    const scroll = opts?.scroll !== false
+    const pulse = opts?.pulse !== false
     const sc = scrollRef.current
-    if (!sc) return
-    const rect = el.getBoundingClientRect()
-    const scRect = sc.getBoundingClientRect()
-    const top = rect.top - scRect.top + sc.scrollTop
-    sc.scrollTo({ top: Math.max(0, top - 120), behavior: 'smooth' })
+    if (scroll && sc) {
+      const rect = el.getBoundingClientRect()
+      const scRect = sc.getBoundingClientRect()
+      const top = rect.top - scRect.top + sc.scrollTop
+      sc.scrollTo({ top: Math.max(0, top - 120), behavior: 'smooth' })
+    }
+    if (!pulse) return
     if (focusTimer.current) {
       window.clearTimeout(focusTimer.current)
       focusTimer.current = null
@@ -882,6 +888,7 @@ export const DocumentEditor = forwardRef<
     targetText?: string
     revisedText?: string
     preserveRawTarget?: boolean
+    scroll?: boolean
   }) => {
     const patchId = opts.patchId == null ? '' : String(opts.patchId)
     const rawTargetText = String(opts.targetText || '').trim()
@@ -1014,7 +1021,7 @@ export const DocumentEditor = forwardRef<
     }
 
     computeEdits()
-    scrollToEl(matched)
+    scrollToEl(matched, { scroll: opts.scroll !== false })
     return true
   }
 
@@ -1150,7 +1157,16 @@ export const DocumentEditor = forwardRef<
     applyAiPatch,
     revertAiPatch,
     getAppliedAiPatch,
-    addSuggestionInsertComment: (opts) => {
+    addSuggestionInsertComment: (opts: {
+      riskId: string | number
+      suggestionText: string
+      riskSourceType?: string
+      targetText?: string
+      anchorText?: string
+      evidenceText?: string
+      clauseUids?: string[]
+      scroll?: boolean
+    }) => {
       const riskId = String(opts.riskId || '').trim()
       const suggestionText = String(opts.suggestionText || '').trim()
       if (!riskId || !suggestionText) return false
@@ -1197,7 +1213,7 @@ export const DocumentEditor = forwardRef<
         const rest = prev.filter((item) => item.sourceRiskId !== riskId)
         return [...rest, nextComment]
       })
-      scrollToEl(matched)
+      scrollToEl(matched, { scroll: opts.scroll !== false })
       return true
     },
     removeSuggestionInsertComment: (riskId) => {
