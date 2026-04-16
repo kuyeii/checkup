@@ -49,6 +49,11 @@ export function UploadDashboard(props: {
     props.setFile(nextFile)
   }
 
+  const handleUploadCardClick = () => {
+    if (props.isReviewing) return
+    if (!hasFile) inputRef.current?.click()
+  }
+
   const hasFile = Boolean(props.file)
 
   const renderMatrixSection = () => (
@@ -116,19 +121,17 @@ export function UploadDashboard(props: {
         <div className={`uploadCardContainer w-full max-w-[640px] shrink-0 ${hasFile ? 'uploadCardContainer--uploaded' : ''}`}>
           <div
             className={`uploadCard ${isDragActive ? 'uploadCard--active' : ''} ${hasFile ? 'uploadCard--uploaded' : ''}`}
-            onClick={() => {
-              if (!hasFile) inputRef.current?.click()
-            }}
+            onClick={handleUploadCardClick}
             onDragOver={(event) => {
               event.preventDefault()
-              if (!hasFile) setIsDragActive(true)
+              if (!hasFile && !props.isReviewing) setIsDragActive(true)
             }}
             onDragLeave={() => setIsDragActive(false)}
             onDrop={(event) => {
               event.preventDefault()
               setIsDragActive(false)
               const nextFile = event.dataTransfer.files?.[0] || null
-              pickFile(nextFile)
+              if (!props.isReviewing) pickFile(nextFile)
             }}
           >
             <input
@@ -166,6 +169,7 @@ export function UploadDashboard(props: {
                     className="postUploadRemoveBtn"
                     aria-label="移除文件"
                     onClick={() => props.setFile(null)}
+                    disabled={props.isReviewing}
                   >
                     <X size={20} />
                   </button>
@@ -190,6 +194,7 @@ export function UploadDashboard(props: {
                         aria-checked={active}
                         className={`postUploadSideCard ${active ? 'postUploadSideCard--active' : ''}`}
                         onClick={() => props.onReviewSideChange(side)}
+                        disabled={props.isReviewing}
                       >
                         <div className="postUploadSideCardHeader">
                           <div className="postUploadSideCardTitle">{copy.title}</div>

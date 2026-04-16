@@ -549,9 +549,21 @@ export default function App() {
   }, [])
 
   const handleUploadFileChange = useCallback((nextFile: File | null) => {
+    if (isReviewing) {
+      openDialog('当前合同仍在审查中，请等待审查完成后再开始新的合同审查。')
+      return
+    }
     setFile(nextFile)
     setSelectedReviewSide(null)
-  }, [])
+  }, [isReviewing, openDialog])
+
+  const handleReviewSideChange = useCallback((side: ReviewSideOption) => {
+    if (isReviewing) {
+      openDialog('当前合同仍在审查中，请等待审查完成后再切换审查立场。')
+      return
+    }
+    setSelectedReviewSide(side)
+  }, [isReviewing, openDialog])
 
   useEffect(() => {
     const originalAlert = window.alert.bind(window)
@@ -1062,6 +1074,10 @@ export default function App() {
   }, [applyLoadedReviewWorkspace, loadReviewWorkspace, maybeAutoApplyAllForRun, navigate])
 
   const startReview = useCallback(async () => {
+    if (isReviewing) {
+      openDialog('当前合同仍在审查中，请等待审查完成后再开始新的合同审查。')
+      return
+    }
     if (!file || !selectedReviewSide) return
     setIsReviewing(true)
     setResult(null)
@@ -2121,7 +2137,7 @@ export default function App() {
               setFile={handleUploadFileChange}
               isReviewing={isReviewing}
               reviewSide={selectedReviewSide}
-              onReviewSideChange={setSelectedReviewSide}
+              onReviewSideChange={handleReviewSideChange}
               onStartReview={async () => {
                 try {
                   await startReview()
