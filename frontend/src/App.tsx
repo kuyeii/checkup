@@ -522,6 +522,7 @@ export default function App() {
   const autoAiDisabledRef = useRef<boolean>(readSessionValue(AUTO_AI_DISABLED_STORAGE_KEY) === '1')
   const previewWaitingRef = useRef<boolean>(isPreviewWaitingMode())
   const previewAutoCompleteRef = useRef<boolean>(isPreviewAutoCompleteMode())
+  const prevPathnameRef = useRef(location.pathname)
   const routeRunId = parseReviewRunId(location.pathname)
   const isRouteHydrating =
     !!routeRunId &&
@@ -708,6 +709,7 @@ export default function App() {
   useEffect(() => {
     setActiveNav(navFromPathname(location.pathname))
   }, [location.pathname])
+
 
   useEffect(() => {
     if (location.pathname === '/') {
@@ -1945,8 +1947,7 @@ export default function App() {
   // Auto AI generation is allowed only for the run started in the current session.
   // Arbitrary historical records remain guarded by newRunIdRef + autoAiTriggeredRef.
 
-  const goUploadPage = useCallback(() => {
-    navigate(pathForNav('upload'))
+  const resetReviewWorkspace = useCallback(() => {
     setRouteHydratingRunId(null)
     setIsReviewing(false)
     handleUploadFileChange(null)
@@ -1955,7 +1956,21 @@ export default function App() {
     setResult(null)
     setEdits([])
     removeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY)
-  }, [navigate])
+  }, [handleUploadFileChange])
+
+  const goUploadPage = useCallback(() => {
+    navigate(pathForNav('upload'))
+    resetReviewWorkspace()
+  }, [navigate, resetReviewWorkspace])
+
+  useEffect(() => {
+    const prevNav = navFromPathname(prevPathnameRef.current)
+    const nextNav = navFromPathname(location.pathname)
+    if (prevNav === 'result' && nextNav === 'upload') {
+      resetReviewWorkspace()
+    }
+    prevPathnameRef.current = location.pathname
+  }, [location.pathname, resetReviewWorkspace])
 
   const goHistoryPage = useCallback(() => {
     navigate(pathForNav('history'))
@@ -2013,7 +2028,17 @@ export default function App() {
                 riskCount={riskCount}
                 riskStats={riskStats}
                 isReviewing={isReviewing}
-                onBack={() => navigate(pathForNav(prevNavRef.current))}
+                onBack={() => {
+                  if (prevNavRef.current === 'upload') {
+                    goUploadPage()
+                    return
+                  }
+                  if (prevNavRef.current === 'history') {
+                    goHistoryPage()
+                    return
+                  }
+                  navigate(pathForNav(prevNavRef.current))
+                }}
                 onGoUpload={goUploadPage}
                 onGoHistory={goHistoryPage}
                 downloadUrl={result?.download_url || null}
