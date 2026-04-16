@@ -422,6 +422,22 @@ function isMissingClauseRisk(risk: any) {
   return String(risk?.risk_source_type || '').trim().toLowerCase() === 'missing_clause'
 }
 
+function getPrimaryClauseUidForRisk(risk: any) {
+  if (!risk || typeof risk !== 'object') return ''
+  const clauseUids = Array.isArray(risk?.clause_uids) ? risk.clause_uids : []
+  const relatedClauseUids = Array.isArray(risk?.related_clause_uids) ? risk.related_clause_uids : []
+  return String(clauseUids[0] || relatedClauseUids[0] || risk?.clause_uid || '').trim()
+}
+
+function getLocateClauseUidsForSuggestionInsert(risk: any) {
+  const primaryUid = getPrimaryClauseUidForRisk(risk)
+  if (isMissingClauseRisk(risk) && primaryUid) return [primaryUid]
+  const allClauseUids =
+    (Array.isArray(risk?.clause_uids) && risk.clause_uids.length > 0 ? risk.clause_uids : risk?.related_clause_uids) || []
+  const refs = asClauseRefs(allClauseUids)
+  return refs.length > 0 ? refs : primaryUid ? [primaryUid] : []
+}
+
 function asClauseRefs(value: unknown): string[] {
   const refs: string[] = []
   const seen = new Set<string>()
@@ -1571,8 +1587,7 @@ export default function App() {
               targetText,
               anchorText: String(found?.anchor_text || ''),
               evidenceText: String(found?.evidence_text || ''),
-              clauseUids:
-                (found?.clause_uids && found?.clause_uids.length > 0 ? found.clause_uids : found?.related_clause_uids) || []
+              clauseUids: getLocateClauseUidsForSuggestionInsert(found)
             })
           }
         }
@@ -1656,8 +1671,7 @@ export default function App() {
               targetText,
               anchorText: String(item?.anchor_text || ''),
               evidenceText: String(item?.evidence_text || ''),
-              clauseUids:
-                (item?.clause_uids && item?.clause_uids.length > 0 ? item.clause_uids : item?.related_clause_uids) || []
+              clauseUids: getLocateClauseUidsForSuggestionInsert(item)
             })
           }
         }
@@ -1741,6 +1755,12 @@ export default function App() {
       const shouldRestorePatch = Boolean(targetText && (aiState === 'succeeded' || revisedText))
 
       if (shouldRestorePatch) {
+        const existingPatch = editor.getAppliedAiPatch(riskId)
+        if (existingPatch && existingPatch.revisedText === revisedText) {
+          restoredCount += 1
+          continue
+        }
+
         const applied = editor.applyAiPatch({
           patchId: riskId,
           targetText,
@@ -1760,8 +1780,7 @@ export default function App() {
           targetText,
           anchorText: String(item?.anchor_text || ''),
           evidenceText: String(item?.evidence_text || ''),
-          clauseUids:
-            (item?.clause_uids && item?.clause_uids.length > 0 ? item.clause_uids : item?.related_clause_uids) || []
+          clauseUids: getLocateClauseUidsForSuggestionInsert(item)
         })
         if (inserted) restoredCount += 1
       }

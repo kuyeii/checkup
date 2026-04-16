@@ -894,6 +894,33 @@ export const DocumentEditor = forwardRef<
     if (candidateTargets.length === 0) return false
     if (candidateTargets.some((candidate) => candidate === revisedText)) return false
 
+    if (patchId) {
+      const existingRecord = appliedAiPatchMapRef.current.get(patchId)
+      if (existingRecord && existingRecord.revisedText === revisedText) {
+        let existingBlock = blockElsRef.current.get(existingRecord.blockId) || null
+        if (!existingBlock) {
+          for (const candidate of blockElsRef.current.values()) {
+            if (findPatchMarkedNodes(candidate, patchId).length > 0) {
+              existingBlock = candidate
+              break
+            }
+          }
+        }
+        if (existingBlock) {
+          const currentText = plainTextOf(existingBlock)
+          const markedNodes = findPatchMarkedNodes(existingBlock, patchId)
+          const alreadyApplied =
+            markedNodes.length > 0 ||
+            (existingRecord.afterText && currentText === existingRecord.afterText) ||
+            (existingRecord.revisedText && currentText.includes(existingRecord.revisedText) && currentText !== existingRecord.beforeText)
+          if (alreadyApplied) {
+            scrollToEl(existingBlock)
+            return true
+          }
+        }
+      }
+    }
+
     let matched: BlockEl | null = null
     let matchedTargetText = ''
     for (const candidateTarget of candidateTargets) {

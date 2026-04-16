@@ -33,6 +33,27 @@ def _compact_text(text: str) -> str:
     return re.sub(r"\s+", "", str(text or ""))
 
 
+def _compact_text_with_index_map(text: str) -> tuple[str, list[int]]:
+    compact_chars: list[str] = []
+    index_map: list[int] = []
+    for idx, ch in enumerate(str(text or "")):
+        if ch.isspace():
+            continue
+        compact_chars.append(ch)
+        index_map.append(idx)
+    return "".join(compact_chars), index_map
+
+
+def _text_contains_candidate(text: str, candidate: str) -> bool:
+    raw_text = str(text or "")
+    raw_candidate = str(candidate or "")
+    if not raw_candidate:
+        return False
+    if raw_candidate in raw_text:
+        return True
+    return _compact_text(raw_candidate) in _compact_text(raw_text)
+
+
 def _unwrap_risks(payload: Any) -> list[dict[str, Any]]:
     if isinstance(payload, dict) and "risk_result" in payload:
         payload = payload["risk_result"]
@@ -50,8 +71,6 @@ def _is_accepted_status(value: Any) -> bool:
 def _pick_candidates(risk: dict[str, Any]) -> list[str]:
     accepted_patch = risk.get("accepted_patch") if isinstance(risk.get("accepted_patch"), dict) else {}
     accepted_before = str(accepted_patch.get("before_text") or "").strip()
-    if accepted_before:
-        return [accepted_before]
 
     ai_rewrite = risk.get("ai_rewrite") if isinstance(risk.get("ai_rewrite"), dict) else {}
     ai_apply = risk.get("ai_apply") if isinstance(risk.get("ai_apply"), dict) else {}
@@ -65,6 +84,7 @@ def _pick_candidates(risk: dict[str, Any]) -> list[str]:
 
     if ai_first:
         ranked_sources: list[tuple[int, str]] = [
+            (0, accepted_before),
             (0, str(ai_apply.get("target_text") or "").strip()),
             (0, str(ai_rewrite.get("target_text") or "").strip()),
             (1, str(locator.get("matched_text") or "").strip()),
@@ -75,13 +95,14 @@ def _pick_candidates(risk: dict[str, Any]) -> list[str]:
         ]
     else:
         ranked_sources = [
-            (0, str(locator.get("matched_text") or "").strip()),
-            (1, str(risk.get("evidence_text") or "").strip()),
-            (2, str(ai_rewrite.get("target_text") or "").strip()),
-            (2, str(ai_apply.get("target_text") or "").strip()),
-            (3, str(risk.get("target_text") or "").strip()),
-            (4, locator_resolved_target_text),
-            (5, str(risk.get("anchor_text") or "").strip()),
+            (0, accepted_before),
+            (1, str(locator.get("matched_text") or "").strip()),
+            (2, str(risk.get("evidence_text") or "").strip()),
+            (3, str(ai_rewrite.get("target_text") or "").strip()),
+            (3, str(ai_apply.get("target_text") or "").strip()),
+            (4, str(risk.get("target_text") or "").strip()),
+            (5, locator_resolved_target_text),
+            (6, str(risk.get("anchor_text") or "").strip()),
         ]
 
     by_compact: dict[str, tuple[int, str]] = {}
@@ -122,6 +143,41 @@ def _pick_candidates(risk: dict[str, Any]) -> list[str]:
         seen.add(compact)
         ordered.append(text)
     return ordered
+
+
+def _pick_locator_validation_candidates(risk: dict[str, Any]) -> list[str]:
+    """
+    Candidates used only to validate whether an existing locator still points to
+    the intended paragraph. We intentionally exclude locator-derived texts here:
+    a stale/wrong locator must never self-validate and drag the revision onto an
+    unrelated paragraph during DOCX export.
+    """
+    accepted_patch = risk.get("accepted_patch") if isinstance(risk.get("accepted_patch"), dict) else {}
+    ai_rewrite = risk.get("ai_rewrite") if isinstance(risk.get("ai_rewrite"), dict) else {}
+    ai_apply = risk.get("ai_apply") if isinstance(risk.get("ai_apply"), dict) else {}
+
+    ranked_sources = [
+        (0, str(accepted_patch.get("before_text") or "").strip()),
+        (1, str(ai_apply.get("target_text") or "").strip()),
+        (1, str(ai_rewrite.get("target_text") or "").strip()),
+        (2, str(risk.get("target_text") or "").strip()),
+        (3, str(risk.get("evidence_text") or "").strip()),
+        (4, str(risk.get("anchor_text") or "").strip()),
+    ]
+
+    by_compact: dict[str, tuple[int, str]] = {}
+    for rank, raw in ranked_sources:
+        text = str(raw or "").strip()
+        compact = _compact_text(text)
+        if len(compact) < 1:
+            continue
+        prev = by_compact.get(compact)
+        if prev is None or rank < prev[0] or (rank == prev[0] and len(compact) > len(_compact_text(prev[1]))):
+            by_compact[compact] = (rank, text)
+
+    ranked = [(rank, text, _compact_text(text)) for rank, text in by_compact.values()]
+    ranked.sort(key=lambda item: (item[0], -len(item[2])))
+    return [text for _rank, text, _compact in ranked]
 
 
 def _set_text(node: etree._Element, text: str) -> None:
@@ -348,24 +404,39 @@ def _pick_best_target_span(
 ) -> tuple[int, int] | None:
     if not target_text:
         return None
-    starts: list[int] = []
+
+    starts: list[tuple[int, int]] = []
     from_idx = 0
     while from_idx <= len(old_text) - len(target_text):
         idx = old_text.find(target_text, from_idx)
         if idx < 0:
             break
-        starts.append(idx)
+        starts.append((idx, idx + len(target_text)))
         from_idx = idx + len(target_text)
+
+    if not starts:
+        compact_old, compact_old_map = _compact_text_with_index_map(old_text)
+        compact_target = _compact_text(target_text)
+        if compact_target and len(compact_old) >= len(compact_target):
+            compact_from = 0
+            while compact_from <= len(compact_old) - len(compact_target):
+                compact_idx = compact_old.find(compact_target, compact_from)
+                if compact_idx < 0:
+                    break
+                compact_end = compact_idx + len(compact_target)
+                start_idx = compact_old_map[compact_idx]
+                end_idx = compact_old_map[compact_end - 1] + 1
+                starts.append((start_idx, end_idx))
+                compact_from = compact_idx + len(compact_target)
+
     if not starts:
         return None
     if len(starts) == 1:
-        s = starts[0]
-        return (s, s + len(target_text))
+        return starts[0]
 
     punct = set("，。；：,.!?！？ \t\r\n")
-    best: tuple[float, int] | None = None
-    for idx in starts:
-        end = idx + len(target_text)
+    best: tuple[float, tuple[int, int]] | None = None
+    for idx, end in starts:
         target_pieces = _slice_pieces(pieces, idx, end)
         score = 0.0
         if _target_has_underlined_digits(target_pieces):
@@ -376,14 +447,15 @@ def _pick_best_target_span(
             score += 20.0
         if end == len(old_text) or right in punct:
             score += 20.0
+        compact_len = len(_compact_text(old_text[idx:end]))
+        score += compact_len / 100.0
         score -= idx / 10000.0
         if best is None or score > best[0]:
-            best = (score, idx)
+            best = (score, (idx, end))
 
     if best is None:
         return None
-    start = best[1]
-    return (start, start + len(target_text))
+    return best[1]
 
 
 def _paragraph_text_len(pieces: list[tuple[str, etree._Element | None]]) -> int:
@@ -535,6 +607,24 @@ def _first_explicit_text(payloads: list[tuple[dict[str, Any], str]]) -> str | No
     return None
 
 
+def _has_exportable_patch(
+    *,
+    status: str,
+    decision: str,
+    ai_state: str,
+    accepted_patch: dict[str, Any],
+) -> bool:
+    if not _is_accepted_status(status):
+        return False
+    if decision and decision != "accepted":
+        return False
+    accepted_kind = str(accepted_patch.get("kind") or "").strip().lower()
+    accepted_after = str(accepted_patch.get("after_text") or "").strip()
+    if accepted_kind == "suggest_insert" and accepted_after:
+        return True
+    return ai_state == "succeeded"
+
+
 def export_ai_patches_to_docx(
     input_docx: Path,
     risk_path: Path,
@@ -564,14 +654,15 @@ def export_ai_patches_to_docx(
             ai_apply = risk.get("ai_apply") if isinstance(risk.get("ai_apply"), dict) else {}
             ai_state = str(ai_rewrite.get("state") or ai_apply.get("state") or "").strip().lower()
 
-            if not _is_accepted_status(status):
-                continue
-            if decision and decision != "accepted":
-                continue
-            if ai_state != "succeeded":
+            accepted_patch = risk.get("accepted_patch") if isinstance(risk.get("accepted_patch"), dict) else {}
+            if not _has_exportable_patch(
+                status=status,
+                decision=decision,
+                ai_state=ai_state,
+                accepted_patch=accepted_patch,
+            ):
                 continue
 
-            accepted_patch = risk.get("accepted_patch") if isinstance(risk.get("accepted_patch"), dict) else {}
             revised_text = _first_explicit_text(
                 [
                     (accepted_patch, "after_text"),
@@ -597,12 +688,15 @@ def export_ai_patches_to_docx(
             if 0 <= para_idx < len(paragraphs):
                 para = paragraphs[para_idx]
                 old_text = _paragraph_text_for_match(para)
-                chosen_target = next((c for c in candidates if c and c in old_text), "")
+                locator_candidates = _pick_locator_validation_candidates(risk)
+                chosen_target = next((c for c in locator_candidates if c and _text_contains_candidate(old_text, c)), "")
+                if not chosen_target:
+                    para = None
 
             if para is None or not chosen_target:
                 for p in paragraphs:
                     old_text = _paragraph_text_for_match(p)
-                    found = next((c for c in candidates if c and c in old_text), "")
+                    found = next((c for c in candidates if c and _text_contains_candidate(old_text, c)), "")
                     if found:
                         para = p
                         chosen_target = found

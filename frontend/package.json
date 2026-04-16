@@ -9,6 +9,7 @@
     "preview": "node ./node_modules/vite/bin/vite.js preview --port 5173 --host"
   },
   "dependencies": {
+    "@remix-run/router": "^1.23.2",
     "diff-match-patch": "^1.0.5",
     "docx-preview": "^0.3.2",
     "lucide-react": "^0.546.0",

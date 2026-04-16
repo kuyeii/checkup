@@ -163,13 +163,34 @@ def _find_best_paragraph(paragraphs: list[ParagraphIndex], snippets: list[str]) 
             pt = _normalize_ws(para.text)
             if not pt:
                 continue
-            if sn in pt or pt in sn:
+            matched = False
+            score = -1
+            if sn in pt:
+                matched = True
                 score = min(len(sn), len(pt))
-                if score > best_score:
-                    best = para
-                    best_snippet = sn
-                    best_score = score
+            elif len(pt) >= 6 and pt in sn:
+                matched = True
+                score = len(pt)
+            if matched and score > best_score:
+                best = para
+                best_snippet = sn
+                best_score = score
     return best, best_snippet
+
+
+def _resolve_locator_paragraph(
+    paragraphs: list[ParagraphIndex],
+    risk: dict[str, Any],
+) -> ParagraphIndex | None:
+    locator = risk.get("locator") if isinstance(risk.get("locator"), dict) else {}
+    raw_index = locator.get("paragraph_index")
+    try:
+        paragraph_index = int(raw_index)
+    except Exception:
+        return None
+    if paragraph_index < 0 or paragraph_index >= len(paragraphs):
+        return None
+    return paragraphs[paragraph_index]
 
 
 def _load_json(path: Path) -> Any:
@@ -243,16 +264,49 @@ def _resolve_clauses_for_risk(risk: dict[str, Any], by_uid: dict[str, dict[str, 
     return resolved
 
 
+def _first_non_empty_text(values: list[Any]) -> str:
+    for value in values:
+        text = str(value or "").strip()
+        if text:
+            return text
+    return ""
+
+
+
+def _pick_suggestion_text(risk: dict[str, Any]) -> str:
+    return _first_non_empty_text(
+        [
+            risk.get("suggestion"),
+            risk.get("suggestion_optimized"),
+            risk.get("suggestion_minimal"),
+            risk.get("basis"),
+        ]
+    )
+
+
+
+def _normalize_comment_text(text: str) -> str:
+    return re.sub(r"\n{3,}", "\n\n", str(text or "").strip())
+
+
+
 def _build_comment_text(risk: dict[str, Any], clauses: list[dict[str, Any]]) -> str:
+    accepted_patch = risk.get("accepted_patch") if isinstance(risk.get("accepted_patch"), dict) else {}
+    accepted_kind = str(accepted_patch.get("kind") or "").strip().lower()
+    accepted_comment_text = _normalize_comment_text(str(accepted_patch.get("comment_text") or ""))
+    if accepted_kind == "suggest_insert" and accepted_comment_text:
+        return accepted_comment_text
+
     issue = str(risk.get("issue") or risk.get("risk_label") or risk.get("title") or "").strip() or "—"
     basis = str(risk.get("basis_summary") or risk.get("basis") or "").strip() or "—"
-    suggestion = str(risk.get("suggestion") or "").strip() or "—"
+    suggestion = _pick_suggestion_text(risk) or "—"
+    suggestion_label = "【建议插入】" if accepted_kind == "suggest_insert" else "【建议】"
 
     return "\n".join(
         [
             f"【问题】{issue}",
             f"【依据】{basis}",
-            f"【建议】{suggestion}",
+            f"{suggestion_label}：{suggestion}",
         ]
     )
 
@@ -311,19 +365,24 @@ def export_comments_to_docx(
             risk_added = 0
 
             for clause in comment_targets:
-                snippets: list[str] = []
-                for key in [risk.get("anchor_text"), risk.get("evidence_text")]:
-                    if isinstance(key, str):
-                        snippets.extend(_candidate_snippets(key))
-                if clause is not None:
-                    for key in [clause.get("clause_text"), clause.get("clause_title")]:
+                para = _resolve_locator_paragraph(paragraphs, risk)
+                matched = None
+                if para is not None:
+                    matched = str((risk.get("locator") or {}).get("matched_text") or "").strip() or _normalize_ws(para.text)
+                else:
+                    snippets: list[str] = []
+                    for key in [risk.get("anchor_text"), risk.get("evidence_text")]:
                         if isinstance(key, str):
                             snippets.extend(_candidate_snippets(key))
-                    if risk_source_type == "missing_clause":
-                        for key in [clause.get("display_clause_id"), clause.get("clause_id"), clause.get("source_clause_id")]:
+                    if clause is not None:
+                        for key in [clause.get("clause_text"), clause.get("clause_title")]:
                             if isinstance(key, str):
                                 snippets.extend(_candidate_snippets(key))
-                para, matched = _find_best_paragraph(paragraphs, snippets)
+                        if risk_source_type == "missing_clause":
+                            for key in [clause.get("display_clause_id"), clause.get("clause_id"), clause.get("source_clause_id")]:
+                                if isinstance(key, str):
+                                    snippets.extend(_candidate_snippets(key))
+                    para, matched = _find_best_paragraph(paragraphs, snippets)
                 if para is None:
                     unmatched.append({
                         "risk_id": risk.get("risk_id"),

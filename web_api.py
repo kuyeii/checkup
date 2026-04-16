@@ -20,6 +20,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from config import settings
 from src.dify_client import DifyWorkflowClient, DifyWorkflowError, extract_blocking_outputs
+from src.docx_locator import enrich_reviewed_risks_with_locators
 from src.parse_outputs import _load_json_with_repair, strip_markdown_json
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -612,6 +613,90 @@ def _apply_anchored_only_target_floor(
     return resolved
 
 
+def _common_prefix_len(left: str, right: str) -> int:
+    prefix = 0
+    max_prefix = min(len(left), len(right))
+    while prefix < max_prefix and left[prefix] == right[prefix]:
+        prefix += 1
+    return prefix
+
+
+def _looks_like_tail_continuation(prefix_text: str, suffix_text: str) -> bool:
+    prefix = str(prefix_text or "").rstrip()
+    suffix = str(suffix_text or "").lstrip()
+    if not prefix or not suffix:
+        return False
+
+    if not prefix.endswith(("：", ":", "，", ",", "、", "；", ";")):
+        return False
+
+    continuation_starters = (
+        "同时",
+        "并",
+        "并应",
+        "并由",
+        "且",
+        "且应",
+        "以及",
+        "及",
+        "还",
+        "还应",
+        "应",
+        "由",
+        "按",
+        "其中",
+        "但",
+    )
+    return any(suffix.startswith(starter) for starter in continuation_starters)
+
+
+def _repair_aggregate_missing_prefix_target(
+    source_text: str | None,
+    current_target: str | None,
+    revised_text: str | None,
+) -> str:
+    source = str(source_text or "").strip()
+    current = str(current_target or "").strip()
+    revised = str(revised_text or "").strip()
+    if not source or not current or not revised:
+        return current
+
+    # Only repair the specific case where aggregate target is still the full
+    # host clause, but the model returned a tail fragment that starts from an
+    # inner continuation point (e.g. "同时…/并…") and omitted the unchanged
+    # leading prefix. This keeps already well-scoped targets unchanged.
+    if current != source:
+        return current
+    if _common_prefix_len(current, revised) >= 2:
+        return current
+
+    blocks = _significant_match_blocks(current, revised)
+    if not blocks:
+        return current
+
+    min_block_size = max(6, min(18, len(current) // 4))
+    for block in blocks:
+        if block.b > 1 or block.a < 4 or block.size < min_block_size:
+            continue
+
+        candidate = current[block.a:].strip()
+        if not candidate:
+            continue
+
+        dropped_prefix = current[: block.a]
+        if not _looks_like_tail_continuation(dropped_prefix, candidate):
+            continue
+
+        matched_chars, longest_block, _ = _sequence_match_stats(candidate, revised)
+        min_match_chars = max(8, min(len(candidate), len(revised)) // 3)
+        if longest_block < min_block_size or matched_chars < min_match_chars:
+            continue
+
+        return candidate
+
+    return current
+
+
 def _resolve_aggregate_patch_target(item: dict[str, Any], ai_payload: dict[str, Any], revised_text: str | None = None) -> str:
     if not isinstance(item, dict) or not isinstance(ai_payload, dict):
         return str(ai_payload.get("target_text") or "").strip()
@@ -631,6 +716,7 @@ def _resolve_aggregate_patch_target(item: dict[str, Any], ai_payload: dict[str, 
 
     shrunk = _shrink_aggregate_target_text(baseline, next_revised)
     resolved = str(shrunk or baseline).strip()
+    resolved = _repair_aggregate_missing_prefix_target(source_target, resolved, next_revised)
     resolved = _apply_anchored_only_target_floor(item, baseline, resolved)
     return resolved
 
@@ -1262,6 +1348,49 @@ def _distinct_non_empty_texts(values: list[Any]) -> list[str]:
         seen.add(text)
         out.append(text)
     return out
+
+
+def _pick_suggestion_insert_text(risk: dict[str, Any]) -> str:
+    return _first_non_empty_text(
+        [
+            risk.get("suggestion"),
+            risk.get("suggestion_optimized"),
+            risk.get("suggestion_minimal"),
+            risk.get("basis"),
+        ]
+    )
+
+
+
+def _build_suggest_insert_comment_text(risk: dict[str, Any]) -> str:
+    issue = str(risk.get("issue") or risk.get("risk_label") or risk.get("title") or "").strip() or "—"
+    basis = str(risk.get("basis_summary") or risk.get("basis") or "").strip() or "—"
+    suggestion = _pick_suggestion_insert_text(risk) or "—"
+    return "\n".join(
+        [
+            f"【问题】{issue}",
+            f"【依据】{basis}",
+            f"【建议插入】：{suggestion}",
+        ]
+    )
+
+
+
+def _build_suggest_insert_patch(risk: dict[str, Any]) -> dict[str, Any] | None:
+    suggestion_text = _pick_suggestion_insert_text(risk)
+    if not suggestion_text:
+        return None
+
+    patch: dict[str, Any] = {
+        "kind": "suggest_insert",
+        "after_text": suggestion_text,
+        "comment_text": _build_suggest_insert_comment_text(risk),
+        "created_at": _iso_now(),
+    }
+    before_text = _extract_target_text(risk)
+    if before_text:
+        patch["before_text"] = before_text
+    return patch
 
 
 def _find_clause_by_key(clause_key: str, clauses: list[dict[str, Any]], alias_map: dict[str, str] | None = None) -> dict[str, Any] | None:
@@ -2119,6 +2248,14 @@ def _export_docx_with_reviewed_risks(run_id: str) -> Path:
     reviewed_path = run_dir / "risk_result_reviewed.json"
     reviewed_path.write_text(json.dumps(reviewed_payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    locator_stdout = ""
+    locator_stderr = ""
+    try:
+        locator_report = enrich_reviewed_risks_with_locators(run_id, run_root=RUN_ROOT)
+        locator_stdout = json.dumps(locator_report, ensure_ascii=False, indent=2)
+    except Exception as exc:
+        locator_stderr = str(exc)
+
     patched_docx = run_dir / "ai_patched.docx"
     patch_cmd = [
         "python",
@@ -2165,6 +2302,8 @@ def _export_docx_with_reviewed_risks(run_id: str) -> Path:
         [
             "[ai_patch]",
             patch_proc.stdout or "",
+            "[risk_locator]",
+            locator_stdout,
             "[risk_comments]",
             comment_proc.stdout or "",
         ]
@@ -2173,6 +2312,8 @@ def _export_docx_with_reviewed_risks(run_id: str) -> Path:
         [
             "[ai_patch]",
             patch_proc.stderr or "",
+            "[risk_locator]",
+            locator_stderr,
             "[risk_comments]",
             comment_proc.stderr or "",
         ]
@@ -2227,15 +2368,25 @@ def patch_risk_status(run_id: str, risk_id: str, body: RiskPatchBody) -> dict[st
         raise HTTPException(status_code=404, detail="risk_id 不存在")
 
     target["status"] = status
+    accepted_patch = target.get("accepted_patch") if isinstance(target.get("accepted_patch"), dict) else {}
+    accepted_kind = str(accepted_patch.get("kind") or "").strip().lower()
     if status == "accepted":
         ai_rewrite = target.get("ai_rewrite") if isinstance(target.get("ai_rewrite"), dict) else {}
         if str(ai_rewrite.get("state") or "").strip().lower() == "succeeded":
             target["ai_rewrite_decision"] = "accepted"
+        else:
+            suggest_insert_patch = _build_suggest_insert_patch(target)
+            if suggest_insert_patch:
+                target["accepted_patch"] = suggest_insert_patch
     elif status == "rejected":
         target["ai_rewrite_decision"] = "rejected"
+        if accepted_kind == "suggest_insert":
+            target.pop("accepted_patch", None)
     elif status == "pending":
         if isinstance(target.get("ai_rewrite"), dict):
             target["ai_rewrite_decision"] = "proposed"
+        if accepted_kind == "suggest_insert":
+            target.pop("accepted_patch", None)
 
     _persist_reviewed_payload(run_dir, reviewed)
     return {"ok": True, "item": target}
@@ -2270,6 +2421,10 @@ def accept_all_risks(run_id: str) -> dict[str, Any]:
         ai_state = str(ai_rewrite.get("state") or "").strip().lower()
         if ai_state == "succeeded":
             item["ai_rewrite_decision"] = "accepted"
+        else:
+            suggest_insert_patch = _build_suggest_insert_patch(item)
+            if suggest_insert_patch:
+                item["accepted_patch"] = suggest_insert_patch
         accepted += 1
 
     _persist_reviewed_payload(run_dir, reviewed)

@@ -70,6 +70,13 @@ def _resolve_related_clauses(
                 seen.add(clause_uid)
                 resolved.append(clause)
 
+    # Canonical clause_uids are already precise enough. Avoid broad ref-based
+    # expansion afterwards, otherwise a top-level ref like "1" can accidentally
+    # pull in unrelated sub-clauses whose source_clause_id is also "1" (e.g.
+    # 5.1 / 8.1), which then poisons DOCX export locators.
+    if resolved:
+        return resolved
+
     refs: list[str] = []
     for key in ("clause_ids", "related_clause_ids", "display_clause_ids"):
         vals = risk.get(key)
