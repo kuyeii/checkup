@@ -274,6 +274,154 @@ def _shrink_aggregate_target_text(original_target_text: str | None, revised_text
     return candidate
 
 
+def _count_fragment_occurrences(source_text: str | None, fragment: str | None) -> int:
+    source = str(source_text or "")
+    target = str(fragment or "")
+    if not source or not target:
+        return 0
+    return len(list(re.finditer(re.escape(target), source)))
+
+
+
+def _sentence_span_containing_index(text: str | None, index: int) -> tuple[int, int] | None:
+    source = str(text or "")
+    if not source or index < 0 or index >= len(source):
+        return None
+    for start, end in _split_text_into_sentence_spans(source):
+        if start <= index < end:
+            return start, end
+    return None
+
+
+
+def _is_unique_stable_sentence_span(source_text: str | None, candidate_text: str | None) -> bool:
+    source = str(source_text or "")
+    candidate = str(candidate_text or "").strip()
+    if not source or not candidate or candidate not in source:
+        return False
+    if _count_fragment_occurrences(source, candidate) != 1:
+        return False
+    spans = _split_text_into_sentence_spans(source)
+    return any(source[start:end].strip() == candidate for start, end in spans)
+
+
+
+def _expand_fragment_to_unique_sentence(source_text: str | None, fragment: str | None) -> str:
+    source = str(source_text or "")
+    raw = str(fragment or "").strip()
+    if not source or not raw or raw == source or raw not in source:
+        return ""
+    if _count_fragment_occurrences(source, raw) != 1:
+        return ""
+
+    match = re.search(re.escape(raw), source)
+    if not match:
+        return ""
+    span = _sentence_span_containing_index(source, match.start())
+    if not span:
+        return ""
+    start, end = span
+    candidate = source[start:end].strip()
+    if not candidate or candidate == source:
+        return ""
+    if _count_fragment_occurrences(source, candidate) != 1:
+        return ""
+    return candidate
+
+
+
+def _aggregate_primary_anchor_field_text(item: dict[str, Any], field: str) -> str:
+    anchored_risk = item.get("anchored_risk")
+    if isinstance(anchored_risk, dict):
+        text = str(anchored_risk.get(field) or "").strip()
+        if text:
+            return text
+
+    anchored_risks = item.get("anchored_risks")
+    if isinstance(anchored_risks, list):
+        for anchored_item in anchored_risks:
+            if not isinstance(anchored_item, dict):
+                continue
+            text = str(anchored_item.get(field) or "").strip()
+            if text:
+                return text
+
+    return str(item.get(field) or "").strip()
+
+
+
+def _select_mixed_aggregate_primary_target(item: dict[str, Any], fallback_target: str | None = None) -> str:
+    clause_text = str(item.get("clause_text") or item.get("target_text") or "").strip()
+    fallback = str(fallback_target or "").strip()
+    if not clause_text:
+        return fallback
+
+    fragment_candidates = [
+        _aggregate_primary_anchor_field_text(item, "evidence_text"),
+        _aggregate_primary_anchor_field_text(item, "target_text"),
+        _aggregate_primary_anchor_field_text(item, "main_text"),
+        _aggregate_primary_anchor_field_text(item, "anchor_text"),
+        fallback,
+    ]
+    seen: set[str] = set()
+    for raw in fragment_candidates:
+        candidate = _sanitize_ai_target_text(raw)
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        expanded = _expand_fragment_to_unique_sentence(clause_text, candidate)
+        if expanded:
+            return expanded
+
+    if fallback and fallback in clause_text and _is_unique_stable_sentence_span(clause_text, fallback):
+        return fallback
+    return fallback or clause_text
+
+
+
+def _is_short_revised_patch(target_text: str | None, revised_text: str | None) -> bool:
+    target = str(target_text or "").strip()
+    revised = str(revised_text or "").strip()
+    if not target or not revised:
+        return False
+    before_changed, after_changed = _minimize_patch_pair(target, revised)
+    before_core = _aggregate_overlap_fragment(before_changed)
+    after_core = _aggregate_overlap_fragment(after_changed)
+    changed_before_len = len(before_core) or len(before_changed.strip())
+    changed_after_len = len(after_core) or len(after_changed.strip())
+    return changed_after_len <= 20 or (changed_after_len <= 28 and changed_before_len <= 18)
+
+
+
+def _apply_mixed_aggregate_target_floor(
+    item: dict[str, Any],
+    baseline: str | None,
+    resolved: str | None,
+    revised_text: str | None = None,
+) -> str:
+    aggregate_type = str(item.get("aggregate_type") or "").strip().lower()
+    current = str(resolved or "").strip()
+    if aggregate_type != "mixed_clause_risks" or not current:
+        return current
+
+    clause_text = str(item.get("clause_text") or item.get("target_text") or "").strip()
+    floor_target = _select_mixed_aggregate_primary_target(item, baseline)
+    if not clause_text or not floor_target or floor_target == current:
+        return current
+    if floor_target not in clause_text or current not in clause_text:
+        return current
+    if current not in floor_target:
+        return current
+    if not _is_unique_stable_sentence_span(clause_text, floor_target):
+        return current
+    if _is_unique_stable_sentence_span(clause_text, current):
+        return current
+    if not _is_short_revised_patch(floor_target, revised_text):
+        return current
+    return floor_target
+
+
+
 def _pick_narrow_aggregate_target(
     item: dict[str, Any],
     ai_payload: dict[str, Any],
@@ -285,6 +433,9 @@ def _pick_narrow_aggregate_target(
     anchor_text = str(item.get("anchor_text") or "").strip()
     aggregate_type = str(item.get("aggregate_type") or "").strip().lower()
     revised = str(revised_text or ai_payload.get("revised_text") or "").strip()
+
+    if aggregate_type == "mixed_clause_risks":
+        return _select_mixed_aggregate_primary_target(item, current_target or evidence_text or anchor_text or clause_text)
 
     if aggregate_type != "anchored_only":
         return current_target or evidence_text or anchor_text or clause_text
@@ -613,6 +764,79 @@ def _apply_anchored_only_target_floor(
     return resolved
 
 
+def _aggregate_target_match_quality(target_text: str | None, revised_text: str | None) -> tuple[int, int, int, int]:
+    target = str(target_text or "").strip()
+    revised = str(revised_text or "").strip()
+    if not target or not revised:
+        return (0, 0, 0, 0)
+
+    matched_chars, longest_block, _ = _sequence_match_stats(target, revised)
+    core_len = max(1, len(_aggregate_overlap_fragment(target)))
+    density = int((matched_chars * 1000) / core_len)
+    return (density, matched_chars, longest_block, -len(target))
+
+
+
+def _can_stably_patch_aggregate_target(target_text: str | None, revised_text: str | None) -> bool:
+    target = str(target_text or "").strip()
+    revised = str(revised_text or "").strip()
+    if not target or not revised:
+        return False
+
+    before_changed, after_changed = _minimize_patch_pair(target, revised)
+    before_core = _aggregate_overlap_fragment(before_changed)
+    after_core = _aggregate_overlap_fragment(after_changed)
+    if len(before_core) < 4 or len(after_core) < 4:
+        return False
+
+    matched_chars, longest_block, _ = _sequence_match_stats(target, revised)
+    min_match_chars = max(6, min(len(before_core), len(after_core)) // 2)
+    return longest_block >= 4 or matched_chars >= min_match_chars
+
+
+
+def _repair_mixed_aggregate_primary_evidence_drift(
+    item: dict[str, Any],
+    source_target: str,
+    resolved: str,
+    revised_text: str | None = None,
+) -> str:
+    aggregate_type = str(item.get("aggregate_type") or "").strip().lower()
+    if aggregate_type != "mixed_clause_risks":
+        return str(resolved or "").strip()
+
+    source = str(source_target or "").strip()
+    current = str(resolved or "").strip()
+    revised = str(revised_text or "").strip()
+    evidence_floor = _select_mixed_aggregate_primary_target(item, _aggregate_group_fallback_text(item, "evidence_text") or str(item.get("evidence_text") or "").strip())
+
+    if not source or not current or not evidence_floor:
+        return current
+    if evidence_floor == source or evidence_floor not in source:
+        return current
+
+    # Only repair the specific drift case from a broad host clause to an
+    # adjacent sibling fragment. Keep already-correct evidence-aligned or
+    # broader evidence-covering targets unchanged.
+    if current == evidence_floor:
+        return current
+    if current in evidence_floor or evidence_floor in current:
+        return current
+    if current not in source:
+        return current
+    if len(source) < max(len(evidence_floor) + 12, int(len(evidence_floor) * 1.2)):
+        return current
+    if not _can_stably_patch_aggregate_target(evidence_floor, revised):
+        return current
+
+    current_score = _aggregate_target_match_quality(current, revised)
+    evidence_score = _aggregate_target_match_quality(evidence_floor, revised)
+    if evidence_score <= current_score:
+        return current
+
+    return evidence_floor
+
+
 def _common_prefix_len(left: str, right: str) -> int:
     prefix = 0
     max_prefix = min(len(left), len(right))
@@ -718,6 +942,8 @@ def _resolve_aggregate_patch_target(item: dict[str, Any], ai_payload: dict[str, 
     resolved = str(shrunk or baseline).strip()
     resolved = _repair_aggregate_missing_prefix_target(source_target, resolved, next_revised)
     resolved = _apply_anchored_only_target_floor(item, baseline, resolved)
+    resolved = _repair_mixed_aggregate_primary_evidence_drift(item, source_target, resolved, next_revised)
+    resolved = _apply_mixed_aggregate_target_floor(item, baseline, resolved, next_revised)
     return resolved
 
 
@@ -1239,7 +1465,27 @@ def _collect_risk_clause_keys(risk: dict[str, Any], clause_alias_map: dict[str, 
     return keys
 
 
-def _sanitize_reviewed_ai_payload(payload: dict[str, Any]) -> bool:
+def _resolve_aggregate_context(run_dir: Path | None, item: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(item, dict):
+        return item
+    if run_dir is None:
+        return item
+    if not str(item.get("aggregate_id") or "").strip():
+        return item
+
+    group = _load_ai_aggregation_group(run_dir, item)
+    if not isinstance(group, dict):
+        return item
+
+    context = _clone_jsonable(group)
+    for field in ("status", "ai_rewrite", "ai_rewrite_decision", "accepted_patch", "locator"):
+        if field in item:
+            context[field] = _clone_jsonable(item[field])
+    return context
+
+
+
+def _sanitize_reviewed_ai_payload(payload: dict[str, Any], run_dir: Path | None = None) -> bool:
     risk_items = (((payload or {}).get("risk_result") or {}).get("risk_items") or [])
     if not isinstance(risk_items, list):
         return False
@@ -1248,9 +1494,16 @@ def _sanitize_reviewed_ai_payload(payload: dict[str, Any]) -> bool:
     for item in risk_items:
         if not isinstance(item, dict):
             continue
-        preserve_full_clause = _use_full_clause_target(item)
+        aggregate_context = _resolve_aggregate_context(run_dir, item)
+        preserve_full_clause = _use_full_clause_target(aggregate_context)
         fallback_target = _normalize_target_text(
-            str(item.get("target_text") or item.get("evidence_text") or item.get("anchor_text") or ""),
+            str(
+                aggregate_context.get("target_text")
+                or item.get("target_text")
+                or item.get("evidence_text")
+                or item.get("anchor_text")
+                or ""
+            ),
             preserve_full_clause=preserve_full_clause,
         )
         for field in ("ai_rewrite", "ai_apply"):
@@ -1269,7 +1522,7 @@ def _sanitize_reviewed_ai_payload(payload: dict[str, Any]) -> bool:
             workflow_kind = str(ai_payload.get("workflow_kind") or "").strip().lower()
             is_aggregate = workflow_kind == "aggregate" or bool(str(item.get("aggregate_id") or "").strip())
             if is_aggregate:
-                target_for_comment, next_revised = _finalize_aggregate_patch_pair(item, ai_payload, revised_text)
+                target_for_comment, next_revised = _finalize_aggregate_patch_pair(aggregate_context, ai_payload, revised_text)
                 if target_for_comment and str(ai_payload.get("target_text") or "").strip() != target_for_comment:
                     ai_payload["target_text"] = target_for_comment
                     changed = True
@@ -1283,6 +1536,8 @@ def _sanitize_reviewed_ai_payload(payload: dict[str, Any]) -> bool:
             if str(ai_payload.get("comment_text") or "").strip() != next_comment:
                 ai_payload["comment_text"] = next_comment
                 changed = True
+        if _refresh_accepted_patch_for_item(item):
+            changed = True
     return changed
 
 def _rewrite_client(*, aggregate: bool = False) -> DifyWorkflowClient:
@@ -1393,6 +1648,89 @@ def _build_suggest_insert_patch(risk: dict[str, Any]) -> dict[str, Any] | None:
     return patch
 
 
+def _build_ai_rewrite_patch(risk: dict[str, Any]) -> dict[str, Any] | None:
+    ai_rewrite = risk.get("ai_rewrite") if isinstance(risk.get("ai_rewrite"), dict) else {}
+    if str(ai_rewrite.get("state") or "").strip().lower() != "succeeded":
+        return None
+
+    before_text = str(ai_rewrite.get("target_text") or "").strip()
+    revised_text = str(ai_rewrite.get("revised_text") or "")
+    if not before_text and not revised_text:
+        return None
+
+    comment_text = str(ai_rewrite.get("comment_text") or "").strip()
+    if not comment_text:
+        comment_text = _build_ai_comment_text(target_text=before_text, revised_text=revised_text)
+
+    created_at = str(ai_rewrite.get("created_at") or "").strip() or _iso_now()
+    return {
+        "kind": "ai_rewrite",
+        "before_text": before_text,
+        "after_text": revised_text,
+        "comment_text": comment_text,
+        "created_at": created_at,
+    }
+
+
+def _refresh_accepted_patch_for_item(item: dict[str, Any]) -> bool:
+    if not isinstance(item, dict):
+        return False
+
+    changed = False
+    status = str(item.get("status") or "").strip().lower()
+    is_accepted = _is_accepted_risk_status(status)
+    ai_rewrite = item.get("ai_rewrite") if isinstance(item.get("ai_rewrite"), dict) else {}
+    ai_state = str(ai_rewrite.get("state") or "").strip().lower()
+    current_patch = item.get("accepted_patch") if isinstance(item.get("accepted_patch"), dict) else None
+
+    if is_accepted and ai_state == "succeeded":
+        if str(item.get("ai_rewrite_decision") or "").strip().lower() != "accepted":
+            item["ai_rewrite_decision"] = "accepted"
+            changed = True
+        next_patch = _build_ai_rewrite_patch(item)
+        if next_patch is not None and next_patch != current_patch:
+            item["accepted_patch"] = next_patch
+            changed = True
+        return changed
+
+    if is_accepted:
+        next_patch = _build_suggest_insert_patch(item)
+        if next_patch is not None:
+            if next_patch != current_patch:
+                item["accepted_patch"] = next_patch
+                changed = True
+        elif current_patch is not None:
+            item.pop("accepted_patch", None)
+            changed = True
+        return changed
+
+    if current_patch is not None:
+        item.pop("accepted_patch", None)
+        changed = True
+    return changed
+
+
+def _has_other_accepted_risk_in_same_clause(
+    target_item: dict[str, Any],
+    risk_items: list[dict[str, Any]],
+    clauses: list[dict[str, Any]] | None = None,
+) -> bool:
+    if not isinstance(target_item, dict) or not isinstance(risk_items, list):
+        return False
+    alias_map = _build_clause_uid_alias_map(clauses or []) if clauses else {}
+    target_keys = _collect_risk_clause_keys(target_item, alias_map)
+    if not target_keys:
+        return False
+    for item in risk_items:
+        if not isinstance(item, dict) or item is target_item:
+            continue
+        if not _is_accepted_risk_status(item.get("status")):
+            continue
+        if _collect_risk_clause_keys(item, alias_map) & target_keys:
+            return True
+    return False
+
+
 def _find_clause_by_key(clause_key: str, clauses: list[dict[str, Any]], alias_map: dict[str, str] | None = None) -> dict[str, Any] | None:
     alias = alias_map or _build_clause_uid_alias_map(clauses)
     normalized_key = alias.get(str(clause_key or "").strip()) or str(clause_key or "").strip()
@@ -1460,6 +1798,21 @@ def _select_aggregate_target_text(
     clause_source: str,
 ) -> tuple[str, str]:
     clause_text = str(clause_source or "").strip()
+    is_mixed = _risk_source_type(host_risk) == "anchored" and bool(multi_risks)
+    if clause_text and is_mixed:
+        mixed_target = _select_mixed_aggregate_primary_target(
+            {
+                "aggregate_type": "mixed_clause_risks",
+                "clause_text": clause_text,
+                "anchored_risk": host_risk,
+                "anchored_risks": [host_risk],
+            },
+            str(host_risk.get("target_text") or host_risk.get("evidence_text") or host_risk.get("main_text") or host_risk.get("anchor_text") or "").strip(),
+        )
+        if mixed_target:
+            if mixed_target != clause_text:
+                return mixed_target, "anchored_primary_sentence"
+            return mixed_target, "host_clause_text"
     if clause_text:
         return clause_text, "host_clause_text"
 
@@ -1852,7 +2205,8 @@ def get_or_create_reviewed_risks(run_id: str) -> dict[str, Any]:
 
     reviewed = _project_reviewed_risk_payload(run_dir=run_dir, validated=validated, previous_reviewed=previous_reviewed)
     reviewed = _ensure_risk_items_status(reviewed)
-    _sanitize_reviewed_ai_payload(reviewed)
+    _sync_ai_aggregation_file(run_dir=run_dir, validated=validated, reviewed=reviewed)
+    _sanitize_reviewed_ai_payload(reviewed, run_dir=run_dir)
     reviewed_path.write_text(json.dumps(reviewed, ensure_ascii=False, indent=2), encoding="utf-8")
     _sync_ai_aggregation_file(run_dir=run_dir, validated=validated, reviewed=reviewed)
     return reviewed
@@ -2368,25 +2722,30 @@ def patch_risk_status(run_id: str, risk_id: str, body: RiskPatchBody) -> dict[st
         raise HTTPException(status_code=404, detail="risk_id 不存在")
 
     target["status"] = status
-    accepted_patch = target.get("accepted_patch") if isinstance(target.get("accepted_patch"), dict) else {}
-    accepted_kind = str(accepted_patch.get("kind") or "").strip().lower()
     if status == "accepted":
+        clauses = _load_run_clauses(run_dir)
+        target["status"] = "ai_applied" if _has_other_accepted_risk_in_same_clause(target, risk_items, clauses) else "accepted"
         ai_rewrite = target.get("ai_rewrite") if isinstance(target.get("ai_rewrite"), dict) else {}
         if str(ai_rewrite.get("state") or "").strip().lower() == "succeeded":
             target["ai_rewrite_decision"] = "accepted"
+            ai_patch = _build_ai_rewrite_patch(target)
+            if ai_patch:
+                target["accepted_patch"] = ai_patch
+            else:
+                target.pop("accepted_patch", None)
         else:
             suggest_insert_patch = _build_suggest_insert_patch(target)
             if suggest_insert_patch:
                 target["accepted_patch"] = suggest_insert_patch
+            else:
+                target.pop("accepted_patch", None)
     elif status == "rejected":
         target["ai_rewrite_decision"] = "rejected"
-        if accepted_kind == "suggest_insert":
-            target.pop("accepted_patch", None)
+        target.pop("accepted_patch", None)
     elif status == "pending":
         if isinstance(target.get("ai_rewrite"), dict):
             target["ai_rewrite_decision"] = "proposed"
-        if accepted_kind == "suggest_insert":
-            target.pop("accepted_patch", None)
+        target.pop("accepted_patch", None)
 
     _persist_reviewed_payload(run_dir, reviewed)
     return {"ok": True, "item": target}
@@ -2421,10 +2780,17 @@ def accept_all_risks(run_id: str) -> dict[str, Any]:
         ai_state = str(ai_rewrite.get("state") or "").strip().lower()
         if ai_state == "succeeded":
             item["ai_rewrite_decision"] = "accepted"
+            ai_patch = _build_ai_rewrite_patch(item)
+            if ai_patch:
+                item["accepted_patch"] = ai_patch
+            else:
+                item.pop("accepted_patch", None)
         else:
             suggest_insert_patch = _build_suggest_insert_patch(item)
             if suggest_insert_patch:
                 item["accepted_patch"] = suggest_insert_patch
+            else:
+                item.pop("accepted_patch", None)
         accepted += 1
 
     _persist_reviewed_payload(run_dir, reviewed)
@@ -2454,7 +2820,12 @@ def ai_apply_risk(run_id: str, risk_id: str) -> dict[str, Any]:
     if str(target.get("status") or "pending").strip().lower() == "rejected":
         raise HTTPException(status_code=409, detail="rejected 风险不允许 AI 自动修改")
     target["ai_rewrite"] = _generate_ai_rewrite(run_id=run_id, run_dir=run_dir, risk=target)
-    target["ai_rewrite_decision"] = "proposed"
+    if _is_accepted_risk_status(target.get("status")):
+        target["ai_rewrite_decision"] = "accepted"
+        _refresh_accepted_patch_for_item(target)
+    else:
+        target["ai_rewrite_decision"] = "proposed"
+        target.pop("accepted_patch", None)
 
     _persist_reviewed_payload(run_dir, reviewed)
     return {"ok": True, "item": target}
@@ -2507,7 +2878,12 @@ def _ai_apply_all_risks_impl(run_id: str) -> dict[str, Any]:
             try:
                 ai_rewrite = future.result()
                 risk["ai_rewrite"] = ai_rewrite
-                risk["ai_rewrite_decision"] = "proposed"
+                if _is_accepted_risk_status(risk.get("status")):
+                    risk["ai_rewrite_decision"] = "accepted"
+                    _refresh_accepted_patch_for_item(risk)
+                else:
+                    risk["ai_rewrite_decision"] = "proposed"
+                    risk.pop("accepted_patch", None)
                 created += 1
             except Exception as exc:
                 failed += 1
@@ -2583,22 +2959,28 @@ def ai_accept_risk(run_id: str, risk_id: str, body: AiAcceptBody) -> dict[str, A
         raise HTTPException(status_code=409, detail="当前风险不存在可接受的 AI 改写建议")
 
     revised_text = str(body.revised_text or "").strip()
-    preserve_full_clause = _use_full_clause_target(target)
     is_aggregate = str(ai_rewrite.get("workflow_kind") or "").strip().lower() == "aggregate" or bool(str(target.get("aggregate_id") or "").strip())
+    aggregate_context = _resolve_aggregate_context(run_dir, target) if is_aggregate else target
+    preserve_full_clause = _use_full_clause_target(aggregate_context)
     existing_target = _normalize_target_text(
         str(ai_rewrite.get("target_text") or ""),
         preserve_full_clause=preserve_full_clause,
     )
-    submitted_target = "" if is_aggregate else _normalize_target_text(str(body.target_text or ""), preserve_full_clause=preserve_full_clause)
+    submitted_target = _normalize_target_text(
+        str(body.target_text or ""),
+        preserve_full_clause=preserve_full_clause,
+    )
+    if submitted_target:
+        ai_rewrite["target_text"] = submitted_target
     if is_aggregate:
         current_target = submitted_target or existing_target
     else:
-        current_target = existing_target or _extract_target_text(target)
+        current_target = submitted_target or existing_target or _extract_target_text(target)
     if revised_text:
         ai_rewrite["revised_text"] = revised_text
     if is_aggregate:
         current_target, normalized_revised = _finalize_aggregate_patch_pair(
-            target,
+            aggregate_context,
             ai_rewrite,
             str(ai_rewrite.get("revised_text") or revised_text or ""),
         )
@@ -2609,8 +2991,13 @@ def ai_accept_risk(run_id: str, risk_id: str, body: AiAcceptBody) -> dict[str, A
         target_text=str(ai_rewrite.get("target_text") or current_target or ""),
         revised_text=str(ai_rewrite.get("revised_text") or ""),
     )
-    target["status"] = "accepted"
+    target["status"] = "ai_applied"
     target["ai_rewrite_decision"] = "accepted"
+    ai_patch = _build_ai_rewrite_patch(target)
+    if ai_patch:
+        target["accepted_patch"] = ai_patch
+    else:
+        target.pop("accepted_patch", None)
 
     _persist_reviewed_payload(run_dir, reviewed)
     return {"ok": True, "item": target}
@@ -2640,16 +3027,17 @@ def ai_edit_risk(run_id: str, risk_id: str, body: AiEditBody) -> dict[str, Any]:
 
     revised_text = str(body.revised_text or "").strip()
 
-    preserve_full_clause = _use_full_clause_target(target)
+    workflow_kind = str(ai_rewrite.get("workflow_kind") or "").strip().lower()
+    is_aggregate = workflow_kind == "aggregate" or bool(str(target.get("aggregate_id") or "").strip())
+    aggregate_context = _resolve_aggregate_context(run_dir, target) if is_aggregate else target
+    preserve_full_clause = _use_full_clause_target(aggregate_context)
     current_target = _normalize_target_text(
         str(ai_rewrite.get("target_text") or ""),
         preserve_full_clause=preserve_full_clause,
     )
     ai_rewrite["revised_text"] = revised_text
-    workflow_kind = str(ai_rewrite.get("workflow_kind") or "").strip().lower()
-    is_aggregate = workflow_kind == "aggregate" or bool(str(target.get("aggregate_id") or "").strip())
     if is_aggregate:
-        resolved_target, normalized_revised = _finalize_aggregate_patch_pair(target, ai_rewrite, revised_text)
+        resolved_target, normalized_revised = _finalize_aggregate_patch_pair(aggregate_context, ai_rewrite, revised_text)
         ai_rewrite["revised_text"] = normalized_revised
     else:
         resolved_target = current_target
@@ -2663,6 +3051,7 @@ def ai_edit_risk(run_id: str, risk_id: str, body: AiEditBody) -> dict[str, Any]:
         revised_text=str(ai_rewrite.get("revised_text") or revised_text),
     )
     target["ai_rewrite_decision"] = "proposed"
+    target.pop("accepted_patch", None)
 
     _persist_reviewed_payload(run_dir, reviewed)
     return {"ok": True, "item": target}
@@ -2687,6 +3076,7 @@ def ai_reject_risk(run_id: str, risk_id: str) -> dict[str, Any]:
         raise HTTPException(status_code=404, detail="risk_id 不存在")
 
     target.pop("ai_rewrite", None)
+    target.pop("accepted_patch", None)
     target["ai_rewrite_decision"] = "rejected"
     target["status"] = "rejected"
 

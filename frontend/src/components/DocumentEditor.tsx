@@ -26,6 +26,7 @@ type AppliedAiPatchRecord = {
   originalTargetText: string
   targetText: string
   revisedText: string
+  originalRevisedText: string
   startIndex: number
   endIndex: number
   keepUnderlinedDigits: boolean
@@ -69,6 +70,12 @@ function plainTextOf(el: HTMLElement) {
 
 function normalizeSearchText(text: string) {
   return text.replace(/\s+/g, '')
+}
+
+const LOOSE_IGNORABLE_RE = /[，。！？；：、“”‘’（）【】《》「」『』\[\]{}()<>.,!?;:'\"`~!@#$%^&*_\-+=|\\/]/g
+
+function normalizeLooseSearchText(text: string) {
+  return text.replace(/\s+/g, '').replace(LOOSE_IGNORABLE_RE, '').toLowerCase()
 }
 
 const CLAUSE_UID_PATTERN = /^segment_[A-Za-z0-9_-]+::[A-Za-z0-9_.()（）-]+$/
@@ -316,6 +323,19 @@ function buildCompactIndexMap(text: string) {
   return { compact, indexMap }
 }
 
+function buildLooseIndexMap(text: string) {
+  let loose = ''
+  const indexMap: number[] = []
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i]
+    LOOSE_IGNORABLE_RE.lastIndex = 0
+    if (/\s/.test(ch) || LOOSE_IGNORABLE_RE.test(ch)) continue
+    loose += ch.toLowerCase()
+    indexMap.push(i)
+  }
+  return { loose, indexMap }
+}
+
 function findCompactOccurrencesWithRawRange(text: string, query: string) {
   const compactQuery = normalizeSearchText(query)
   if (!compactQuery) return [] as Array<{ start: number; end: number }>
@@ -335,6 +355,52 @@ function findCompactOccurrencesWithRawRange(text: string, query: string) {
   return ranges
 }
 
+function findLooseOccurrencesWithRawRange(text: string, query: string) {
+  const looseQuery = normalizeLooseSearchText(query)
+  if (looseQuery.length < 4) return [] as Array<{ start: number; end: number }>
+  const mapped = buildLooseIndexMap(text)
+  const ranges: Array<{ start: number; end: number }> = []
+  let from = 0
+  while (from <= mapped.loose.length - looseQuery.length) {
+    const idx = mapped.loose.indexOf(looseQuery, from)
+    if (idx < 0) break
+    const startRaw = mapped.indexMap[idx]
+    const endRaw = mapped.indexMap[idx + looseQuery.length - 1] + 1
+    if (Number.isFinite(startRaw) && Number.isFinite(endRaw) && endRaw > startRaw) {
+      ranges.push({ start: startRaw, end: endRaw })
+    }
+    from = idx + looseQuery.length
+  }
+  return ranges
+}
+
+function minimizePatchPair(targetText: string, revisedText: string) {
+  const before = String(targetText || '')
+  const after = String(revisedText || '')
+  if (!before || !after || before === after) {
+    return { targetText: before, revisedText: after }
+  }
+
+  let prefix = 0
+  const limit = Math.min(before.length, after.length)
+  while (prefix < limit && before[prefix] === after[prefix]) prefix += 1
+
+  let suffix = 0
+  while (
+    suffix < before.length - prefix &&
+    suffix < after.length - prefix &&
+    before[before.length - 1 - suffix] === after[after.length - 1 - suffix]
+  ) {
+    suffix += 1
+  }
+
+  const minimizedTarget = before.slice(prefix, before.length - suffix)
+  const minimizedRevised = after.slice(prefix, after.length - suffix)
+  return {
+    targetText: minimizedTarget || before,
+    revisedText: minimizedRevised || after
+  }
+}
 function findPatchMarkedNodes(block: HTMLElement, patchId: string) {
   const out: HTMLElement[] = []
   if (!patchId) return out
@@ -808,11 +874,7 @@ export const DocumentEditor = forwardRef<
   }
 
   const findBestBlockByText = (inputs: Array<{ text: string; weight: number; allowFragments: boolean }>, allowLoose: boolean) => {
-    const normalizeLoose = (text: string) =>
-      text
-        .replace(/\s+/g, '')
-        .replace(/[，。！？；：、“”‘’（）【】《》「」『』\[\]{}()<>.,!?;:'"`~!@#$%^&*_\-+=|\\/]/g, '')
-        .toLowerCase()
+    const normalizeLoose = (text: string) => normalizeLooseSearchText(text)
 
     const buildCandidates = (text: string, allowFragments: boolean) => {
       const trimmed = (text || '').trim()
@@ -894,16 +956,34 @@ export const DocumentEditor = forwardRef<
     const rawTargetText = String(opts.targetText || '').trim()
     const normalizedRawTargetText = rawTargetText.replace(/\s+/g, ' ').trim()
     const sanitizedTargetText = sanitizeLocatorText(rawTargetText)
-    const candidateTargets = Array.from(
-      new Set([normalizedRawTargetText, sanitizedTargetText].filter(Boolean))
+    const originalRevisedText = String(opts.revisedText || '').trim()
+
+    const patchCandidates = Array.from(
+      new Map(
+        [
+          { targetText: normalizedRawTargetText, revisedText: originalRevisedText },
+          { targetText: sanitizedTargetText, revisedText: originalRevisedText },
+          ...(opts.preserveRawTarget
+            ? []
+            : (() => {
+                const minimized = minimizePatchPair(normalizedRawTargetText || sanitizedTargetText, originalRevisedText)
+                return [
+                  { targetText: minimized.targetText.trim(), revisedText: minimized.revisedText.trim() },
+                  { targetText: sanitizeLocatorText(minimized.targetText).trim(), revisedText: minimized.revisedText.trim() }
+                ]
+              })())
+        ]
+          .filter((candidate) => candidate.targetText)
+          .map((candidate) => [`${candidate.targetText}@@${candidate.revisedText}`, candidate])
+      ).values()
     )
-    const revisedText = String(opts.revisedText || '').trim()
-    if (candidateTargets.length === 0) return false
-    if (candidateTargets.some((candidate) => candidate === revisedText)) return false
+
+    if (patchCandidates.length === 0) return false
+    if (patchCandidates.some((candidate) => candidate.targetText === candidate.revisedText)) return false
 
     if (patchId) {
       const existingRecord = appliedAiPatchMapRef.current.get(patchId)
-      if (existingRecord && existingRecord.revisedText === revisedText) {
+      if (existingRecord && (existingRecord.originalRevisedText || existingRecord.revisedText) === originalRevisedText) {
         let existingBlock = blockElsRef.current.get(existingRecord.blockId) || null
         if (!existingBlock) {
           for (const candidate of blockElsRef.current.values()) {
@@ -928,55 +1008,89 @@ export const DocumentEditor = forwardRef<
       }
     }
 
-    let matched: BlockEl | null = null
-    let matchedTargetText = ''
-    for (const candidateTarget of candidateTargets) {
-      for (const el of blockElsRef.current.values()) {
-        const txt = plainTextOf(el)
-        if (txt.includes(candidateTarget)) {
-          matched = el
-          matchedTargetText = candidateTarget
-          break
-        }
-      }
-      if (matched) break
+    type PatchMatch = {
+      block: BlockEl
+      currentText: string
+      currentHtml: string
+      targetText: string
+      revisedText: string
+      candidateRanges: Array<{ start: number; end: number }>
     }
 
-    if (!matched) {
-      for (const candidateTarget of candidateTargets) {
-        const compactTarget = normalizeSearchText(candidateTarget)
-        if (!compactTarget) continue
+    const findPatchMatch = (): PatchMatch | null => {
+      for (const candidate of patchCandidates) {
         for (const el of blockElsRef.current.values()) {
           const txt = plainTextOf(el)
-          if (normalizeSearchText(txt).includes(compactTarget)) {
-            matched = el
-            matchedTargetText = candidateTarget
-            break
+          if (!txt) continue
+          const exactMatches = findAllOccurrences(txt, candidate.targetText)
+          const exactRanges = exactMatches.map((idx) => ({ start: idx, end: idx + candidate.targetText.length }))
+          if (exactRanges.length > 0) {
+            return {
+              block: el,
+              currentText: txt,
+              currentHtml: el.innerHTML,
+              targetText: candidate.targetText,
+              revisedText: candidate.revisedText,
+              candidateRanges: exactRanges
+            }
           }
         }
-        if (matched) break
       }
+
+      for (const candidate of patchCandidates) {
+        for (const el of blockElsRef.current.values()) {
+          const txt = plainTextOf(el)
+          if (!txt) continue
+          const compactRanges = findCompactOccurrencesWithRawRange(txt, candidate.targetText)
+          if (compactRanges.length > 0) {
+            return {
+              block: el,
+              currentText: txt,
+              currentHtml: el.innerHTML,
+              targetText: candidate.targetText,
+              revisedText: candidate.revisedText,
+              candidateRanges: compactRanges
+            }
+          }
+        }
+      }
+
+      for (const candidate of patchCandidates) {
+        for (const el of blockElsRef.current.values()) {
+          const txt = plainTextOf(el)
+          if (!txt) continue
+          const looseRanges = findLooseOccurrencesWithRawRange(txt, candidate.targetText)
+          if (looseRanges.length > 0) {
+            return {
+              block: el,
+              currentText: txt,
+              currentHtml: el.innerHTML,
+              targetText: candidate.targetText,
+              revisedText: candidate.revisedText,
+              candidateRanges: looseRanges
+            }
+          }
+        }
+      }
+
+      return null
     }
 
-    if (!matched || !matchedTargetText) return false
+    const matchedPatch = findPatchMatch()
+    if (!matchedPatch) return false
 
-    const currentText = plainTextOf(matched)
-    const currentHtml = matched.innerHTML
-    const exactMatches = findAllOccurrences(currentText, matchedTargetText)
+    const matched = matchedPatch.block
+    const currentText = matchedPatch.currentText
+    const currentHtml = matchedPatch.currentHtml
+    const matchedTargetText = matchedPatch.targetText
+    const revisedText = matchedPatch.revisedText
     let nextText = currentText
     let startIndex = -1
     let endIndex = -1
     let keepUnderlinedDigits = false
     let effectiveTargetText = matchedTargetText
     let replaced = false
-
-    const candidateRanges: Array<{ start: number; end: number }> = exactMatches.map((idx) => ({
-      start: idx,
-      end: idx + matchedTargetText.length
-    }))
-    if (candidateRanges.length === 0) {
-      candidateRanges.push(...findCompactOccurrencesWithRawRange(currentText, matchedTargetText))
-    }
+    const candidateRanges = matchedPatch.candidateRanges
 
     if (candidateRanges.length > 0) {
       let best = candidateRanges[0]
@@ -1014,6 +1128,7 @@ export const DocumentEditor = forwardRef<
         originalTargetText: rawTargetText || matchedTargetText,
         targetText: effectiveTargetText || matchedTargetText,
         revisedText,
+        originalRevisedText,
         startIndex,
         endIndex,
         keepUnderlinedDigits
@@ -1024,7 +1139,6 @@ export const DocumentEditor = forwardRef<
     scrollToEl(matched, { scroll: opts.scroll !== false })
     return true
   }
-
   const revertAiPatch = (patchId: string | number) => {
     const key = String(patchId || '')
     if (!key) return false
@@ -1115,7 +1229,7 @@ export const DocumentEditor = forwardRef<
     return {
       patchId: key,
       targetText: String(record.targetText || ''),
-      revisedText: String(record.revisedText || '')
+      revisedText: String(record.originalRevisedText || record.revisedText || '')
     }
   }
 
