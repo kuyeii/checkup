@@ -112,6 +112,17 @@ def _append_dedup(parts: list[str], seen: set[str], value: str, *, allow_weak: b
     parts.append(norm)
 
 
+def _compact_compare_text(text: str) -> str:
+    return re.sub(r"\s+", "", normalize_text(text)).lower()
+
+
+def _is_text_covered_by_parts(value: str, parts: list[str]) -> bool:
+    candidate = _compact_compare_text(value)
+    if not candidate:
+        return True
+    return any(candidate in _compact_compare_text(part) for part in parts)
+
+
 def _parse_normative_basis(normative_basis: Any) -> tuple[str, str, str]:
     if isinstance(normative_basis, dict):
         title = normalize_text(str(normative_basis.get("basis_title", "") or ""))
@@ -134,7 +145,7 @@ def _humanize_risk_text_fields(item: dict[str, Any], clause_metas: list[dict[str
         item[field] = humanize_clause_refs(raw, alias_map)
 
 
-def _compose_structured_basis(item: dict[str, Any]) -> tuple[str, str] | None:
+def _compose_structured_basis(item: dict[str, Any]) -> tuple[str, str, str] | None:
     factual_basis = normalize_text(str(item.get("factual_basis", "") or ""))
     reasoning_basis = normalize_text(str(item.get("reasoning_basis", "") or ""))
     norm_title, norm_detail, norm_citation = _parse_normative_basis(item.get("normative_basis"))
@@ -165,12 +176,15 @@ def _compose_structured_basis(item: dict[str, Any]) -> tuple[str, str] | None:
     _append_dedup(basis_parts, basis_seen, reasoning_basis, allow_weak=False)
     _append_dedup(basis_parts, basis_seen, norm_title, allow_weak=False)
     _append_dedup(basis_parts, basis_seen, norm_detail, allow_weak=False)
-    _append_dedup(basis_parts, basis_seen, norm_citation, allow_weak=True)
 
     if not basis_parts:
         return None
 
-    return "；".join(summary_parts[:2]), "；".join(basis_parts)
+    basis_citation = ""
+    if norm_citation and not _is_text_covered_by_parts(norm_citation, basis_parts):
+        basis_citation = norm_citation
+
+    return "；".join(summary_parts[:2]), "；".join(basis_parts), basis_citation
 
 
 def _review_reason(item: dict[str, Any], clause_metas: list[dict[str, Any]]) -> list[str]:
@@ -622,13 +636,18 @@ def normalize_and_dedupe_risks(
         rule_id = _basis_rule_id(dimension, is_boilerplate, issue)
         structured_basis = _compose_structured_basis(item)
         if structured_basis is not None:
-            basis_summary, basis_text = structured_basis
+            basis_summary, basis_text, basis_citation = structured_basis
         else:
             basis_summary = _basis_summary(dimension, issue, evidence_text, is_boilerplate)
             basis_text = basis_summary
+            basis_citation = ""
         item["basis_rule_id"] = rule_id
         item["basis_summary"] = basis_summary
         item["basis"] = f"[{rule_id}] {basis_text}"
+        if basis_citation:
+            item["basis_citation"] = basis_citation
+        else:
+            item.pop("basis_citation", None)
         item["review_required_reason"] = _review_reason(item, clause_metas)
         item["is_boilerplate_related"] = is_boilerplate
 

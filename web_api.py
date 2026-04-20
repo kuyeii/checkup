@@ -224,15 +224,34 @@ def _significant_match_blocks(source: str, revised: str) -> list[Any]:
     return significant_blocks or blocks
 
 
-def _first_significant_match_start(source: str, revised: str) -> int | None:
+def _effective_shrink_match_blocks(source: str, revised: str) -> list[Any]:
     use_blocks = _significant_match_blocks(source, revised)
+    if not use_blocks:
+        return []
+
+    strong_blocks: list[Any] = []
+    for block in use_blocks:
+        fragment = _aggregate_overlap_fragment(source[block.a : block.a + block.size])
+        if len(fragment) < 4:
+            continue
+        if fragment in _AGGREGATE_GENERIC_OVERLAP_FRAGMENTS:
+            continue
+        strong_blocks.append(block)
+
+    return strong_blocks or use_blocks
+
+
+
+def _first_significant_match_start(source: str, revised: str) -> int | None:
+    use_blocks = _effective_shrink_match_blocks(source, revised)
     if not use_blocks:
         return None
     return use_blocks[0].a
 
 
+
 def _last_significant_match_end(source: str, revised: str) -> int | None:
-    use_blocks = _significant_match_blocks(source, revised)
+    use_blocks = _effective_shrink_match_blocks(source, revised)
     if not use_blocks:
         return None
     return use_blocks[-1].a + use_blocks[-1].size
@@ -307,11 +326,43 @@ def _is_unique_stable_sentence_span(source_text: str | None, candidate_text: str
 
 
 
+def _unique_sentence_aligned_fragment(source_text: str | None, fragment: str | None) -> str:
+    source = str(source_text or "")
+    raw = str(fragment or "").strip()
+    if not source or not raw or raw == source or raw not in source:
+        return ""
+    if _count_fragment_occurrences(source, raw) != 1:
+        return ""
+
+    match = re.search(re.escape(raw), source)
+    if not match:
+        return ""
+    start, end = match.span()
+
+    start_aligned = False
+    end_aligned = False
+    for sent_start, sent_end in _split_text_into_sentence_spans(source):
+        if sent_start == start:
+            start_aligned = True
+        if sent_end == end:
+            end_aligned = True
+        if start_aligned and end_aligned:
+            return source[start:end].strip()
+
+    return ""
+
+
+
 def _expand_fragment_to_unique_sentence(source_text: str | None, fragment: str | None) -> str:
     source = str(source_text or "")
     raw = str(fragment or "").strip()
     if not source or not raw or raw == source or raw not in source:
         return ""
+
+    preserved = _unique_sentence_aligned_fragment(source, raw)
+    if preserved:
+        return preserved
+
     if _count_fragment_occurrences(source, raw) != 1:
         return ""
 
@@ -1004,6 +1055,55 @@ def _strip_unsafe_aggregate_revised_tail(source_text: str | None, target_text: s
 
 
 
+def _extend_aggregate_target_with_source_suffix_overlap(
+    source_text: str | None,
+    current_target: str | None,
+    revised_text: str | None,
+) -> str:
+    source = str(source_text or "").strip()
+    current = str(current_target or "").strip()
+    revised = str(revised_text or "").strip()
+    if not source or not current or not revised:
+        return current
+    if current == source or current not in source:
+        return current
+    if _count_fragment_occurrences(source, current) != 1:
+        return current
+
+    target_start = source.find(current)
+    if target_start < 0:
+        return current
+
+    source_tail = source[target_start:]
+    overlap_len = _common_prefix_len(source_tail, revised)
+    if overlap_len <= len(current):
+        return current
+
+    extra_overlap = overlap_len - len(current)
+    min_extra_overlap = max(6, min(18, max(len(current) // 6, 1)))
+    if extra_overlap < min_extra_overlap:
+        return current
+
+    matched_last_index = min(target_start + overlap_len - 1, len(source) - 1)
+    span = _sentence_span_containing_index(source, matched_last_index)
+    if not span:
+        return current
+
+    _, sentence_end = span
+    candidate = source[target_start:sentence_end].strip()
+    if not candidate or len(candidate) <= len(current):
+        return current
+    if _count_fragment_occurrences(source, candidate) != 1:
+        return current
+
+    candidate_overlap = _common_prefix_len(candidate, revised)
+    if candidate_overlap < len(current) + min_extra_overlap:
+        return current
+
+    return candidate
+
+
+
 def _finalize_aggregate_patch_pair(item: dict[str, Any], ai_payload: dict[str, Any], revised_text: str | None = None) -> tuple[str, str]:
     resolved_target = _resolve_aggregate_patch_target(item, ai_payload, revised_text)
     next_revised = str(revised_text or ai_payload.get("revised_text") or "").strip()
@@ -1017,6 +1117,11 @@ def _finalize_aggregate_patch_pair(item: dict[str, Any], ai_payload: dict[str, A
             next_revised = guided_revised
 
     next_revised = _strip_deleted_phrase_from_revised_change_head(item, resolved_target, next_revised)
+    # If the model has copied the immediate source suffix that follows the
+    # current target, expand the target forward to consume that unchanged span
+    # as part of the replacement. Otherwise accepting the rewrite would append
+    # duplicated text that already exists right after the target in the source.
+    resolved_target = _extend_aggregate_target_with_source_suffix_overlap(source_target, resolved_target, next_revised)
     # Keep the resolved span as target and never re-minimize to a tiny token
     # (e.g. "参照"), otherwise replace may miss and append at tail.
     # When the resolved target ends with a strong sentence boundary but the
@@ -1486,6 +1591,43 @@ def _resolve_aggregate_context(run_dir: Path | None, item: dict[str, Any]) -> di
 
 
 
+def _extract_normative_citation(item: dict[str, Any]) -> str:
+    normative_basis = item.get("normative_basis")
+    if not isinstance(normative_basis, dict):
+        return ""
+    return str(normative_basis.get("citation_text") or "").strip()
+
+
+
+def _strip_redundant_basis_citation(item: dict[str, Any]) -> bool:
+    if not isinstance(item, dict):
+        return False
+
+    basis = str(item.get("basis") or "").strip()
+    citation = _extract_normative_citation(item)
+    if not basis or not citation:
+        return False
+
+    if not basis.endswith(citation):
+        return False
+
+    prefix = re.sub(r"[；;，,、\s]+$", "", basis[: -len(citation)]).strip()
+    if not prefix:
+        return False
+
+    changed = False
+    if prefix != basis:
+        item["basis"] = prefix
+        changed = True
+
+    if str(item.get("basis_citation") or "").strip() != citation:
+        item["basis_citation"] = citation
+        changed = True
+
+    return changed
+
+
+
 def _sanitize_reviewed_display_payload(payload: dict[str, Any], clauses: list[dict[str, Any]] | None = None) -> bool:
     risk_items = (((payload or {}).get("risk_result") or {}).get("risk_items") or [])
     if not isinstance(risk_items, list):
@@ -1499,6 +1641,8 @@ def _sanitize_reviewed_display_payload(payload: dict[str, Any], clauses: list[di
     for item in risk_items:
         if not isinstance(item, dict):
             continue
+        if _strip_redundant_basis_citation(item):
+            changed = True
         for field in ("issue", "basis_summary", "basis", "factual_basis", "reasoning_basis", "suggestion_basis"):
             raw = str(item.get(field) or "").strip()
             if not raw:

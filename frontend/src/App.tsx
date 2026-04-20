@@ -348,16 +348,97 @@ function isUsablePatchTarget(value: string, preserveRaw = false) {
   return compact.length >= 1
 }
 
+function countTextOccurrences(sourceText: string, fragment: string) {
+  if (!sourceText || !fragment) return 0
+  let count = 0
+  let fromIndex = 0
+  while (fromIndex <= sourceText.length) {
+    const foundAt = sourceText.indexOf(fragment, fromIndex)
+    if (foundAt < 0) break
+    count += 1
+    fromIndex = foundAt + fragment.length
+  }
+  return count
+}
+
+function findSentenceEnd(sourceText: string, fromIndex: number) {
+  const boundaries = new Set(['。', '！', '？', '；', '\n'])
+  for (let idx = Math.max(0, fromIndex); idx < sourceText.length; idx += 1) {
+    if (!boundaries.has(sourceText[idx])) continue
+    let end = idx + 1
+    while (end < sourceText.length && /[”」』）)\]\s]/.test(sourceText[end])) end += 1
+    return end
+  }
+  return sourceText.length
+}
+
+function commonPrefixLength(left: string, right: string) {
+  let prefix = 0
+  const maxPrefix = Math.min(left.length, right.length)
+  while (prefix < maxPrefix && left[prefix] === right[prefix]) prefix += 1
+  return prefix
+}
+
+function extendTargetWithSourceSuffixOverlap(sourceText: string, currentTarget: string, revisedText: string) {
+  const source = String(sourceText || '').trim()
+  const current = String(currentTarget || '').trim()
+  const revised = String(revisedText || '').trim()
+  if (!source || !current || !revised) return current
+  if (current === source || !source.includes(current)) return current
+  if (countTextOccurrences(source, current) !== 1) return current
+
+  const targetStart = source.indexOf(current)
+  if (targetStart < 0) return current
+
+  const sourceTail = source.slice(targetStart)
+  const overlapLen = commonPrefixLength(sourceTail, revised)
+  if (overlapLen <= current.length) return current
+
+  const extraOverlap = overlapLen - current.length
+  const minExtraOverlap = Math.max(6, Math.min(18, Math.max(Math.floor(current.length / 6), 1)))
+  if (extraOverlap < minExtraOverlap) return current
+
+  const candidateEnd = findSentenceEnd(source, targetStart + overlapLen - 1)
+  const candidate = source.slice(targetStart, candidateEnd).trim()
+  if (!candidate || candidate.length <= current.length) return current
+  if (countTextOccurrences(source, candidate) !== 1) return current
+
+  const candidateOverlap = commonPrefixLength(candidate, revised)
+  if (candidateOverlap < current.length + minExtraOverlap) return current
+  return candidate
+}
+
 function pickBestPatchTarget(risk: any, preferredTarget?: string) {
   if (!risk || typeof risk !== 'object') return ''
   const preserveRaw = isAggregateRiskLike(risk)
   const locator = risk.locator && typeof risk.locator === 'object' ? risk.locator : {}
   const aiRewrite = risk.ai_rewrite && typeof risk.ai_rewrite === 'object' ? risk.ai_rewrite : {}
   const aiApply = risk.ai_apply && typeof risk.ai_apply === 'object' ? risk.ai_apply : {}
+  const revisedText = String(aiRewrite.revised_text || aiApply.revised_text || '').trim()
+  const rawPreferredCandidates = [String(preferredTarget || '').trim(), String(aiRewrite.target_text || '').trim(), String(aiApply.target_text || '').trim()]
+  let overlapExpandedPreferred = ''
+  for (const rawPreferred of rawPreferredCandidates) {
+    const normalizedPreferred = normalizePatchTargetForRisk(risk, rawPreferred).trim()
+    if (!normalizedPreferred || !revisedText) continue
+    const sourceCandidates = [
+      String(risk.target_text || '').trim(),
+      String(locator.matched_text || '').trim(),
+      String(risk.evidence_text || '').trim(),
+      String(risk.anchor_text || '').trim()
+    ]
+    for (const sourceCandidate of sourceCandidates) {
+      const expanded = extendTargetWithSourceSuffixOverlap(sourceCandidate, normalizedPreferred, revisedText)
+      if (!expanded) continue
+      if (compactText(expanded).length <= compactText(normalizedPreferred).length) continue
+      if (compactText(expanded).length > compactText(overlapExpandedPreferred).length) {
+        overlapExpandedPreferred = expanded
+      }
+    }
+  }
   // For AI accept/apply, always prioritize AI-provided target text.
   // Using evidence/anchor first can pick a shorter span and break replacement alignment.
   const buckets: string[][] = [
-    [String(preferredTarget || '').trim(), String(aiRewrite.target_text || '').trim(), String(aiApply.target_text || '').trim()],
+    [overlapExpandedPreferred, ...rawPreferredCandidates],
     [String(locator.matched_text || '').trim(), String(risk.target_text || '').trim()],
     [String(risk.anchor_text || '').trim()],
     [String(risk.evidence_text || '').trim()]
@@ -548,14 +629,20 @@ export default function App() {
     })
   }, [])
 
+  const applyWorkspaceFile = useCallback((nextFile: File | null, options?: { preserveReviewSide?: boolean }) => {
+    setFile(nextFile)
+    if (!options?.preserveReviewSide) {
+      setSelectedReviewSide(null)
+    }
+  }, [])
+
   const handleUploadFileChange = useCallback((nextFile: File | null) => {
     if (isReviewing) {
       openDialog('当前合同仍在审查中，请等待审查完成后再开始新的合同审查。')
       return
     }
-    setFile(nextFile)
-    setSelectedReviewSide(null)
-  }, [isReviewing, openDialog])
+    applyWorkspaceFile(nextFile)
+  }, [applyWorkspaceFile, isReviewing, openDialog])
 
   const handleReviewSideChange = useCallback((side: ReviewSideOption) => {
     if (isReviewing) {
@@ -991,7 +1078,7 @@ export default function App() {
   }) => {
     const { runId: targetRunId, file: nextFile, meta: nextMeta, result: nextResult, effectiveStatus, fallbackFileName } = params
 
-    setFile(nextFile)
+    applyWorkspaceFile(nextFile, { preserveReviewSide: true })
     setRunId(targetRunId)
     setMeta(nextMeta)
 
@@ -1036,7 +1123,7 @@ export default function App() {
         nextMeta
       )
     )
-  }, [persistCompletedReviewSnapshot])
+  }, [applyWorkspaceFile, persistCompletedReviewSnapshot])
 
   const openSessionReview = useCallback(async (item: ReviewHistoryItem) => {
     if (item.available === false) {
@@ -1188,7 +1275,7 @@ export default function App() {
               nextFile = new File([blob], fileName, { type: blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
             }
             if (cancelled) return
-            handleUploadFileChange(nextFile)
+            applyWorkspaceFile(nextFile, { preserveReviewSide: true })
             setResult(payload)
             setIsReviewing(false)
             navigate(buildReviewPath(runId), { replace: true })
@@ -1269,7 +1356,7 @@ export default function App() {
       cancelled = true
       abortController.abort()
     }
-  }, [runId, file, activeNav, result, maybeAutoApplyAllForRun, refreshHistoryFromApi, navigate, selectedReviewSide])
+  }, [runId, file, activeNav, result, applyWorkspaceFile, maybeAutoApplyAllForRun, refreshHistoryFromApi, navigate])
 
   useEffect(() => {
     if (historyFetchOnceRef.current) return
@@ -1979,13 +2066,13 @@ export default function App() {
   const resetReviewWorkspace = useCallback(() => {
     setRouteHydratingRunId(null)
     setIsReviewing(false)
-    handleUploadFileChange(null)
+    applyWorkspaceFile(null)
     setRunId(null)
     setMeta(null)
     setResult(null)
     setEdits([])
     removeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY)
-  }, [handleUploadFileChange])
+  }, [applyWorkspaceFile])
 
   const goUploadPage = useCallback(() => {
     navigate(pathForNav('upload'))
