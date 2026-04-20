@@ -1424,6 +1424,7 @@ export default function App() {
       : undefined
     editorRef.current?.locateRisk({
       ...locateOpts,
+      riskId,
       riskSourceType: String(riskSourceType || riskForLocate?.risk_source_type || ''),
       targetText: normalizePatchTargetForRisk(riskForLocate, String(locateOpts.targetText || '')),
       anchorText: sanitizeAiTargetText(String(locateOpts.anchorText || '')),
@@ -1566,7 +1567,10 @@ export default function App() {
             patchId: riskId,
             targetText,
             revisedText,
-            preserveRawTarget
+            preserveRawTarget,
+            anchorText: String(found?.anchor_text || ''),
+            evidenceText: String(found?.evidence_text || ''),
+            clauseUids: getLocateClauseUidsForSuggestionInsert(found)
           }) || false
         if (!applied) {
           throw new Error('未能在文档中定位到可替换文本，接受已取消。请先点击“定位原文”确认后再试。')
@@ -1653,7 +1657,10 @@ export default function App() {
               patchId: riskId,
               targetText,
               revisedText,
-              preserveRawTarget
+              preserveRawTarget,
+              anchorText: String(item?.anchor_text || ''),
+              evidenceText: String(item?.evidence_text || ''),
+              clauseUids: getLocateClauseUidsForSuggestionInsert(item)
             }) || false
           if (!applied) {
             throw new Error('未能在文档中定位到可替换文本')
@@ -1784,6 +1791,9 @@ export default function App() {
           targetText,
           revisedText,
           preserveRawTarget: isAggregateRiskLike(item),
+          anchorText: String(item?.anchor_text || ''),
+          evidenceText: String(item?.evidence_text || ''),
+          clauseUids: getLocateClauseUidsForSuggestionInsert(item),
           scroll: false
         })
         if (applied || editor.getAppliedAiPatch(riskId)) {
@@ -1953,7 +1963,10 @@ export default function App() {
           patchId: riskId,
           targetText: patchTargetText,
           revisedText: patchRevisedText,
-          preserveRawTarget: isAggregateRiskLike(mergedRiskForPatch)
+          preserveRawTarget: isAggregateRiskLike(mergedRiskForPatch),
+          anchorText: String(mergedRiskForPatch?.anchor_text || ''),
+          evidenceText: String(mergedRiskForPatch?.evidence_text || ''),
+          clauseUids: getLocateClauseUidsForSuggestionInsert(mergedRiskForPatch)
         })
       }
     },

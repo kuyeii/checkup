@@ -16,7 +16,7 @@ function isAcceptedRiskStatus(status?: string) {
 
 function stripRuleCodes(text?: string) {
   return (text || '')
-    .replace(/[【\[][^【】\[\]\n]{0,80}_[A-Za-z0-9-]{2,}[】\]]\s*/g, '')
+    .replace(/[【\[][^【】\[\]\n]{0,160}(?:RULE|TPL|POLICY|CHECK|REG|MODEL|STD|CLAUSE)_[^【】\[\]\n]{1,160}[】\]]\s*/g, '')
     .replace(/(?:^|\s)(?:RULE|TPL|POLICY|CHECK|REG|MODEL|STD|CLAUSE)_[A-Za-z0-9_-]+(?=\s|$)/g, ' ')
     .replace(/segment_[A-Za-z0-9_-]+::[A-Za-z0-9_.()（）-]+/g, ' ')
     .replace(/(?:条款|条文|clause)\s*[0-9]+(?:\.[A-Za-z0-9]+)+/gi, ' ')

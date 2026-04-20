@@ -32,6 +32,16 @@ type AppliedAiPatchRecord = {
   keepUnderlinedDigits: boolean
 }
 
+type LocatedRiskHint = {
+  riskKey: string
+  blockId: string
+  targetText: string
+  anchorText: string
+  evidenceText: string
+  clauseUids: string[]
+  updatedAt: number
+}
+
 export type AppliedAiPatchSnapshot = {
   patchId: string
   targetText: string
@@ -39,7 +49,7 @@ export type AppliedAiPatchSnapshot = {
 }
 
 export type DocumentEditorHandle = {
-  locateRisk: (opts: { riskSourceType?: string; targetText?: string; anchorText?: string; evidenceText?: string; clauseUids?: string[] }) => void
+  locateRisk: (opts: { riskId?: string | number; riskSourceType?: string; targetText?: string; anchorText?: string; evidenceText?: string; clauseUids?: string[] }) => void
   scrollToBlock: (blockId: string) => void
   scrollToEdit: (editId: string) => void
   applyAiPatch: (opts: {
@@ -47,6 +57,9 @@ export type DocumentEditorHandle = {
     targetText?: string
     revisedText?: string
     preserveRawTarget?: boolean
+    anchorText?: string
+    evidenceText?: string
+    clauseUids?: string[]
     scroll?: boolean
   }) => boolean
   revertAiPatch: (patchId: string | number) => boolean
@@ -452,6 +465,7 @@ export const DocumentEditor = forwardRef<
   const cardElsRef = useRef<Map<string, HTMLButtonElement>>(new Map())
   const sourceElsRef = useRef<Map<string, HTMLElement>>(new Map())
   const appliedAiPatchMapRef = useRef<Map<string, AppliedAiPatchRecord>>(new Map())
+  const locatedRiskHintMapRef = useRef<Map<string, LocatedRiskHint>>(new Map())
 
   useEffect(() => {
     props.onReadyChange?.(ready)
@@ -950,6 +964,9 @@ export const DocumentEditor = forwardRef<
     targetText?: string
     revisedText?: string
     preserveRawTarget?: boolean
+    anchorText?: string
+    evidenceText?: string
+    clauseUids?: string[]
     scroll?: boolean
   }) => {
     const patchId = opts.patchId == null ? '' : String(opts.patchId)
@@ -1018,62 +1035,110 @@ export const DocumentEditor = forwardRef<
     }
 
     const findPatchMatch = (): PatchMatch | null => {
-      for (const candidate of patchCandidates) {
-        for (const el of blockElsRef.current.values()) {
-          const txt = plainTextOf(el)
-          if (!txt) continue
-          const exactMatches = findAllOccurrences(txt, candidate.targetText)
-          const exactRanges = exactMatches.map((idx) => ({ start: idx, end: idx + candidate.targetText.length }))
-          if (exactRanges.length > 0) {
-            return {
-              block: el,
-              currentText: txt,
-              currentHtml: el.innerHTML,
-              targetText: candidate.targetText,
-              revisedText: candidate.revisedText,
-              candidateRanges: exactRanges
+      const allBlocks = Array.from(blockElsRef.current.values())
+      let orderedBlocks = allBlocks
+      const locateHint = getRiskLocateHint(patchId)
+      const hintedBlock = locateHint ? blockElsRef.current.get(locateHint.blockId || '') || null : null
+
+      const findMatchInBlocks = (
+        blocks: BlockEl[],
+        candidates: Array<{ targetText: string; revisedText: string }>
+      ): PatchMatch | null => {
+        for (const candidate of candidates) {
+          for (const el of blocks) {
+            const txt = plainTextOf(el)
+            if (!txt) continue
+            const exactMatches = findAllOccurrences(txt, candidate.targetText)
+            const exactRanges = exactMatches.map((idx) => ({ start: idx, end: idx + candidate.targetText.length }))
+            if (exactRanges.length > 0) {
+              return {
+                block: el,
+                currentText: txt,
+                currentHtml: el.innerHTML,
+                targetText: candidate.targetText,
+                revisedText: candidate.revisedText,
+                candidateRanges: exactRanges
+              }
             }
           }
         }
-      }
 
-      for (const candidate of patchCandidates) {
-        for (const el of blockElsRef.current.values()) {
-          const txt = plainTextOf(el)
-          if (!txt) continue
-          const compactRanges = findCompactOccurrencesWithRawRange(txt, candidate.targetText)
-          if (compactRanges.length > 0) {
-            return {
-              block: el,
-              currentText: txt,
-              currentHtml: el.innerHTML,
-              targetText: candidate.targetText,
-              revisedText: candidate.revisedText,
-              candidateRanges: compactRanges
+        for (const candidate of candidates) {
+          for (const el of blocks) {
+            const txt = plainTextOf(el)
+            if (!txt) continue
+            const compactRanges = findCompactOccurrencesWithRawRange(txt, candidate.targetText)
+            if (compactRanges.length > 0) {
+              return {
+                block: el,
+                currentText: txt,
+                currentHtml: el.innerHTML,
+                targetText: candidate.targetText,
+                revisedText: candidate.revisedText,
+                candidateRanges: compactRanges
+              }
             }
           }
         }
-      }
 
-      for (const candidate of patchCandidates) {
-        for (const el of blockElsRef.current.values()) {
-          const txt = plainTextOf(el)
-          if (!txt) continue
-          const looseRanges = findLooseOccurrencesWithRawRange(txt, candidate.targetText)
-          if (looseRanges.length > 0) {
-            return {
-              block: el,
-              currentText: txt,
-              currentHtml: el.innerHTML,
-              targetText: candidate.targetText,
-              revisedText: candidate.revisedText,
-              candidateRanges: looseRanges
+        for (const candidate of candidates) {
+          for (const el of blocks) {
+            const txt = plainTextOf(el)
+            if (!txt) continue
+            const looseRanges = findLooseOccurrencesWithRawRange(txt, candidate.targetText)
+            if (looseRanges.length > 0) {
+              return {
+                block: el,
+                currentText: txt,
+                currentHtml: el.innerHTML,
+                targetText: candidate.targetText,
+                revisedText: candidate.revisedText,
+                candidateRanges: looseRanges
+              }
             }
           }
         }
+
+        return null
       }
 
-      return null
+      if (hintedBlock) {
+        const hintedCandidates = Array.from(
+          new Map(
+            [
+              ...patchCandidates,
+              ...[locateHint?.targetText, locateHint?.anchorText, locateHint?.evidenceText]
+                .map((text) => String(text || '').trim())
+                .filter(Boolean)
+                .map((text) => ({ targetText: text, revisedText: originalRevisedText }))
+            ]
+              .filter((candidate) => candidate.targetText)
+              .map((candidate) => [`${candidate.targetText}@@${candidate.revisedText}`, candidate])
+          ).values()
+        )
+        const hintedMatch = findMatchInBlocks([hintedBlock], hintedCandidates)
+        if (hintedMatch) return hintedMatch
+        return null
+      }
+
+      const clauseUids = opts.clauseUids || []
+      const hasLocateContext = Boolean(opts.anchorText || opts.evidenceText || clauseUids.length > 0)
+      if (hasLocateContext) {
+        const { strictInputs, fuzzyInputs } = buildLocateInputs({
+          targetText: normalizedRawTargetText || sanitizedTargetText,
+          anchorText: String(opts.anchorText || ''),
+          evidenceText: String(opts.evidenceText || ''),
+          clauseUids
+        })
+        const preferredBlock = findBestBlockByText(strictInputs, false) || findBestBlockByText(fuzzyInputs, true)
+        if (preferredBlock) {
+          const preferredOnlyMatch = findMatchInBlocks([preferredBlock], patchCandidates)
+          if (preferredOnlyMatch) return preferredOnlyMatch
+          orderedBlocks = [preferredBlock, ...allBlocks.filter((el) => el !== preferredBlock)]
+        }
+      }
+
+      return findMatchInBlocks(orderedBlocks, patchCandidates)
     }
 
     const matchedPatch = findPatchMatch()
@@ -1260,11 +1325,45 @@ export const DocumentEditor = forwardRef<
     return { strictInputs, fuzzyInputs, targetText, anchorText, evidenceText }
   }
 
+  const getRiskLocateHint = (riskId?: string | number) => {
+    const riskKey = String(riskId ?? '').trim()
+    if (!riskKey) return null
+    return locatedRiskHintMapRef.current.get(riskKey) || null
+  }
+
+  const resolveLocateBlock = (opts: { targetText?: string; anchorText?: string; evidenceText?: string; clauseUids?: string[] }) => {
+    const { strictInputs, fuzzyInputs, targetText, anchorText, evidenceText } = buildLocateInputs(opts)
+    const matched = findBestBlockByText(strictInputs, false) || findBestBlockByText(fuzzyInputs, true)
+    return {
+      matched,
+      targetText,
+      anchorText,
+      evidenceText,
+      clauseUids: opts.clauseUids || []
+    }
+  }
+
   useImperativeHandle(ref, () => ({
     locateRisk: (opts) => {
-      const { strictInputs, fuzzyInputs } = buildLocateInputs(opts)
-      const ok = locateByText(strictInputs, false) || locateByText(fuzzyInputs, true)
-      if (!ok) alert('未能在当前文档中定位到风险锚点文本：可能已被编辑修改或原文未匹配。')
+      const resolved = resolveLocateBlock(opts)
+      const best = resolved.matched
+      if (!best) {
+        alert('未能在当前文档中定位到风险锚点文本：可能已被编辑修改或原文未匹配。')
+        return
+      }
+      const riskKey = String(opts.riskId ?? '').trim()
+      if (riskKey) {
+        locatedRiskHintMapRef.current.set(riskKey, {
+          riskKey,
+          blockId: best.dataset.blockId || '',
+          targetText: resolved.targetText,
+          anchorText: resolved.anchorText,
+          evidenceText: resolved.evidenceText,
+          clauseUids: resolved.clauseUids,
+          updatedAt: Date.now(),
+        })
+      }
+      scrollToEl(best)
     },
     scrollToBlock,
     scrollToEdit,
@@ -1285,9 +1384,15 @@ export const DocumentEditor = forwardRef<
       const suggestionText = String(opts.suggestionText || '').trim()
       if (!riskId || !suggestionText) return false
 
-      const locateInputs = buildLocateInputs(opts)
-      const matched =
-        findBestBlockByText(locateInputs.strictInputs, false) || findBestBlockByText(locateInputs.fuzzyInputs, true)
+      const locateHint = getRiskLocateHint(riskId)
+      const hintedBlock = locateHint ? blockElsRef.current.get(locateHint.blockId || '') || null : null
+      const locateInputs = buildLocateInputs({
+        targetText: locateHint?.targetText || opts.targetText,
+        anchorText: locateHint?.anchorText || opts.anchorText,
+        evidenceText: locateHint?.evidenceText || opts.evidenceText,
+        clauseUids: locateHint?.clauseUids?.length ? locateHint.clauseUids : opts.clauseUids,
+      })
+      const matched = hintedBlock || findBestBlockByText(locateInputs.strictInputs, false) || findBestBlockByText(locateInputs.fuzzyInputs, true)
       if (!matched) return false
 
       const blockId = matched.dataset.blockId || ''
@@ -1353,6 +1458,7 @@ export const DocumentEditor = forwardRef<
       cardElsRef.current = new Map()
       sourceElsRef.current = new Map()
       appliedAiPatchMapRef.current = new Map()
+      locatedRiskHintMapRef.current = new Map()
       props.onEditsChange([])
 
       if (!props.file || !docRef.current) {

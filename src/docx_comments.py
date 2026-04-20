@@ -236,28 +236,43 @@ def _build_clause_indexes(clauses: list[dict[str, Any]]) -> tuple[dict[str, dict
 
 def _resolve_clauses_for_risk(risk: dict[str, Any], by_uid: dict[str, dict[str, Any]], by_id: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
     resolved: list[dict[str, Any]] = []
-    seen = set()
-    for uid in risk.get("clause_uids") or []:
-        clause = by_uid.get(str(uid).strip())
-        if clause and clause.get("clause_uid") not in seen:
-            seen.add(clause["clause_uid"])
+    seen: set[str] = set()
+
+    for key in ("clause_uids", "related_clause_uids"):
+        vals = risk.get(key)
+        if isinstance(vals, list):
+            for uid in vals:
+                uid_s = str(uid or "").strip()
+                if not uid_s:
+                    continue
+                clause = by_uid.get(uid_s)
+                clause_uid = str((clause or {}).get("clause_uid") or "").strip()
+                if clause and clause_uid and clause_uid not in seen:
+                    seen.add(clause_uid)
+                    resolved.append(clause)
+    raw_uid = str(risk.get("clause_uid") or "").strip()
+    if raw_uid:
+        clause = by_uid.get(raw_uid)
+        clause_uid = str((clause or {}).get("clause_uid") or "").strip()
+        if clause and clause_uid and clause_uid not in seen:
+            seen.add(clause_uid)
             resolved.append(clause)
     if resolved:
         return resolved
 
     refs: list[str] = []
-    for key in ["clause_ids", "display_clause_ids"]:
+    for key in ("clause_ids", "related_clause_ids", "display_clause_ids"):
         vals = risk.get(key)
         if isinstance(vals, list):
-            refs.extend(str(v).strip() for v in vals if str(v).strip())
-    if not refs:
-        ref = str(risk.get("clause_id") or risk.get("display_clause_id") or "").strip()
-        if ref:
-            refs.extend([p.strip() for p in CLAUSE_REF_SPLIT_RE.split(ref) if p.strip()])
+            refs.extend(str(v or "").strip() for v in vals if str(v or "").strip())
+    for key in ("clause_id", "display_clause_id"):
+        raw = str(risk.get(key) or "").strip()
+        if raw:
+            refs.extend([p.strip() for p in CLAUSE_REF_SPLIT_RE.split(raw) if p.strip()])
 
     for ref in refs:
         for clause in by_id.get(ref, []):
-            uid = clause.get("clause_uid")
+            uid = str(clause.get("clause_uid") or "").strip()
             if uid and uid not in seen:
                 seen.add(uid)
                 resolved.append(clause)

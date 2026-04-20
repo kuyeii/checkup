@@ -5,6 +5,7 @@ import logging
 import re
 from typing import Any
 
+from .clause_ref_display import build_clause_alias_map, humanize_clause_refs
 from .normalize_clauses import extract_top_level_from_clause_ref
 
 LAW_REVIEW_PATTERNS = [
@@ -120,6 +121,17 @@ def _parse_normative_basis(normative_basis: Any) -> tuple[str, str, str]:
     if isinstance(normative_basis, str):
         return "", normalize_text(normative_basis), ""
     return "", "", ""
+
+
+def _humanize_risk_text_fields(item: dict[str, Any], clause_metas: list[dict[str, Any]]) -> None:
+    alias_map = build_clause_alias_map(clause_metas)
+    if not alias_map:
+        return
+    for field in ("issue", "factual_basis", "reasoning_basis", "basis_summary", "basis", "suggestion_basis"):
+        raw = str(item.get(field, "") or "").strip()
+        if not raw:
+            continue
+        item[field] = humanize_clause_refs(raw, alias_map)
 
 
 def _compose_structured_basis(item: dict[str, Any]) -> tuple[str, str] | None:
@@ -602,6 +614,7 @@ def normalize_and_dedupe_risks(
             exact_index=exact_index,
         )
 
+        _humanize_risk_text_fields(item, clause_metas)
         is_boilerplate = any(bool(meta.get("is_boilerplate_instruction")) for meta in clause_metas)
         issue = str(item.get("issue", "") or "")
         dimension = str(item.get("dimension", "") or "")

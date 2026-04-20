@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from config import settings
+from src.clause_ref_display import build_clause_alias_map, humanize_clause_refs
 from src.dify_client import DifyWorkflowClient, DifyWorkflowError, extract_blocking_outputs
 from src.docx_locator import enrich_reviewed_risks_with_locators
 from src.parse_outputs import _load_json_with_repair, strip_markdown_json
@@ -1485,6 +1486,45 @@ def _resolve_aggregate_context(run_dir: Path | None, item: dict[str, Any]) -> di
 
 
 
+def _sanitize_reviewed_display_payload(payload: dict[str, Any], clauses: list[dict[str, Any]] | None = None) -> bool:
+    risk_items = (((payload or {}).get("risk_result") or {}).get("risk_items") or [])
+    if not isinstance(risk_items, list):
+        return False
+
+    alias_map = build_clause_alias_map(clauses or [])
+    if not alias_map:
+        return False
+
+    changed = False
+    for item in risk_items:
+        if not isinstance(item, dict):
+            continue
+        for field in ("issue", "basis_summary", "basis", "factual_basis", "reasoning_basis", "suggestion_basis"):
+            raw = str(item.get(field) or "").strip()
+            if not raw:
+                continue
+            cleaned = humanize_clause_refs(raw, alias_map)
+            if cleaned != raw:
+                item[field] = cleaned
+                changed = True
+
+        for nested_key in ("ai_rewrite", "ai_apply", "accepted_patch"):
+            nested = item.get(nested_key)
+            if not isinstance(nested, dict):
+                continue
+            raw_comment = str(nested.get("comment_text") or "").strip()
+            if not raw_comment:
+                continue
+            cleaned_comment = humanize_clause_refs(raw_comment, alias_map)
+            if cleaned_comment != raw_comment:
+                nested["comment_text"] = cleaned_comment
+                changed = True
+
+        if _refresh_accepted_patch_for_item(item):
+            changed = True
+    return changed
+
+
 def _sanitize_reviewed_ai_payload(payload: dict[str, Any], run_dir: Path | None = None) -> bool:
     risk_items = (((payload or {}).get("risk_result") or {}).get("risk_items") or [])
     if not isinstance(risk_items, list):
@@ -1638,7 +1678,8 @@ def _build_suggest_insert_patch(risk: dict[str, Any]) -> dict[str, Any] | None:
 
     patch: dict[str, Any] = {
         "kind": "suggest_insert",
-        "after_text": suggestion_text,
+        "export_mode": "comment_only",
+        "suggestion_text": suggestion_text,
         "comment_text": _build_suggest_insert_comment_text(risk),
         "created_at": _iso_now(),
     }
@@ -1665,6 +1706,7 @@ def _build_ai_rewrite_patch(risk: dict[str, Any]) -> dict[str, Any] | None:
     created_at = str(ai_rewrite.get("created_at") or "").strip() or _iso_now()
     return {
         "kind": "ai_rewrite",
+        "export_mode": "document_patch",
         "before_text": before_text,
         "after_text": revised_text,
         "comment_text": comment_text,
@@ -2226,6 +2268,9 @@ def _build_result_payload(run_id: str) -> dict[str, Any]:
     if clauses is None:
         raise HTTPException(status_code=404, detail="结果尚未生成完成")
     validated = get_or_create_reviewed_risks(run_id)
+    if isinstance(clauses, list):
+        if _sanitize_reviewed_display_payload(validated, clauses):
+            _persist_reviewed_payload(run_dir, validated)
     meta = _read_meta(run_id)
     reviewed_docx = run_dir / "reviewed_comments.docx"
     return {
@@ -2599,6 +2644,9 @@ def _export_docx_with_reviewed_risks(run_id: str) -> Path:
         raise HTTPException(status_code=404, detail="merged_clauses.json 不存在")
 
     reviewed_payload = get_or_create_reviewed_risks(run_id)
+    merged_clauses = _safe_json(merged_path)
+    if isinstance(merged_clauses, list):
+        _sanitize_reviewed_display_payload(reviewed_payload, merged_clauses)
     reviewed_path = run_dir / "risk_result_reviewed.json"
     reviewed_path.write_text(json.dumps(reviewed_payload, ensure_ascii=False, indent=2), encoding="utf-8")
 

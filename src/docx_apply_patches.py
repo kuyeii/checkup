@@ -618,10 +618,22 @@ def _has_exportable_patch(
         return False
     if decision and decision != "accepted":
         return False
+
     accepted_kind = str(accepted_patch.get("kind") or "").strip().lower()
-    accepted_after = str(accepted_patch.get("after_text") or "").strip()
-    if accepted_kind == "suggest_insert" and accepted_after:
-        return True
+    export_mode = str(accepted_patch.get("export_mode") or accepted_patch.get("mode") or "").strip().lower()
+
+    if export_mode in {"comment_only", "annotation_only"}:
+        return False
+
+    # Backward compatibility: older reviewed payloads persisted suggestion inserts
+    # as accepted_patch with after_text. These are annotation-only decisions and
+    # must never be exported as DOCX text revisions.
+    if accepted_kind == "suggest_insert":
+        return False
+
+    if export_mode in {"document_patch", "doc_patch", "text_patch"}:
+        return "after_text" in accepted_patch
+
     return ai_state == "succeeded"
 
 
