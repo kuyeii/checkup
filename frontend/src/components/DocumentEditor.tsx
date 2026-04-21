@@ -2,12 +2,21 @@ import React, { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, use
 import { renderAsync } from 'docx-preview'
 import DiffMatchPatch from 'diff-match-patch'
 import type { EditSummary } from '../types'
+import { analyzeTableAppendPatch } from '../utils/aiRewritePatch'
 
 function uid() {
   return Math.random().toString(16).slice(2) + Date.now().toString(16)
 }
 
 type BlockEl = HTMLElement & { dataset: { blockId?: string } }
+
+type StructuralItem = {
+  index: number
+  kind: 'block' | 'table'
+  element: HTMLElement
+  text: string
+  looseText: string
+}
 
 type EditVisual = {
   rects: Array<{ left: number; top: number; width: number; height: number }>
@@ -38,6 +47,7 @@ type LocatedRiskHint = {
   targetText: string
   anchorText: string
   evidenceText: string
+  matchedText: string
   clauseUids: string[]
   updatedAt: number
 }
@@ -387,6 +397,357 @@ function findLooseOccurrencesWithRawRange(text: string, query: string) {
   return ranges
 }
 
+function computeAppendOnlySuffix(sourceText: string, revisedText: string) {
+  const source = String(sourceText || '')
+  const revised = String(revisedText || '')
+  if (!source || !revised || source === revised) return ''
+
+  const matcher = new DiffMatchPatch()
+  const diffs = matcher.diff_main(source, revised)
+  matcher.diff_cleanupSemantic(diffs)
+
+  let suffix = ''
+  let consumedSource = 0
+  let reachedSourceEnd = false
+  for (const [op, chunk] of diffs) {
+    if (!chunk) continue
+    if (op === 0) {
+      consumedSource += chunk.length
+      if (reachedSourceEnd && normalizeSearchText(chunk)) return ''
+      if (consumedSource >= source.length) {
+        reachedSourceEnd = true
+      }
+      continue
+    }
+    if (op === -1) {
+      return ''
+    }
+    if (op === 1) {
+      if (!reachedSourceEnd && normalizeSearchText(chunk)) {
+        return ''
+      }
+      suffix += chunk
+    }
+  }
+
+  if (!reachedSourceEnd || !suffix.trim()) return ''
+  return suffix
+}
+
+function extractAppendOnlySuffixFromClusterText(clusterText: string, revisedText: string) {
+  const clusterLoose = normalizeLooseSearchText(String(clusterText || ''))
+  const revised = String(revisedText || '')
+  if (!clusterLoose || !revised) return ''
+
+  const lines = revised.split(/\r?\n/)
+  let lastSourceLine = -1
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i].trim()
+    const loose = normalizeLooseSearchText(line)
+    if (!loose) {
+      if (/^[|:\-]+$/.test(line.replace(/\s+/g, ''))) {
+        lastSourceLine = i
+      }
+      continue
+    }
+    if (clusterLoose.includes(loose)) {
+      lastSourceLine = i
+    }
+  }
+  if (lastSourceLine < 0 || lastSourceLine >= lines.length - 1) return ''
+  const suffix = lines.slice(lastSourceLine + 1).join('\n').replace(/^\s+/, '').trim()
+  return suffix
+}
+
+function extractAppendOnlySuffixFromSourceHint(sourceText: string, revisedText: string) {
+  const source = String(sourceText || '')
+  const revised = String(revisedText || '')
+  if (!source || !revised || source === revised) return ''
+
+  const sourceLines = source.split(/\r?\n/)
+  const revisedLines = revised.split(/\r?\n/)
+  const sourceSig: Array<{ rawIndex: number; loose: string }> = []
+  const revisedSig: Array<{ rawIndex: number; loose: string }> = []
+
+  for (let i = 0; i < sourceLines.length; i += 1) {
+    const loose = normalizeLooseSearchText(sourceLines[i])
+    if (loose) sourceSig.push({ rawIndex: i, loose })
+  }
+  for (let i = 0; i < revisedLines.length; i += 1) {
+    const loose = normalizeLooseSearchText(revisedLines[i])
+    if (loose) revisedSig.push({ rawIndex: i, loose })
+  }
+
+  if (sourceSig.length === 0 || revisedSig.length <= 1) return ''
+
+  let bestMatchLen = 0
+  let bestSuffixStart = -1
+  for (let sourceStart = 0; sourceStart < sourceSig.length; sourceStart += 1) {
+    let matchLen = 0
+    while (
+      sourceStart + matchLen < sourceSig.length &&
+      matchLen < revisedSig.length &&
+      sourceSig[sourceStart + matchLen].loose === revisedSig[matchLen].loose
+    ) {
+      matchLen += 1
+    }
+    if (matchLen === 0) continue
+    if (sourceStart + matchLen !== sourceSig.length) continue
+    if (matchLen >= revisedSig.length) continue
+    let matchedChars = 0
+    for (let offset = 0; offset < matchLen; offset += 1) {
+      matchedChars += sourceSig[sourceStart + offset].loose.length
+    }
+    if (matchLen < 2 && matchedChars < 24) continue
+    const suffixStart = revisedSig[matchLen].rawIndex
+    if (
+      matchLen > bestMatchLen ||
+      (matchLen === bestMatchLen && (bestSuffixStart < 0 || suffixStart < bestSuffixStart))
+    ) {
+      bestMatchLen = matchLen
+      bestSuffixStart = suffixStart
+    }
+  }
+
+  if (bestSuffixStart < 0) return ''
+  return revisedLines.slice(bestSuffixStart).join('\n').replace(/^\s+/, '').trim()
+}
+
+function collectSequentialBlockCluster(
+  blocks: BlockEl[],
+  startIndex: number,
+  sourceText: string
+) {
+  const compactSource = normalizeLooseSearchText(String(sourceText || ''))
+  if (!compactSource || startIndex < 0 || startIndex >= blocks.length) return [] as BlockEl[]
+
+  const cluster: BlockEl[] = []
+  let cursor = 0
+  let matchedAny = false
+  let skippedAfterMatch = 0
+
+  for (let i = startIndex; i < blocks.length; i += 1) {
+    const block = blocks[i]
+    const blockText = plainTextOf(block)
+    const compactBlock = normalizeLooseSearchText(blockText)
+    if (!compactBlock) {
+      if (!matchedAny) continue
+      skippedAfterMatch += 1
+      if (skippedAfterMatch >= 3) break
+      continue
+    }
+
+    const idx = compactSource.indexOf(compactBlock, cursor)
+    if (idx < 0) {
+      if (!matchedAny) continue
+      skippedAfterMatch += 1
+      if (skippedAfterMatch >= 2) break
+      continue
+    }
+
+    matchedAny = true
+    skippedAfterMatch = 0
+    cluster.push(block)
+    cursor = idx + compactBlock.length
+    if (cursor >= compactSource.length) break
+  }
+
+  if (cluster.length === 0) return [] as BlockEl[]
+  const joinedCompact = normalizeLooseSearchText(cluster.map((block) => plainTextOf(block)).join('\n'))
+  if (!joinedCompact || !compactSource.includes(joinedCompact)) return [] as BlockEl[]
+  return cluster
+}
+
+function buildTableStructuralText(table: HTMLTableElement) {
+  const lines = Array.from(table.rows)
+    .map((row) => {
+      const cells = Array.from(row.cells)
+        .map((cell) => plainTextOf(cell as HTMLElement).replace(/\s+/g, ' ').trim())
+        .filter((cell) => cell.length > 0)
+      if (cells.length === 0) return ''
+      return `| ${cells.join(' | ')} |`
+    })
+    .filter(Boolean)
+  return lines.join('\n').trim()
+}
+
+function collectStructuralItems(root: HTMLElement) {
+  const nodes = Array.from(root.querySelectorAll<HTMLElement>('p, li, table'))
+  const items: StructuralItem[] = []
+
+  nodes.forEach((node) => {
+    const tag = node.tagName.toLowerCase()
+    if (tag === 'table') {
+      const text = buildTableStructuralText(node as HTMLTableElement)
+      const looseText = normalizeLooseSearchText(text)
+      if (!looseText) return
+      items.push({ index: items.length, kind: 'table', element: node, text, looseText })
+      return
+    }
+
+    if (node.closest('table')) return
+    const text = plainTextOf(node).replace(/\s+/g, ' ').trim()
+    const looseText = normalizeLooseSearchText(text)
+    if (!looseText) return
+    items.push({ index: items.length, kind: 'block', element: node, text, looseText })
+  })
+
+  return items
+}
+
+function collectSequentialStructuralCluster(
+  items: StructuralItem[],
+  startIndex: number,
+  sourceText: string
+) {
+  const compactSource = normalizeLooseSearchText(String(sourceText || ''))
+  if (!compactSource || startIndex < 0 || startIndex >= items.length) return [] as StructuralItem[]
+
+  const cluster: StructuralItem[] = []
+  let cursor = 0
+  let matchedAny = false
+  let skippedAfterMatch = 0
+
+  for (let i = startIndex; i < items.length; i += 1) {
+    const item = items[i]
+    if (!item.looseText) continue
+
+    const idx = compactSource.indexOf(item.looseText, cursor)
+    if (idx < 0) {
+      if (!matchedAny) continue
+      skippedAfterMatch += 1
+      if (skippedAfterMatch >= 2) break
+      continue
+    }
+
+    matchedAny = true
+    skippedAfterMatch = 0
+    cluster.push(item)
+    cursor = idx + item.looseText.length
+    if (cursor >= compactSource.length) break
+  }
+
+  if (cluster.length === 0) return [] as StructuralItem[]
+  const joinedCompact = cluster.map((item) => item.looseText).join('')
+  if (!joinedCompact || !compactSource.includes(joinedCompact)) return [] as StructuralItem[]
+  return cluster
+}
+
+type StructuredInsertionPlan = {
+  cluster: StructuralItem[]
+  anchorItem: StructuralItem
+  insertPosition: 'before' | 'after'
+  insertText: string
+  matchedCharCount: number
+  score: number
+}
+
+function tableCellTokens(tableText: string) {
+  return String(tableText || '')
+    .split('|')
+    .map((part) => part.replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .filter((part) => !/^:?-{3,}:?$/.test(part))
+}
+
+function tableTokenOverlapRatio(left: string, right: string) {
+  const leftTokens = Array.from(new Set(tableCellTokens(left)))
+  if (leftTokens.length === 0) return 0
+  const rightLoose = normalizeLooseSearchText(right)
+  const hits = leftTokens.filter((token) => normalizeLooseSearchText(token) && rightLoose.includes(normalizeLooseSearchText(token))).length
+  return hits / leftTokens.length
+}
+
+function previousStructuralItem(items: StructuralItem[], startIndex: number, kind?: StructuralItem['kind']) {
+  for (let idx = startIndex - 1; idx >= 0; idx -= 1) {
+    const item = items[idx]
+    if (!item) continue
+    if (kind && item.kind !== kind) continue
+    return item
+  }
+  return null
+}
+
+function buildStructuredInsertionPlan(
+  items: StructuralItem[],
+  startIndex: number,
+  sourceText: string,
+  revisedText: string
+): StructuredInsertionPlan | null {
+  const cluster = collectSequentialStructuralCluster(items, startIndex, sourceText)
+  if (cluster.length === 0) return null
+
+  const revised = String(revisedText || '')
+  const revisedLooseMap = buildLooseIndexMap(revised)
+  if (!revisedLooseMap.loose) return null
+
+  let cursor = 0
+  let previousRawEnd = 0
+  let matchedCharCount = 0
+  const insertions: Array<{ insertText: string; anchorItem: StructuralItem; insertPosition: 'before' | 'after' }> = []
+
+  for (let idx = 0; idx < cluster.length; idx += 1) {
+    const item = cluster[idx]
+    const matchAt = revisedLooseMap.loose.indexOf(item.looseText, cursor)
+    if (matchAt < 0) return null
+
+    const rawStart = revisedLooseMap.indexMap[matchAt]
+    const rawEnd = revisedLooseMap.indexMap[matchAt + item.looseText.length - 1] + 1
+    if (!Number.isFinite(rawStart) || !Number.isFinite(rawEnd) || rawEnd <= rawStart) return null
+
+    const gapText = revised.slice(previousRawEnd, rawStart).trim()
+    if (gapText) {
+      insertions.push({
+        insertText: gapText,
+        anchorItem: idx === 0 ? item : cluster[idx - 1],
+        insertPosition: idx === 0 ? 'before' : 'after',
+      })
+    }
+
+    cursor = matchAt + item.looseText.length
+    previousRawEnd = rawEnd
+    matchedCharCount += item.looseText.length
+  }
+
+  const trailingText = revised.slice(previousRawEnd).trim()
+  if (trailingText) {
+    insertions.push({
+      insertText: trailingText,
+      anchorItem: cluster[cluster.length - 1],
+      insertPosition: 'after',
+    })
+  }
+
+  if (insertions.length !== 1) return null
+  const insertion = insertions[0]
+  const insertionLoose = normalizeLooseSearchText(insertion.insertText)
+  if (insertionLoose) {
+    const clusterIndexes = new Set(cluster.map((item) => item.index))
+    const nearbyItems = items.filter((item) => {
+      if (clusterIndexes.has(item.index)) return false
+      if (item.looseText.length < 12) return false
+      if (insertion.insertPosition === 'before') {
+        return item.index >= insertion.anchorItem.index && item.index <= insertion.anchorItem.index + 1
+      }
+      return item.index > insertion.anchorItem.index && item.index <= insertion.anchorItem.index + 2
+    })
+    if (nearbyItems.some((item) => insertionLoose.includes(item.looseText))) {
+      return null
+    }
+  }
+
+  const score = cluster.length * 1000 + matchedCharCount * 2 - insertion.insertText.length
+
+  return {
+    cluster,
+    anchorItem: insertion.anchorItem,
+    insertPosition: insertion.insertPosition,
+    insertText: insertion.insertText,
+    matchedCharCount,
+    score,
+  }
+}
+
 function minimizePatchPair(targetText: string, revisedText: string) {
   const before = String(targetText || '')
   const after = String(revisedText || '')
@@ -503,6 +864,66 @@ export const DocumentEditor = forwardRef<
       })
       baselineRef.current = base
     }
+  }
+
+  const upsertInsertedParagraph = (opts: {
+    anchorElement: HTMLElement
+    position: 'before' | 'after'
+    text: string
+    patchId?: string
+  }) => {
+    const { anchorElement, position, text, patchId } = opts
+    let insertionBlock: BlockEl | null = null
+    let createdBlock = false
+
+    const sibling =
+      position === 'before'
+        ? (anchorElement.previousElementSibling as HTMLElement | null)
+        : (anchorElement.nextElementSibling as HTMLElement | null)
+
+    if (sibling) {
+      const siblingTag = sibling.tagName.toLowerCase()
+      const siblingText = plainTextOf(sibling).trim()
+      if ((siblingTag === 'p' || siblingTag === 'li') && !siblingText && sibling.closest('table') == null) {
+        insertionBlock = sibling as BlockEl
+      }
+    }
+
+    if (!insertionBlock) {
+      insertionBlock = document.createElement('p') as BlockEl
+      insertionBlock.className = 'editableBlock'
+      insertionBlock.setAttribute('contenteditable', 'true')
+      insertionBlock.setAttribute('spellcheck', 'false')
+      const nextId = `b_${blockElsRef.current.size + 1}`
+      insertionBlock.dataset.blockId = nextId
+      if (anchorElement.parentNode) {
+        if (position === 'before') {
+          anchorElement.parentNode.insertBefore(insertionBlock, anchorElement)
+        } else {
+          anchorElement.parentNode.insertBefore(insertionBlock, anchorElement.nextSibling)
+        }
+      } else {
+        return null
+      }
+      createdBlock = true
+      collectBlocks()
+    }
+
+    const beforeText = plainTextOf(insertionBlock)
+    const beforeHtml = insertionBlock.innerHTML
+    insertionBlock.innerHTML = ''
+    insertionBlock.appendChild(createReplacementFragment(insertionBlock, text, false, patchId || undefined))
+    insertionBlock.normalize()
+    const afterText = plainTextOf(insertionBlock)
+    if (!afterText || afterText === beforeText) {
+      if (createdBlock && insertionBlock.parentNode) {
+        insertionBlock.parentNode.removeChild(insertionBlock)
+        collectBlocks()
+      }
+      return null
+    }
+
+    return { insertionBlock, beforeText, beforeHtml, afterText }
   }
 
   const computeEdits = () => {
@@ -974,6 +1395,19 @@ export const DocumentEditor = forwardRef<
     const normalizedRawTargetText = rawTargetText.replace(/\s+/g, ' ').trim()
     const sanitizedTargetText = sanitizeLocatorText(rawTargetText)
     const originalRevisedText = String(opts.revisedText || '').trim()
+    const locateHint = getRiskLocateHint(patchId)
+    const clauseUids = opts.clauseUids || []
+    const hasContextualFallback = Boolean(
+      originalRevisedText &&
+        (
+          clauseUids.length > 0 ||
+          opts.anchorText ||
+          opts.evidenceText ||
+          locateHint?.anchorText ||
+          locateHint?.evidenceText ||
+          locateHint?.matchedText
+        )
+    )
 
     const patchCandidates = Array.from(
       new Map(
@@ -995,7 +1429,7 @@ export const DocumentEditor = forwardRef<
       ).values()
     )
 
-    if (patchCandidates.length === 0) return false
+    if (patchCandidates.length === 0 && !hasContextualFallback) return false
     if (patchCandidates.some((candidate) => candidate.targetText === candidate.revisedText)) return false
 
     if (patchId) {
@@ -1034,11 +1468,129 @@ export const DocumentEditor = forwardRef<
       candidateRanges: Array<{ start: number; end: number }>
     }
 
-    const findPatchMatch = (): PatchMatch | null => {
+    const findPatchMatch = (): PatchMatch | 'applied' | null => {
       const allBlocks = Array.from(blockElsRef.current.values())
       let orderedBlocks = allBlocks
-      const locateHint = getRiskLocateHint(patchId)
       const hintedBlock = locateHint ? blockElsRef.current.get(locateHint.blockId || '') || null : null
+      const hintedIndex = hintedBlock ? allBlocks.indexOf(hintedBlock) : -1
+
+      const locateInputs = buildLocateInputs({
+        targetText: normalizedRawTargetText || sanitizedTargetText || String(locateHint?.matchedText || ''),
+        anchorText: String(opts.anchorText || locateHint?.anchorText || ''),
+        evidenceText: String(opts.evidenceText || locateHint?.evidenceText || ''),
+        clauseUids
+      })
+      const preferredBlock = findBestBlockByText(locateInputs.strictInputs, false) || findBestBlockByText(locateInputs.fuzzyInputs, true)
+
+      const resolveStructuralIndex = (items: StructuralItem[], block: BlockEl | null) => {
+        if (!block || items.length === 0) return -1
+        const table = block.closest('table') as HTMLElement | null
+        const anchorElement = table || block
+        return items.findIndex((item) => item.element === anchorElement)
+      }
+
+      const tryApplyTableAppendPatch = () => {
+        if (!docRef.current) return false
+
+        const appendCandidates = Array.from(
+          new Map(
+            patchCandidates
+              .map((candidate) => {
+                const analysis = analyzeTableAppendPatch(candidate.targetText, candidate.revisedText)
+                if (!analysis) return null
+                return [`${analysis.anchorPrefix}@@${analysis.tableMarkdown}@@${analysis.insertText}`, analysis] as const
+              })
+              .filter(Boolean) as Array<readonly [string, NonNullable<ReturnType<typeof analyzeTableAppendPatch>>]>
+          ).values()
+        )
+        if (appendCandidates.length === 0) return false
+
+        const structuralItems = collectStructuralItems(docRef.current)
+        if (structuralItems.length === 0) return false
+
+        const hintedStructuralIndex = resolveStructuralIndex(structuralItems, hintedBlock)
+        const preferredStructuralIndex = resolveStructuralIndex(structuralItems, preferredBlock)
+
+        let bestMatch:
+          | {
+              analysis: NonNullable<ReturnType<typeof analyzeTableAppendPatch>>
+              tableItem: StructuralItem
+              score: number
+            }
+          | null = null
+
+        for (const analysis of appendCandidates) {
+          const tableLoose = normalizeLooseSearchText(analysis.tableMarkdown)
+          const prefixLoose = normalizeLooseSearchText(analysis.anchorPrefix)
+          if (!tableLoose) continue
+
+          for (const item of structuralItems) {
+            if (item.kind !== 'table') continue
+
+            const looseOverlap =
+              item.looseText.includes(tableLoose) || tableLoose.includes(item.looseText)
+                ? 1
+                : Math.max(tableTokenOverlapRatio(analysis.tableMarkdown, item.text), tableTokenOverlapRatio(item.text, analysis.tableMarkdown))
+            if (looseOverlap < 0.45) continue
+
+            let score = looseOverlap * 1000
+            const prevBlock = previousStructuralItem(structuralItems, item.index, 'block')
+            if (prefixLoose && prevBlock?.looseText) {
+              if (prevBlock.looseText.includes(prefixLoose) || prefixLoose.includes(prevBlock.looseText)) {
+                score += 320
+              } else {
+                const combinedLoose = normalizeLooseSearchText(`${prevBlock.text}\n${item.text}`)
+                if (combinedLoose.includes(prefixLoose)) score += 160
+              }
+            }
+
+            const referenceIndexes = [hintedStructuralIndex, preferredStructuralIndex].filter((value) => value >= 0)
+            if (referenceIndexes.length > 0) {
+              const bestDistance = Math.min(...referenceIndexes.map((value) => Math.abs(item.index - value)))
+              score += Math.max(0, 180 - bestDistance * 36)
+              if (item.index >= Math.min(...referenceIndexes)) score += 48
+            }
+
+            if (!bestMatch || score > bestMatch.score) {
+              bestMatch = { analysis, tableItem: item, score }
+            }
+          }
+        }
+
+        if (!bestMatch) return false
+
+        const inserted = upsertInsertedParagraph({
+          anchorElement: bestMatch.tableItem.element,
+          position: 'after',
+          text: bestMatch.analysis.insertText,
+          patchId: patchId || undefined,
+        })
+        if (!inserted) return false
+
+        if (patchId) {
+          appliedAiPatchMapRef.current.set(patchId, {
+            patchId,
+            blockId: inserted.insertionBlock.dataset.blockId || '',
+            beforeText: inserted.beforeText,
+            afterText: inserted.afterText,
+            blockHtmlBefore: inserted.beforeHtml,
+            blockHtmlAfter: inserted.insertionBlock.innerHTML,
+            originalTargetText: rawTargetText || normalizedRawTargetText || sanitizedTargetText || bestMatch.analysis.displayBeforeText,
+            targetText: '',
+            revisedText: bestMatch.analysis.insertText,
+            originalRevisedText,
+            startIndex: inserted.beforeText.length,
+            endIndex: inserted.beforeText.length,
+            keepUnderlinedDigits: false,
+          })
+        }
+
+        computeEdits()
+        scrollToEl(inserted.insertionBlock, { scroll: opts.scroll !== false })
+        return true
+      }
+
+      if (tryApplyTableAppendPatch()) return 'applied'
 
       const findMatchInBlocks = (
         blocks: BlockEl[],
@@ -1118,31 +1670,202 @@ export const DocumentEditor = forwardRef<
         )
         const hintedMatch = findMatchInBlocks([hintedBlock], hintedCandidates)
         if (hintedMatch) return hintedMatch
-        return null
+
+        if (hintedIndex >= 0) {
+          const neighborBlocks = allBlocks.filter((_, idx) => Math.abs(idx - hintedIndex) <= 12)
+          const nearbyMatch = findMatchInBlocks(neighborBlocks, hintedCandidates)
+          if (nearbyMatch) return nearbyMatch
+          orderedBlocks = [
+            ...neighborBlocks,
+            ...allBlocks.filter((_, idx) => Math.abs(idx - hintedIndex) > 12)
+          ]
+        }
       }
 
-      const clauseUids = opts.clauseUids || []
-      const hasLocateContext = Boolean(opts.anchorText || opts.evidenceText || clauseUids.length > 0)
-      if (hasLocateContext) {
-        const { strictInputs, fuzzyInputs } = buildLocateInputs({
-          targetText: normalizedRawTargetText || sanitizedTargetText,
-          anchorText: String(opts.anchorText || ''),
-          evidenceText: String(opts.evidenceText || ''),
-          clauseUids
-        })
-        const preferredBlock = findBestBlockByText(strictInputs, false) || findBestBlockByText(fuzzyInputs, true)
-        if (preferredBlock) {
-          const preferredOnlyMatch = findMatchInBlocks([preferredBlock], patchCandidates)
-          if (preferredOnlyMatch) return preferredOnlyMatch
-          orderedBlocks = [preferredBlock, ...allBlocks.filter((el) => el !== preferredBlock)]
-        }
+      const hasLocateContext = Boolean(
+        opts.anchorText ||
+          opts.evidenceText ||
+          locateHint?.anchorText ||
+          locateHint?.evidenceText ||
+          locateHint?.matchedText ||
+          clauseUids.length > 0
+      )
+      if (hasLocateContext && preferredBlock) {
+        const preferredOnlyMatch = findMatchInBlocks([preferredBlock], patchCandidates)
+        if (preferredOnlyMatch) return preferredOnlyMatch
+        orderedBlocks = [preferredBlock, ...allBlocks.filter((el) => el !== preferredBlock)]
       }
 
       return findMatchInBlocks(orderedBlocks, patchCandidates)
     }
 
     const matchedPatch = findPatchMatch()
-    if (!matchedPatch) return false
+    if (matchedPatch === 'applied') return true
+    if (!matchedPatch) {
+      const allBlocks = Array.from(blockElsRef.current.values())
+      const hintedBlock = locateHint ? blockElsRef.current.get(locateHint.blockId || '') || null : null
+      const hintedIndex = hintedBlock ? allBlocks.indexOf(hintedBlock) : -1
+      const clauseTexts = clauseUids.map((uid) => props.clauseTextByUid?.[uid] || '').filter(Boolean)
+      const hintedBlockText = hintedBlock ? plainTextOf(hintedBlock) : ''
+      const sourceHints = [
+        ...clauseTexts,
+        hintedBlockText,
+        String(locateHint?.matchedText || ''),
+        String(opts.evidenceText || locateHint?.evidenceText || ''),
+        String(opts.anchorText || locateHint?.anchorText || ''),
+        normalizedRawTargetText || sanitizedTargetText,
+      ]
+        .map((text) => String(text || '').trim())
+        .filter(Boolean)
+      const locateInputs = buildLocateInputs({
+        targetText: normalizedRawTargetText || sanitizedTargetText || String(locateHint?.matchedText || ''),
+        anchorText: String(opts.anchorText || locateHint?.anchorText || ''),
+        evidenceText: String(opts.evidenceText || locateHint?.evidenceText || ''),
+        clauseUids,
+      })
+      const preferredBlock =
+        findBestBlockByText(locateInputs.strictInputs, false) ||
+        findBestBlockByText(locateInputs.fuzzyInputs, true)
+      const preferredIndex = preferredBlock ? allBlocks.indexOf(preferredBlock) : -1
+
+      if ((preferredIndex >= 0 || hintedIndex >= 0) && originalRevisedText) {
+        const structuralItems = docRef.current ? collectStructuralItems(docRef.current) : []
+        const resolveStructuralIndex = (block: BlockEl | null) => {
+          if (!block || structuralItems.length === 0) return -1
+          const table = block.closest('table') as HTMLElement | null
+          const anchorElement = table || block
+          return structuralItems.findIndex((item) => item.element === anchorElement)
+        }
+
+        const hintedStructuralIndex = resolveStructuralIndex(hintedBlock)
+        const preferredStructuralIndex = resolveStructuralIndex(preferredBlock)
+        const structuralStartIndexes = new Set<number>()
+        if (hintedStructuralIndex >= 0) {
+          for (let idx = Math.max(0, hintedStructuralIndex - 3); idx <= hintedStructuralIndex; idx += 1) {
+            structuralStartIndexes.add(idx)
+          }
+        }
+        if (preferredStructuralIndex >= 0) {
+          for (let idx = Math.max(0, preferredStructuralIndex - 3); idx <= preferredStructuralIndex; idx += 1) {
+            structuralStartIndexes.add(idx)
+          }
+        }
+
+        let bestPlan: StructuredInsertionPlan | null = null
+        if (structuralItems.length > 0 && structuralStartIndexes.size > 0) {
+          const orderedStartIndexes = Array.from(structuralStartIndexes).sort((a, b) => a - b)
+          for (const sourceHint of sourceHints) {
+            for (const startIndex of orderedStartIndexes) {
+              const plan = buildStructuredInsertionPlan(structuralItems, startIndex, sourceHint, originalRevisedText)
+              if (!plan) continue
+              if (!bestPlan || plan.score > bestPlan.score) {
+                bestPlan = plan
+              }
+            }
+          }
+        }
+
+        if (bestPlan) {
+          const inserted = upsertInsertedParagraph({
+            anchorElement: bestPlan.anchorItem.element,
+            position: bestPlan.insertPosition,
+            text: bestPlan.insertText,
+            patchId: patchId || undefined,
+          })
+          if (inserted) {
+            if (patchId) {
+              appliedAiPatchMapRef.current.set(patchId, {
+                patchId,
+                blockId: inserted.insertionBlock.dataset.blockId || '',
+                beforeText: inserted.beforeText,
+                afterText: inserted.afterText,
+                blockHtmlBefore: inserted.beforeHtml,
+                blockHtmlAfter: inserted.insertionBlock.innerHTML,
+                originalTargetText: rawTargetText || normalizedRawTargetText || sanitizedTargetText,
+                targetText: '',
+                revisedText: bestPlan.insertText,
+                originalRevisedText,
+                startIndex: inserted.beforeText.length,
+                endIndex: inserted.beforeText.length,
+                keepUnderlinedDigits: false,
+              })
+            }
+
+            computeEdits()
+            scrollToEl(inserted.insertionBlock, { scroll: opts.scroll !== false })
+            return true
+          }
+        }
+
+        const anchorIndexes = new Set<number>()
+        if (hintedIndex >= 0) {
+          for (let idx = Math.max(0, hintedIndex - 3); idx <= hintedIndex; idx += 1) {
+            anchorIndexes.add(idx)
+          }
+        }
+        if (preferredIndex >= 0) {
+          for (let idx = Math.max(0, preferredIndex - 3); idx <= preferredIndex; idx += 1) {
+            anchorIndexes.add(idx)
+          }
+        }
+        const startIndexes = Array.from(anchorIndexes).sort((a, b) => a - b)
+        for (const sourceHint of sourceHints) {
+          let cluster: BlockEl[] = []
+          for (const startIndex of startIndexes) {
+            cluster = collectSequentialBlockCluster(allBlocks, startIndex, sourceHint)
+            if (cluster.length > 0) break
+          }
+          if (cluster.length === 0) continue
+
+          const clusterText = cluster.map((block) => plainTextOf(block)).join('\n')
+          let suffixText = ''
+          for (const suffixHint of sourceHints) {
+            suffixText = extractAppendOnlySuffixFromSourceHint(suffixHint, originalRevisedText)
+            if (suffixText) break
+          }
+          if (!suffixText) {
+            suffixText =
+              extractAppendOnlySuffixFromClusterText(clusterText, originalRevisedText) ||
+              computeAppendOnlySuffix(sourceHint, originalRevisedText)
+          }
+          if (!suffixText) continue
+
+          const lastClusterBlock = cluster[cluster.length - 1]
+          const tableAncestor = lastClusterBlock.closest('table') as HTMLElement | null
+          const inserted = upsertInsertedParagraph({
+            anchorElement: tableAncestor || lastClusterBlock,
+            position: 'after',
+            text: suffixText,
+            patchId: patchId || undefined,
+          })
+          if (!inserted) continue
+
+          if (patchId) {
+            appliedAiPatchMapRef.current.set(patchId, {
+              patchId,
+              blockId: inserted.insertionBlock.dataset.blockId || '',
+              beforeText: inserted.beforeText,
+              afterText: inserted.afterText,
+              blockHtmlBefore: inserted.beforeHtml,
+              blockHtmlAfter: inserted.insertionBlock.innerHTML,
+              originalTargetText: rawTargetText || normalizedRawTargetText || sanitizedTargetText,
+              targetText: '',
+              revisedText: suffixText,
+              originalRevisedText,
+              startIndex: inserted.beforeText.length,
+              endIndex: inserted.beforeText.length,
+              keepUnderlinedDigits: false,
+            })
+          }
+
+          computeEdits()
+          scrollToEl(inserted.insertionBlock, { scroll: opts.scroll !== false })
+          return true
+        }
+      }
+
+      return false
+    }
 
     const matched = matchedPatch.block
     const currentText = matchedPatch.currentText
@@ -1359,6 +2082,7 @@ export const DocumentEditor = forwardRef<
           targetText: resolved.targetText,
           anchorText: resolved.anchorText,
           evidenceText: resolved.evidenceText,
+          matchedText: plainTextOf(best),
           clauseUids: resolved.clauseUids,
           updatedAt: Date.now(),
         })

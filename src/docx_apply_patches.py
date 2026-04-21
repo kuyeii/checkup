@@ -17,6 +17,7 @@ from .docx_comments import (
     _paragraph_text_for_match,
     _pick_explicit_target_candidates,
     _read_xml,
+    _unwrap_clauses,
     _xml_bytes,
     w,
 )
@@ -24,6 +25,7 @@ from .docx_comments import (
 XML_SPACE = "{http://www.w3.org/XML/1998/namespace}space"
 TERMINAL_PUNCT = set("。！？；:：.!?;")
 ENUMERATION_DELIMS = set("、，,")
+LOOSE_MATCH_RE = re.compile(r'''[\s，。！？；：、“”‘’（）【】《》「」『』\[\]{}()<>.,!?;:'"`~!@#$%^&*_\-+=|\\/]+''')
 
 
 def _load_json(path: Path) -> Any:
@@ -32,6 +34,10 @@ def _load_json(path: Path) -> Any:
 
 def _compact_text(text: str) -> str:
     return re.sub(r"\s+", "", str(text or ""))
+
+
+def _loose_compact_text(text: str) -> str:
+    return LOOSE_MATCH_RE.sub("", str(text or "")).lower()
 
 
 def _compact_text_with_index_map(text: str) -> tuple[str, list[int]]:
@@ -611,6 +617,381 @@ def _first_explicit_text(payloads: list[tuple[dict[str, Any], str]]) -> str | No
     return None
 
 
+def _collect_risk_clause_uids(risk: dict[str, Any]) -> list[str]:
+    values: list[str] = []
+    for key in ("clause_uid",):
+        raw = str(risk.get(key) or "").strip()
+        if raw:
+            values.append(raw)
+    for key in ("clause_uids", "related_clause_uids"):
+        raw_vals = risk.get(key)
+        if not isinstance(raw_vals, list):
+            continue
+        values.extend(str(v or "").strip() for v in raw_vals if str(v or "").strip())
+    out: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        if value and value not in seen:
+            seen.add(value)
+            out.append(value)
+    return out
+
+
+def _load_clause_text_by_uid_for_export(risk_path: Path) -> dict[str, str]:
+    run_dir = risk_path.parent
+    clauses_path = run_dir / "merged_clauses.json"
+    if not clauses_path.exists():
+        return {}
+    try:
+        clauses = _unwrap_clauses(_load_json(clauses_path))
+    except Exception:
+        return {}
+    mapping: dict[str, str] = {}
+    for clause in clauses:
+        if not isinstance(clause, dict):
+            continue
+        uid = str(clause.get("clause_uid") or "").strip()
+        if not uid:
+            continue
+        text = str(clause.get("clause_text") or clause.get("source_excerpt") or "").strip()
+        if text:
+            mapping[uid] = text
+    return mapping
+
+
+def _pick_append_source_hints(risk: dict[str, Any], clause_text_by_uid: dict[str, str]) -> list[str]:
+    ranked: list[tuple[int, str]] = []
+    for uid in _collect_risk_clause_uids(risk):
+        ranked.append((0, str(clause_text_by_uid.get(uid) or "").strip()))
+    ranked.extend(
+        [
+            (1, str(risk.get("main_text") or "").strip()),
+            (2, str(risk.get("evidence_text") or "").strip()),
+            (3, str(risk.get("anchor_text") or "").strip()),
+            (4, str(risk.get("target_text") or "").strip()),
+        ]
+    )
+    by_compact: dict[str, tuple[int, str]] = {}
+    for rank, raw in ranked:
+        compact = _compact_text(raw)
+        if len(compact) < 4:
+            continue
+        prev = by_compact.get(compact)
+        if prev is None or rank < prev[0] or (rank == prev[0] and len(compact) > len(_compact_text(prev[1]))):
+            by_compact[compact] = (rank, raw)
+    ordered = sorted(by_compact.values(), key=lambda item: (item[0], -len(_compact_text(item[1]))))
+    return [text for _rank, text in ordered]
+
+
+def _compute_append_only_suffix(source_text: str, revised_text: str) -> str | None:
+    source = str(source_text or "")
+    revised = str(revised_text or "")
+    if not source or not revised or source == revised:
+        return None
+
+    matcher = difflib.SequenceMatcher(a=source, b=revised, autojunk=False)
+    suffix_parts: list[str] = []
+    source_exhausted = False
+    consumed_source = 0
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            consumed_source += i2 - i1
+            if source_exhausted and _compact_text(source[i1:i2]):
+                return None
+            if consumed_source >= len(source):
+                source_exhausted = True
+            continue
+        if tag == "delete":
+            return None
+        if tag == "replace":
+            if _compact_text(source[i1:i2]) or _compact_text(revised[j1:j2]):
+                return None
+            continue
+        if tag == "insert":
+            inserted = revised[j1:j2]
+            if not source_exhausted and _compact_text(inserted):
+                return None
+            suffix_parts.append(inserted)
+    suffix = "".join(suffix_parts).strip()
+    if not source_exhausted or not suffix:
+        return None
+    return suffix
+
+
+def _extract_append_only_suffix_from_cluster_text(cluster_text: str, revised_text: str) -> str | None:
+    cluster_loose = _loose_compact_text(cluster_text)
+    revised = str(revised_text or "")
+    if not cluster_loose or not revised:
+        return None
+
+    lines = revised.splitlines()
+    last_source_line = -1
+    for idx, raw_line in enumerate(lines):
+        line = raw_line.strip()
+        loose = _loose_compact_text(line)
+        if not loose:
+            if re.fullmatch(r"[|:\-]+", re.sub(r"\s+", "", line or "")):
+                last_source_line = idx
+            continue
+        if loose in cluster_loose:
+            last_source_line = idx
+    if last_source_line < 0 or last_source_line >= len(lines) - 1:
+        return None
+    suffix = "\n".join(lines[last_source_line + 1 :]).lstrip().strip()
+    return suffix or None
+
+
+def _extract_append_only_suffix_from_source_hint(source_text: str, revised_text: str) -> str | None:
+    source = str(source_text or "")
+    revised = str(revised_text or "")
+    if not source or not revised or source == revised:
+        return None
+
+    source_lines = source.splitlines()
+    revised_lines = revised.splitlines()
+    source_sig: list[tuple[int, str]] = []
+    revised_sig: list[tuple[int, str]] = []
+
+    for idx, raw_line in enumerate(source_lines):
+        loose = _loose_compact_text(raw_line)
+        if loose:
+            source_sig.append((idx, loose))
+    for idx, raw_line in enumerate(revised_lines):
+        loose = _loose_compact_text(raw_line)
+        if loose:
+            revised_sig.append((idx, loose))
+
+    if not source_sig or len(revised_sig) <= 1:
+        return None
+
+    best_match_len = 0
+    best_suffix_start: int | None = None
+    for source_start in range(len(source_sig)):
+        match_len = 0
+        while (
+            source_start + match_len < len(source_sig)
+            and match_len < len(revised_sig)
+            and source_sig[source_start + match_len][1] == revised_sig[match_len][1]
+        ):
+            match_len += 1
+        if match_len == 0:
+            continue
+        if source_start + match_len != len(source_sig):
+            continue
+        if match_len >= len(revised_sig):
+            continue
+        matched_chars = sum(len(source_sig[source_start + offset][1]) for offset in range(match_len))
+        if match_len < 2 and matched_chars < 24:
+            continue
+        suffix_start = revised_sig[match_len][0]
+        if match_len > best_match_len or (match_len == best_match_len and (best_suffix_start is None or suffix_start < best_suffix_start)):
+            best_match_len = match_len
+            best_suffix_start = suffix_start
+
+    if best_suffix_start is None:
+        return None
+
+    suffix = "\n".join(revised_lines[best_suffix_start:]).lstrip().strip()
+    return suffix or None
+
+def _collect_sequential_paragraph_cluster(
+    paragraphs: list[etree._Element],
+    paragraph_texts: list[str],
+    start_idx: int,
+    source_text: str,
+) -> list[int]:
+    compact_source = _loose_compact_text(source_text)
+    if not compact_source or start_idx < 0 or start_idx >= len(paragraphs):
+        return []
+
+    cluster: list[int] = []
+    cursor = 0
+    matched_any = False
+    skipped_after_match = 0
+    for idx in range(start_idx, len(paragraphs)):
+        raw_text = paragraph_texts[idx]
+        compact_para = _loose_compact_text(raw_text)
+        if not compact_para:
+            if not matched_any:
+                continue
+            skipped_after_match += 1
+            if skipped_after_match >= 3:
+                break
+            continue
+        found_at = compact_source.find(compact_para, cursor)
+        if found_at < 0:
+            if not matched_any:
+                continue
+            skipped_after_match += 1
+            if skipped_after_match >= 2:
+                break
+            continue
+        matched_any = True
+        skipped_after_match = 0
+        cluster.append(idx)
+        cursor = found_at + len(compact_para)
+        if cursor >= len(compact_source):
+            break
+    if not cluster:
+        return []
+    joined_compact = _loose_compact_text("\n".join(paragraph_texts[idx] for idx in cluster))
+    if not joined_compact or joined_compact not in compact_source:
+        return []
+    return cluster
+
+
+def _first_nonempty_paragraph_rpr(paragraph: etree._Element) -> etree._Element | None:
+    pieces = _paragraph_run_pieces(paragraph)
+    return _first_nonempty_rpr(pieces)
+
+
+def _clear_paragraph_runs(paragraph: etree._Element) -> None:
+    ppr = paragraph.find(w("pPr"))
+    for child in list(paragraph):
+        if ppr is not None and child is ppr:
+            continue
+        paragraph.remove(child)
+
+
+def _populate_paragraph_with_insert(
+    paragraph: etree._Element,
+    text: str,
+    rev_id: int,
+    author: str,
+    rev_date: str,
+    base_rpr: etree._Element | None = None,
+) -> bool:
+    if not text:
+        return False
+    _clear_paragraph_runs(paragraph)
+    _append_inserted_run(paragraph, text, rev_id, author, rev_date, base_rpr)
+    return True
+
+
+def _nearest_ancestor(el: etree._Element | None, tag: str) -> etree._Element | None:
+    current = el
+    while current is not None:
+        if current.tag == tag:
+            return current
+        current = current.getparent()
+    return None
+
+
+def _create_inserted_paragraph_after(
+    anchor: etree._Element,
+    text: str,
+    rev_id: int,
+    author: str,
+    rev_date: str,
+    base_rpr: etree._Element | None = None,
+) -> etree._Element | None:
+    parent = anchor.getparent()
+    if parent is None:
+        return None
+    new_para = etree.Element(w("p"))
+    _append_inserted_run(new_para, text, rev_id, author, rev_date, base_rpr)
+    insert_at = parent.index(anchor) + 1
+    parent.insert(insert_at, new_para)
+    return new_para
+
+
+def _try_apply_append_only_cluster_patch(
+    *,
+    paragraphs: list[etree._Element],
+    paragraph_texts: list[str],
+    risk: dict[str, Any],
+    clause_text_by_uid: dict[str, str],
+    revised_text: str,
+    rev_id: int,
+    author: str,
+    rev_date: str,
+) -> dict[str, Any] | None:
+    source_hints = _pick_append_source_hints(risk, clause_text_by_uid)
+    if not source_hints or not revised_text:
+        return None
+
+    start_candidates: list[int] = []
+    locator = risk.get("locator") if isinstance(risk.get("locator"), dict) else {}
+    raw_para_idx = locator.get("paragraph_index")
+    try:
+        para_idx = int(raw_para_idx)
+    except Exception:
+        para_idx = -1
+    if 0 <= para_idx < len(paragraphs):
+        for idx in range(max(0, para_idx - 3), para_idx + 1):
+            if idx not in start_candidates:
+                start_candidates.append(idx)
+
+    explicit_candidates = _pick_explicit_target_candidates(risk)
+    for idx, text in enumerate(paragraph_texts):
+        if idx in start_candidates:
+            continue
+        found = next((candidate for candidate in explicit_candidates if candidate and _text_contains_candidate(text, candidate)), "")
+        if found:
+            start_candidates.append(idx)
+        if len(start_candidates) >= 3:
+            break
+
+    if not start_candidates:
+        return None
+
+    for start_idx in start_candidates:
+        preferred_para_text = paragraph_texts[start_idx]
+        for source_hint in source_hints:
+            cluster = _collect_sequential_paragraph_cluster(paragraphs, paragraph_texts, start_idx, source_hint)
+            if not cluster:
+                continue
+            cluster_text = "\n".join(paragraph_texts[idx] for idx in cluster)
+            suffix = None
+            for suffix_hint in source_hints:
+                suffix = _extract_append_only_suffix_from_source_hint(suffix_hint, revised_text)
+                if suffix:
+                    break
+            if not suffix:
+                suffix = (
+                    _extract_append_only_suffix_from_cluster_text(cluster_text, revised_text)
+                    or _compute_append_only_suffix(source_hint, revised_text)
+                )
+            if not suffix:
+                continue
+            if len(cluster) <= 1 and _text_contains_candidate(preferred_para_text, source_hint):
+                continue
+
+            last_idx = cluster[-1]
+            base_rpr = _first_nonempty_paragraph_rpr(paragraphs[last_idx])
+
+            target_para: etree._Element | None = None
+            if last_idx + 1 < len(paragraphs):
+                next_text = paragraph_texts[last_idx + 1]
+                next_para = paragraphs[last_idx + 1]
+                if not str(next_text or "").strip() and _nearest_ancestor(next_para, w("tbl")) is None:
+                    target_para = next_para
+                    if _populate_paragraph_with_insert(target_para, suffix, rev_id, author, rev_date, base_rpr):
+                        return {
+                            "paragraph_index": last_idx + 1,
+                            "target_text": "",
+                            "revised_text": suffix,
+                            "mode": "append_after_cluster_existing_paragraph",
+                            "cluster_indices": cluster,
+                        }
+
+            last_para = paragraphs[last_idx]
+            last_tbl = _nearest_ancestor(last_para, w("tbl"))
+            if last_tbl is not None:
+                inserted = _create_inserted_paragraph_after(last_tbl, suffix, rev_id, author, rev_date, base_rpr)
+            else:
+                inserted = _create_inserted_paragraph_after(last_para, suffix, rev_id, author, rev_date, base_rpr)
+            if inserted is not None:
+                return {
+                    "paragraph_index": last_idx + 1,
+                    "target_text": "",
+                    "revised_text": suffix,
+                    "mode": "append_after_cluster_new_paragraph",
+                    "cluster_indices": cluster,
+                }
+    return None
+
+
 def _has_exportable_patch(
     *,
     status: str,
@@ -648,6 +1029,7 @@ def export_ai_patches_to_docx(
     author: str = "合同审查系统",
 ) -> dict[str, Any]:
     risks = _unwrap_risks(_load_json(risk_path))
+    clause_text_by_uid = _load_clause_text_by_uid_for_export(risk_path)
 
     with zipfile.ZipFile(input_docx, "r") as zin:
         overrides: dict[str, bytes] = {}
@@ -687,7 +1069,40 @@ def export_ai_patches_to_docx(
                 ]
             )
             search_candidates = _pick_explicit_target_candidates(risk)
-            if revised_text is None or not search_candidates:
+            if revised_text is None:
+                failed += 1
+                unmatched.append({"risk_id": risk.get("risk_id"), "reason": "missing_revised_or_target"})
+                continue
+
+            paragraphs = doc_root.xpath(".//w:p", namespaces=NS)
+            paragraph_texts = [_paragraph_text_for_match(p) for p in paragraphs]
+
+            append_report = _try_apply_append_only_cluster_patch(
+                paragraphs=paragraphs,
+                paragraph_texts=paragraph_texts,
+                risk=risk,
+                clause_text_by_uid=clause_text_by_uid,
+                revised_text=revised_text,
+                rev_id=revision_id,
+                author=author,
+                rev_date=revision_date,
+            )
+            if append_report is not None:
+                applied.append(
+                    {
+                        "risk_id": risk.get("risk_id"),
+                        "paragraph_index": append_report.get("paragraph_index"),
+                        "target_text": append_report.get("target_text", ""),
+                        "revised_text": append_report.get("revised_text", revised_text),
+                        "revision_id": revision_id,
+                        "mode": append_report.get("mode"),
+                        "cluster_indices": append_report.get("cluster_indices", []),
+                    }
+                )
+                revision_id += 1
+                continue
+
+            if not search_candidates:
                 failed += 1
                 unmatched.append({"risk_id": risk.get("risk_id"), "reason": "missing_revised_or_target"})
                 continue

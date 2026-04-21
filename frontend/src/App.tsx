@@ -519,6 +519,16 @@ function getLocateClauseUidsForSuggestionInsert(risk: any) {
   return refs.length > 0 ? refs : primaryUid ? [primaryUid] : []
 }
 
+function canAttemptContextualAiPatch(risk: any, clauseUids?: string[]) {
+  const refs = Array.isArray(clauseUids) ? clauseUids.filter(Boolean) : []
+  return Boolean(
+    refs.length > 0 ||
+      String(risk?.anchor_text || '').trim() ||
+      String(risk?.evidence_text || '').trim() ||
+      String(risk?.locator?.matched_text || '').trim()
+  )
+}
+
 function asClauseRefs(value: unknown): string[] {
   const refs: string[] = []
   const seen = new Set<string>()
@@ -1640,15 +1650,17 @@ export default function App() {
       const aiState = String(ai?.state || '').toLowerCase()
       const shouldApplyAi = Boolean(ai && (aiState === 'succeeded' || revisedText))
       const preserveRawTarget = isAggregateRiskLike(found)
+      const clauseUids = getLocateClauseUidsForSuggestionInsert(found)
+      const canTryContextualApply = canAttemptContextualAiPatch(found, clauseUids)
       let appliedLocally = false
       let acceptedTargetText = targetText
       let acceptedRevisedText = revisedText
 
-      if (shouldApplyAi && !targetText) {
+      if (shouldApplyAi && !targetText && !canTryContextualApply) {
         throw new Error('未能在文档中定位到可替换文本，接受已取消。请先点击“定位原文”确认后再试。')
       }
 
-      if (shouldApplyAi && targetText) {
+      if (shouldApplyAi) {
         const applied =
           editorRef.current?.applyAiPatch({
             patchId: riskId,
@@ -1657,7 +1669,7 @@ export default function App() {
             preserveRawTarget,
             anchorText: String(found?.anchor_text || ''),
             evidenceText: String(found?.evidence_text || ''),
-            clauseUids: getLocateClauseUidsForSuggestionInsert(found)
+            clauseUids
           }) || false
         if (!applied) {
           throw new Error('未能在文档中定位到可替换文本，接受已取消。请先点击“定位原文”确认后再试。')
@@ -1696,7 +1708,7 @@ export default function App() {
               targetText,
               anchorText: String(found?.anchor_text || ''),
               evidenceText: String(found?.evidence_text || ''),
-              clauseUids: getLocateClauseUidsForSuggestionInsert(found)
+              clauseUids
             })
           }
         }
@@ -1729,16 +1741,18 @@ export default function App() {
       const suggestionInsertText = pickSuggestionInsertText(item)
       const shouldApplyAi = Boolean(ai && (aiState === 'succeeded' || revisedText))
       const preserveRawTarget = isAggregateRiskLike(item)
+      const clauseUids = getLocateClauseUidsForSuggestionInsert(item)
+      const canTryContextualApply = canAttemptContextualAiPatch(item, clauseUids)
       let appliedLocally = false
       let acceptedTargetText = targetText
       let acceptedRevisedText = revisedText
 
       try {
         let acceptedByAiEndpoint = false
-        if (shouldApplyAi && !targetText) {
+        if (shouldApplyAi && !targetText && !canTryContextualApply) {
           throw new Error('未能在文档中定位到可替换文本')
         }
-        if (shouldApplyAi && targetText) {
+        if (shouldApplyAi) {
           const applied =
             editorRef.current?.applyAiPatch({
               patchId: riskId,
@@ -1747,7 +1761,7 @@ export default function App() {
               preserveRawTarget,
               anchorText: String(item?.anchor_text || ''),
               evidenceText: String(item?.evidence_text || ''),
-              clauseUids: getLocateClauseUidsForSuggestionInsert(item)
+              clauseUids
             }) || false
           if (!applied) {
             throw new Error('未能在文档中定位到可替换文本')
@@ -1783,7 +1797,7 @@ export default function App() {
               targetText,
               anchorText: String(item?.anchor_text || ''),
               evidenceText: String(item?.evidence_text || ''),
-              clauseUids: getLocateClauseUidsForSuggestionInsert(item)
+              clauseUids
             })
           }
         }
