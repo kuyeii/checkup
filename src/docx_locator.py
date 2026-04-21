@@ -15,8 +15,12 @@ from .docx_comments import (
     ParagraphIndex,
     _build_clause_indexes,
     _candidate_snippets,
+    _collect_explicit_target_snippets,
     _find_best_paragraph,
+    _find_clause_fallback_paragraph,
+    _find_first_paragraph_by_priority,
     _paragraph_text_for_match,
+    _text_contains_candidate,
     _unwrap_clauses,
     _unwrap_risk_payload,
 )
@@ -97,17 +101,18 @@ def _resolve_related_clauses(
 
 
 def _pick_target_text(risk: dict[str, Any], paragraph_text: str, matched_text: str) -> str:
+    target_text = str(risk.get("target_text") or "").strip()
+    main_text = str(risk.get("main_text") or "").strip()
     evidence_text = str(risk.get("evidence_text") or "").strip()
     anchor_text = str(risk.get("anchor_text") or "").strip()
-    para_norm = _normalize_ws(paragraph_text)
-    evidence_norm = _normalize_ws(evidence_text)
-    if evidence_norm and para_norm and evidence_norm in para_norm:
-        return evidence_text
+    for candidate in (target_text, main_text, evidence_text):
+        if candidate and paragraph_text and _text_contains_candidate(paragraph_text, candidate):
+            return candidate
     if matched_text:
         return matched_text
     if anchor_text:
         return anchor_text
-    return evidence_text
+    return main_text or evidence_text
 
 
 def _collect_locator_snippets(
@@ -153,23 +158,25 @@ def locate_risk(
         for p in paragraphs
     ]
 
-    snippets_with_strategy: list[tuple[str, str]] = []
-    for key, strategy in [
-        (str(risk.get("evidence_text") or "").strip(), "evidence_text"),
-        (str(risk.get("anchor_text") or "").strip(), "anchor_text"),
-    ]:
-        for sn in _candidate_snippets(key):
-            snippets_with_strategy.append((sn, strategy))
-    for clause in related_clauses:
-        for raw, strategy in [
-            (str(clause.get("clause_text") or "").strip(), "clause_text"),
-            (str(clause.get("clause_title") or "").strip(), "clause_title"),
-        ]:
-            for sn in _candidate_snippets(raw):
-                snippets_with_strategy.append((sn, strategy))
-
-    snippets = [x[0] for x in snippets_with_strategy]
-    best_para, matched = _find_best_paragraph(para_inputs, snippets)
+    snippets_with_strategy = _collect_explicit_target_snippets(risk)
+    best_para, matched = _find_first_paragraph_by_priority(para_inputs, [x[0] for x in snippets_with_strategy])
+    if best_para is None:
+        risk_source_type = str(risk.get("risk_source_type", "anchored") or "anchored").strip().lower()
+        best_para, matched, matched_strategy = _find_clause_fallback_paragraph(para_inputs, related_clauses, risk_source_type)
+        if best_para is not None:
+            snippets_with_strategy = _collect_locator_snippets(risk, related_clauses)
+            if matched_strategy:
+                matched_strategy_norm = _normalize_ws(str(matched or ""))
+                snippets_with_strategy = [
+                    (candidate, strategy)
+                    for candidate, strategy in snippets_with_strategy
+                    if strategy != matched_strategy or _normalize_ws(candidate) == matched_strategy_norm
+                ] or [(str(matched or ""), matched_strategy)]
+        else:
+            clause_snippets = _collect_locator_snippets(risk, related_clauses)
+            best_para, matched = _find_best_paragraph(para_inputs, [x[0] for x in clause_snippets])
+            if best_para is not None:
+                snippets_with_strategy = clause_snippets
     if best_para is None:
         locator = {
             "paragraph_index": None,
@@ -188,6 +195,7 @@ def locate_risk(
 
     confidence_map = {
         "evidence_text": 0.95,
+        "main_text": 0.9,
         "anchor_text": 0.85,
         "clause_text": 0.75,
         "clause_title": 0.65,

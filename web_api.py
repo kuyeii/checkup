@@ -1827,7 +1827,11 @@ def _build_suggest_insert_patch(risk: dict[str, Any]) -> dict[str, Any] | None:
         "comment_text": _build_suggest_insert_comment_text(risk),
         "created_at": _iso_now(),
     }
-    before_text = _extract_target_text(risk)
+
+    locator = risk.get("locator") if isinstance(risk.get("locator"), dict) else {}
+    locator_matched_text = str(locator.get("matched_text") or "").strip()
+    locator_resolved_target_text = str(risk.get("locator_resolved_target_text") or "").strip()
+    before_text = locator_resolved_target_text or locator_matched_text or _extract_target_text(risk)
     if before_text:
         patch["before_text"] = before_text
     return patch
@@ -2260,6 +2264,7 @@ def _extract_target_text(risk: dict[str, Any]) -> str:
     preserve_full_clause = _use_full_clause_target(risk)
     candidates = [
         str(risk.get("target_text") or "").strip(),
+        str(risk.get("main_text") or "").strip(),
         str(risk.get("evidence_text") or "").strip(),
         str(risk.get("anchor_text") or "").strip(),
     ]

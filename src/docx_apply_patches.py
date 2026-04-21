@@ -15,6 +15,7 @@ from lxml import etree
 from .docx_comments import (
     NS,
     _paragraph_text_for_match,
+    _pick_explicit_target_candidates,
     _read_xml,
     _xml_bytes,
     w,
@@ -88,21 +89,23 @@ def _pick_candidates(risk: dict[str, Any]) -> list[str]:
             (0, str(ai_apply.get("target_text") or "").strip()),
             (0, str(ai_rewrite.get("target_text") or "").strip()),
             (1, str(locator.get("matched_text") or "").strip()),
-            (2, str(risk.get("evidence_text") or "").strip()),
-            (3, str(risk.get("target_text") or "").strip()),
-            (4, locator_resolved_target_text),
-            (5, str(risk.get("anchor_text") or "").strip()),
+            (2, str(risk.get("target_text") or "").strip()),
+            (3, str(risk.get("main_text") or "").strip()),
+            (4, str(risk.get("evidence_text") or "").strip()),
+            (5, locator_resolved_target_text),
+            (6, str(risk.get("anchor_text") or "").strip()),
         ]
     else:
         ranked_sources = [
             (0, accepted_before),
             (1, str(locator.get("matched_text") or "").strip()),
-            (2, str(risk.get("evidence_text") or "").strip()),
-            (3, str(ai_rewrite.get("target_text") or "").strip()),
-            (3, str(ai_apply.get("target_text") or "").strip()),
-            (4, str(risk.get("target_text") or "").strip()),
-            (5, locator_resolved_target_text),
-            (6, str(risk.get("anchor_text") or "").strip()),
+            (2, str(ai_rewrite.get("target_text") or "").strip()),
+            (2, str(ai_apply.get("target_text") or "").strip()),
+            (3, str(risk.get("target_text") or "").strip()),
+            (4, str(risk.get("main_text") or "").strip()),
+            (5, str(risk.get("evidence_text") or "").strip()),
+            (6, locator_resolved_target_text),
+            (7, str(risk.get("anchor_text") or "").strip()),
         ]
 
     by_compact: dict[str, tuple[int, str]] = {}
@@ -161,8 +164,9 @@ def _pick_locator_validation_candidates(risk: dict[str, Any]) -> list[str]:
         (1, str(ai_apply.get("target_text") or "").strip()),
         (1, str(ai_rewrite.get("target_text") or "").strip()),
         (2, str(risk.get("target_text") or "").strip()),
-        (3, str(risk.get("evidence_text") or "").strip()),
-        (4, str(risk.get("anchor_text") or "").strip()),
+        (3, str(risk.get("main_text") or "").strip()),
+        (4, str(risk.get("evidence_text") or "").strip()),
+        (5, str(risk.get("anchor_text") or "").strip()),
     ]
 
     by_compact: dict[str, tuple[int, str]] = {}
@@ -682,8 +686,8 @@ def export_ai_patches_to_docx(
                     (ai_apply, "revised_text"),
                 ]
             )
-            candidates = _pick_candidates(risk)
-            if revised_text is None or not candidates:
+            search_candidates = _pick_explicit_target_candidates(risk)
+            if revised_text is None or not search_candidates:
                 failed += 1
                 unmatched.append({"risk_id": risk.get("risk_id"), "reason": "missing_revised_or_target"})
                 continue
@@ -708,7 +712,7 @@ def export_ai_patches_to_docx(
             if para is None or not chosen_target:
                 for p in paragraphs:
                     old_text = _paragraph_text_for_match(p)
-                    found = next((c for c in candidates if c and _text_contains_candidate(old_text, c)), "")
+                    found = next((c for c in search_candidates if c and _text_contains_candidate(old_text, c)), "")
                     if found:
                         para = p
                         chosen_target = found

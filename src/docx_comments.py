@@ -83,6 +83,11 @@ def _paragraph_text_for_match(p: etree._Element) -> str:
     return "".join(parts)
 
 
+def _paragraph_visible_text_for_match(p: etree._Element) -> str:
+    parts = p.xpath(".//w:t/text()", namespaces=NS)
+    return "".join(parts)
+
+
 def _add_comment_to_paragraph(p: etree._Element, comment_id: int) -> None:
     crs = etree.Element(w("commentRangeStart"))
     crs.set(w("id"), str(comment_id))
@@ -176,6 +181,70 @@ def _find_best_paragraph(paragraphs: list[ParagraphIndex], snippets: list[str]) 
                 best_snippet = sn
                 best_score = score
     return best, best_snippet
+
+
+def _find_first_paragraph_by_priority(
+    paragraphs: list[ParagraphIndex],
+    snippets: list[str],
+) -> tuple[ParagraphIndex | None, str | None]:
+    for snippet in snippets:
+        para, matched = _find_best_paragraph(paragraphs, [snippet])
+        if para is not None:
+            return para, matched
+    return None, None
+
+
+def _build_clause_fallback_groups(
+    clause_metas: list[dict[str, Any]] | None,
+    risk_source_type: str,
+) -> list[list[tuple[str, str]]]:
+    groups: list[list[tuple[str, str]]] = []
+    for clause in clause_metas or []:
+        group: list[tuple[str, str]] = []
+        for raw, strategy in [
+            (clause.get("clause_text"), "clause_text"),
+            (clause.get("clause_title"), "clause_title"),
+        ]:
+            if isinstance(raw, str):
+                group.extend((snippet, strategy) for snippet in _candidate_snippets(raw))
+        if risk_source_type == "missing_clause":
+            for raw in (clause.get("display_clause_id"), clause.get("clause_id"), clause.get("source_clause_id")):
+                if isinstance(raw, str):
+                    group.extend((snippet, "clause_ref") for snippet in _candidate_snippets(raw))
+        if not group:
+            continue
+        deduped: list[tuple[str, str]] = []
+        seen: set[tuple[str, str]] = set()
+        for snippet, strategy in group:
+            key = (_normalize_ws(snippet), strategy)
+            if not key[0] or key in seen:
+                continue
+            seen.add(key)
+            deduped.append((snippet, strategy))
+        if deduped:
+            groups.append(deduped)
+    return groups
+
+
+def _find_clause_fallback_paragraph(
+    paragraphs: list[ParagraphIndex],
+    clause_metas: list[dict[str, Any]] | None,
+    risk_source_type: str,
+) -> tuple[ParagraphIndex | None, str | None, str | None]:
+    for group in _build_clause_fallback_groups(clause_metas, risk_source_type):
+        para, matched = _find_best_paragraph(paragraphs, [snippet for snippet, _strategy in group])
+        if para is None:
+            continue
+        matched_strategy = next(
+            (
+                strategy
+                for snippet, strategy in group
+                if _normalize_ws(snippet) == _normalize_ws(str(matched or ""))
+            ),
+            "clause_fallback",
+        )
+        return para, matched, matched_strategy
+    return None, None, None
 
 
 def _resolve_locator_paragraph(
@@ -288,6 +357,111 @@ def _first_non_empty_text(values: list[Any]) -> str:
 
 
 
+def _compact_text(text: str) -> str:
+    return re.sub(r"\s+", "", str(text or ""))
+
+
+def _text_contains_candidate(text: str, candidate: str) -> bool:
+    raw_text = str(text or "")
+    raw_candidate = str(candidate or "")
+    if not raw_candidate:
+        return False
+    if raw_candidate in raw_text:
+        return True
+    return _compact_text(raw_candidate) in _compact_text(raw_text)
+
+
+def _collect_explicit_target_snippets(
+    risk: dict[str, Any],
+    *,
+    include_revised_text: bool = False,
+) -> list[tuple[str, str]]:
+    accepted_patch = risk.get("accepted_patch") if isinstance(risk.get("accepted_patch"), dict) else {}
+    ai_rewrite = risk.get("ai_rewrite") if isinstance(risk.get("ai_rewrite"), dict) else {}
+    ai_apply = risk.get("ai_apply") if isinstance(risk.get("ai_apply"), dict) else {}
+
+    ranked_sources: list[tuple[int, str, str]] = []
+    if include_revised_text:
+        ranked_sources.extend(
+            [
+                (0, str(accepted_patch.get("after_text") or "").strip(), "accepted_patch_after_text"),
+                (1, str(ai_apply.get("revised_text") or "").strip(), "ai_apply_revised_text"),
+                (1, str(ai_rewrite.get("revised_text") or "").strip(), "ai_rewrite_revised_text"),
+            ]
+        )
+    ranked_sources.extend(
+        [
+            (2, str(accepted_patch.get("before_text") or "").strip(), "accepted_patch_before_text"),
+            (3, str(ai_apply.get("target_text") or "").strip(), "ai_apply_target_text"),
+            (3, str(ai_rewrite.get("target_text") or "").strip(), "ai_rewrite_target_text"),
+            (4, str(risk.get("target_text") or "").strip(), "target_text"),
+            # main_text is the primary clause excerpt selected by the pipeline.
+            # For missing-clause / multi-clause risks this is often the most
+            # precise single-clause anchor, while evidence_text may concatenate
+            # several related clauses and therefore be unsuitable for paragraph
+            # level DOCX matching.
+            (5, str(risk.get("main_text") or "").strip(), "main_text"),
+            (6, str(risk.get("evidence_text") or "").strip(), "evidence_text"),
+            (7, str(risk.get("anchor_text") or "").strip(), "anchor_text"),
+        ]
+    )
+
+    by_compact: dict[str, tuple[int, str, str]] = {}
+    for rank, raw, strategy in ranked_sources:
+        for snippet in _candidate_snippets(raw):
+            compact = _compact_text(snippet)
+            if not compact:
+                continue
+            prev = by_compact.get(compact)
+            if prev is None or rank < prev[0] or (rank == prev[0] and len(compact) > len(_compact_text(prev[1]))):
+                by_compact[compact] = (rank, snippet, strategy)
+
+    ordered = sorted(by_compact.values(), key=lambda item: (item[0], -len(_compact_text(item[1]))))
+    return [(snippet, strategy) for _rank, snippet, strategy in ordered]
+
+
+def _pick_explicit_target_candidates(risk: dict[str, Any]) -> list[str]:
+    return [snippet for snippet, _strategy in _collect_explicit_target_snippets(risk)]
+
+
+def _resolve_risk_paragraph(
+    paragraphs: list[ParagraphIndex],
+    risk: dict[str, Any],
+    clause_metas: list[dict[str, Any]] | None = None,
+    *,
+    allow_clause_fallback: bool = True,
+    include_revised_text: bool = False,
+) -> tuple[ParagraphIndex | None, str | None, str | None]:
+    explicit_snippets = _collect_explicit_target_snippets(risk, include_revised_text=include_revised_text)
+    explicit_candidates = [snippet for snippet, _strategy in explicit_snippets]
+
+    locator_para = _resolve_locator_paragraph(paragraphs, risk)
+    if locator_para is not None and explicit_candidates:
+        matched = next((candidate for candidate in explicit_candidates if _text_contains_candidate(locator_para.text, candidate)), None)
+        if matched:
+            strategy = next((strategy for candidate, strategy in explicit_snippets if _normalize_ws(candidate) == _normalize_ws(matched)), "locator_validated")
+            return locator_para, matched, strategy
+
+    if explicit_candidates:
+        para, matched = _find_first_paragraph_by_priority(paragraphs, explicit_candidates)
+        if para is not None:
+            strategy = next((strategy for candidate, strategy in explicit_snippets if _normalize_ws(candidate) == _normalize_ws(str(matched or ""))), "explicit_target")
+            return para, matched, strategy
+
+    if allow_clause_fallback:
+        risk_source_type = str(risk.get("risk_source_type", "anchored") or "anchored").strip().lower()
+        para, matched, strategy = _find_clause_fallback_paragraph(paragraphs, clause_metas, risk_source_type)
+        if para is not None:
+            return para, matched, strategy or "clause_fallback"
+
+    if locator_para is not None and not explicit_candidates:
+        locator = risk.get("locator") if isinstance(risk.get("locator"), dict) else {}
+        matched = str(locator.get("matched_text") or "").strip() or _normalize_ws(locator_para.text)
+        return locator_para, matched, "locator_only"
+
+    return None, None, None
+
+
 def _pick_suggestion_text(risk: dict[str, Any]) -> str:
     return _first_non_empty_text(
         [
@@ -325,6 +499,37 @@ def _build_comment_text(risk: dict[str, Any], clauses: list[dict[str, Any]]) -> 
         ]
     )
 
+def _uses_single_anchor_comment(risk: dict[str, Any]) -> bool:
+    accepted_patch = risk.get("accepted_patch") if isinstance(risk.get("accepted_patch"), dict) else {}
+    accepted_kind = str(accepted_patch.get("kind") or "").strip().lower()
+    export_mode = str(accepted_patch.get("export_mode") or accepted_patch.get("mode") or "").strip().lower()
+    return accepted_kind == "suggest_insert" or export_mode in {"comment_only", "annotation_only"}
+
+
+def _resolve_single_anchor_comment_paragraph(
+    paragraphs: list[ParagraphIndex],
+    risk: dict[str, Any],
+    clause_metas: list[dict[str, Any]] | None = None,
+) -> tuple[ParagraphIndex | None, str | None, str | None]:
+    para, matched, strategy = _resolve_risk_paragraph(
+        paragraphs,
+        risk,
+        clause_metas,
+        allow_clause_fallback=True,
+        include_revised_text=True,
+    )
+    if para is not None:
+        return para, matched, strategy
+
+    locator_para = _resolve_locator_paragraph(paragraphs, risk)
+    if locator_para is not None:
+        locator = risk.get("locator") if isinstance(risk.get("locator"), dict) else {}
+        matched = str(locator.get("matched_text") or "").strip() or _normalize_ws(locator_para.text)
+        return locator_para, matched, "locator_fallback"
+
+    return None, None, None
+
+
 def _is_included_status(status: str, include_statuses: tuple[str, ...]) -> bool:
     normalized = str(status or "").strip().lower()
     allowed = {str(x or "").strip().lower() for x in include_statuses}
@@ -359,7 +564,7 @@ def export_comments_to_docx(
         overrides[rels_name] = _xml_bytes(rels_root)
 
         paragraphs = [
-            ParagraphIndex(index=i, text=_paragraph_text_for_match(p), element=p)
+            ParagraphIndex(index=i, text=_paragraph_visible_text_for_match(p), element=p)
             for i, p in enumerate(doc_root.xpath(".//w:p", namespaces=NS))
         ]
 
@@ -376,28 +581,26 @@ def export_comments_to_docx(
             risk_source_type = str(risk.get("risk_source_type", "anchored") or "anchored").strip().lower()
             clause_metas = _resolve_clauses_for_risk(risk, by_uid, by_id)
             comment_text = _build_comment_text(risk, clause_metas)
-            comment_targets = clause_metas if clause_metas else [None]
+            single_anchor_comment = _uses_single_anchor_comment(risk)
+            comment_targets = [None] if single_anchor_comment else (clause_metas if clause_metas else [None])
             risk_added = 0
 
             for clause in comment_targets:
-                para = _resolve_locator_paragraph(paragraphs, risk)
-                matched = None
-                if para is not None:
-                    matched = str((risk.get("locator") or {}).get("matched_text") or "").strip() or _normalize_ws(para.text)
+                clause_scope = clause_metas if clause is None else [clause]
+                if single_anchor_comment:
+                    para, matched, _match_strategy = _resolve_single_anchor_comment_paragraph(
+                        paragraphs,
+                        risk,
+                        clause_scope,
+                    )
                 else:
-                    snippets: list[str] = []
-                    for key in [risk.get("anchor_text"), risk.get("evidence_text")]:
-                        if isinstance(key, str):
-                            snippets.extend(_candidate_snippets(key))
-                    if clause is not None:
-                        for key in [clause.get("clause_text"), clause.get("clause_title")]:
-                            if isinstance(key, str):
-                                snippets.extend(_candidate_snippets(key))
-                        if risk_source_type == "missing_clause":
-                            for key in [clause.get("display_clause_id"), clause.get("clause_id"), clause.get("source_clause_id")]:
-                                if isinstance(key, str):
-                                    snippets.extend(_candidate_snippets(key))
-                    para, matched = _find_best_paragraph(paragraphs, snippets)
+                    para, matched, _match_strategy = _resolve_risk_paragraph(
+                        paragraphs,
+                        risk,
+                        clause_scope,
+                        allow_clause_fallback=True,
+                        include_revised_text=True,
+                    )
                 if para is None:
                     unmatched.append({
                         "risk_id": risk.get("risk_id"),
