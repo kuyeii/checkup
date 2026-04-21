@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReviewMeta } from '../types'
 
 function inferStage(step: string) {
@@ -33,27 +33,50 @@ const REVIEW_GROUPS = [
   { title: '结果生成', tasks: ['汇总风险依据与修订建议', '生成结构化审查结果'] }
 ]
 
+const FLAT_TASKS = REVIEW_GROUPS.flatMap((group) => group.tasks)
+const INTRO_FIRST_STEP_MS = 2000
+const INTRO_TOTAL_MS = 4000
+const INTRO_SECOND_TASK_INDEX = 1
+
+const INTRO_LABELS = [
+  '正在解析合同结构并切分段落…',
+  '正在识别并处理敏感信息…'
+] as const
+
 type TaskState = 'done' | 'active' | 'todo' | 'failed'
+type IntroPhase = 0 | 1 | 2
 
-function resolveTaskStates(percent: number, status: ReviewMeta['status'] | undefined) {
-  const flatTasks = REVIEW_GROUPS.flatMap((g) => g.tasks)
-  const total = Math.max(1, flatTasks.length)
-  const roughIndex = Math.floor((Math.max(1, Math.min(99, percent)) / 100) * total)
-  const activeIndex = Math.max(0, Math.min(total - 1, roughIndex))
+function resolveActiveIndex(percent: number) {
+  const total = Math.max(1, FLAT_TASKS.length)
+  const clampedPercent = Math.max(1, Math.min(99, percent))
+  const roughIndex = Math.floor((clampedPercent / 100) * total)
+  return Math.max(0, Math.min(total - 1, roughIndex))
+}
 
-  const states: TaskState[] = flatTasks.map((_, idx) => {
-    if (status === 'completed') return 'done'
+function buildTaskStates(activeIndex: number, status: ReviewMeta['status'] | undefined) {
+  return FLAT_TASKS.map((_, idx) => {
+    if (status === 'completed') return 'done' as const
     if (status === 'failed') {
-      if (idx < activeIndex) return 'done'
-      if (idx === activeIndex) return 'failed'
-      return 'todo'
+      if (idx < activeIndex) return 'done' as const
+      if (idx === activeIndex) return 'failed' as const
+      return 'todo' as const
     }
-    if (idx < activeIndex) return 'done'
-    if (idx === activeIndex) return 'active'
-    return 'todo'
+    if (idx < activeIndex) return 'done' as const
+    if (idx === activeIndex) return 'active' as const
+    return 'todo' as const
   })
+}
 
-  return { flatTasks, states }
+function buildIntroStates(phase: IntroPhase) {
+  return FLAT_TASKS.map((_, idx) => {
+    if (phase === 0) {
+      if (idx === 0) return 'active' as const
+      return 'todo' as const
+    }
+    if (idx === 0) return 'done' as const
+    if (idx === 1) return 'active' as const
+    return 'todo' as const
+  })
 }
 
 export function ReviewProgress(props: {
@@ -66,8 +89,45 @@ export function ReviewProgress(props: {
   const baseProg = useMemo(() => computeProgress(props.meta), [props.meta])
   const status = props.meta?.status
   const isWaiting = !status || status === 'queued' || status === 'running'
-  const prog = baseProg
-  const { states } = useMemo(() => resolveTaskStates(prog.percent, status), [prog.percent, status])
+  const realActiveIndex = useMemo(() => resolveActiveIndex(baseProg.percent), [baseProg.percent])
+
+  const [introPhase, setIntroPhase] = useState<IntroPhase>(() => (isWaiting ? 0 : 2))
+  const highestActiveIndexRef = useRef(0)
+
+  useEffect(() => {
+    highestActiveIndexRef.current = 0
+    if (!isWaiting) {
+      setIntroPhase(2)
+      return
+    }
+
+    setIntroPhase(0)
+    const firstTimer = window.setTimeout(() => setIntroPhase(1), INTRO_FIRST_STEP_MS)
+    const doneTimer = window.setTimeout(() => setIntroPhase(2), INTRO_TOTAL_MS)
+
+    return () => {
+      window.clearTimeout(firstTimer)
+      window.clearTimeout(doneTimer)
+    }
+  }, [props.runId])
+
+  const displayActiveIndex = useMemo(() => {
+    if (introPhase === 0) return 0
+    if (introPhase === 1) return INTRO_SECOND_TASK_INDEX
+    return Math.max(highestActiveIndexRef.current, INTRO_SECOND_TASK_INDEX, realActiveIndex)
+  }, [introPhase, realActiveIndex])
+
+  useEffect(() => {
+    highestActiveIndexRef.current = Math.max(highestActiveIndexRef.current, displayActiveIndex)
+  }, [displayActiveIndex])
+
+  const displayLabel = introPhase === 0 ? INTRO_LABELS[0] : introPhase === 1 ? INTRO_LABELS[1] : baseProg.label
+  const states = useMemo(() => {
+    if (introPhase === 0 || introPhase === 1) return buildIntroStates(introPhase)
+    return buildTaskStates(displayActiveIndex, status)
+  }, [displayActiveIndex, introPhase, status])
+  const shouldSpinActiveTask = introPhase !== 2 || isWaiting
+
   let cursor = 0
 
   return (
@@ -76,7 +136,7 @@ export function ReviewProgress(props: {
         <div className="progressHeader">
           <div>
             <div className="progressTitle">正在审查合同</div>
-            <div className="progressSub">{prog.label}</div>
+            <div className="progressSub">{displayLabel}</div>
           </div>
         </div>
 
@@ -97,7 +157,7 @@ export function ReviewProgress(props: {
                               <path d="M3 8.4 6.5 12 13 5.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           ) : (
-                            <span className={`progressTaskRing ${state === 'active' && isWaiting ? 'progressTaskRing--spin' : ''}`} />
+                            <span className={`progressTaskRing ${state === 'active' && shouldSpinActiveTask ? 'progressTaskRing--spin' : ''}`} />
                           )}
                         </div>
                         <div className="progressTaskText">{task}</div>
