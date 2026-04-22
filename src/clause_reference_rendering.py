@@ -19,6 +19,7 @@ _USER_VISIBLE_RISK_TEXT_FIELDS = (
     "issue",
     "factual_basis",
     "reasoning_basis",
+    "basis_minimal",
     "basis_summary",
     "basis",
     "suggestion",

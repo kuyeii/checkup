@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {
+  Check,
+  ChevronDown,
   CheckCircle2,
   FileText,
   Lightbulb,
@@ -33,7 +35,7 @@ const analysisScopeCopy: Record<AnalysisScopeOption, {
   description: string
 }> = {
   full_detail: {
-    title: '全部详细分析',
+    title: '深度审查',
     description: '输出全部风险点，并生成完整的依据与 AI 改写建议。'
   },
   high_risk_only: {
@@ -42,20 +44,13 @@ const analysisScopeCopy: Record<AnalysisScopeOption, {
   }
 }
 
-const selectorGroups = [
-  {
-    key: 'review-side',
-    title: '请选择您的审查立场',
-    ariaLabel: '审查立场选择',
-    options: ['甲方', '乙方'] as ReviewSideOption[]
-  },
-  {
-    key: 'analysis-scope',
-    title: '请选择审查范围',
-    ariaLabel: '审查范围选择',
-    options: ['full_detail', 'high_risk_only'] as AnalysisScopeOption[]
-  }
-] as const
+const reviewSideGroup = {
+  title: '请选择您的审查立场',
+  ariaLabel: '审查立场选择',
+  options: ['甲方', '乙方'] as ReviewSideOption[]
+} as const
+
+const analysisScopeOptions = ['full_detail', 'high_risk_only'] as AnalysisScopeOption[]
 
 function formatFileSize(size?: number) {
   const safeSize = Number(size || 0)
@@ -90,7 +85,9 @@ export function UploadDashboard(props: {
   onOpenHistory: () => void
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const scopeMenuRef = useRef<HTMLDivElement | null>(null)
   const [isDragActive, setIsDragActive] = useState(false)
+  const [isScopeMenuOpen, setIsScopeMenuOpen] = useState(false)
 
   const resetInputValue = () => {
     if (inputRef.current) {
@@ -109,8 +106,38 @@ export function UploadDashboard(props: {
     }
   }, [props.file])
 
+  useEffect(() => {
+    if (!isScopeMenuOpen) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null
+      if (target && scopeMenuRef.current?.contains(target)) return
+      setIsScopeMenuOpen(false)
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsScopeMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isScopeMenuOpen])
+
+  useEffect(() => {
+    if (props.isReviewing) {
+      setIsScopeMenuOpen(false)
+    }
+  }, [props.isReviewing])
+
   const hasFile = Boolean(props.file)
   const fileSizeLabel = formatFileSize(props.file?.size)
+  const selectedScopeCopy = analysisScopeCopy[props.analysisScope]
 
   const handleUploadCardClick = () => {
     if (props.isReviewing) return
@@ -166,6 +193,64 @@ export function UploadDashboard(props: {
           </ul>
         </div>
       </div>
+    </div>
+  )
+
+  const renderAnalysisScopeDropdown = () => (
+    <div
+      ref={scopeMenuRef}
+      className="uploadScopeDock"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button
+        type="button"
+        className="uploadScopeButton"
+        aria-haspopup="listbox"
+        aria-expanded={isScopeMenuOpen}
+        aria-label="审查范围选择"
+        onClick={() => setIsScopeMenuOpen((open) => !open)}
+        disabled={props.isReviewing}
+      >
+        <span className="uploadScopeButtonIcon">
+          <FileText size={14} />
+        </span>
+        <span className="uploadScopeButtonValue">{selectedScopeCopy.title}</span>
+        <ChevronDown
+          size={14}
+          className={`uploadScopeButtonCaret ${isScopeMenuOpen ? 'uploadScopeButtonCaret--open' : ''}`}
+        />
+      </button>
+
+      {isScopeMenuOpen ? (
+        <div className="uploadScopeMenu" role="listbox" aria-label="审查范围选项">
+          {analysisScopeOptions.map((scope) => {
+            const active = props.analysisScope === scope
+            const copy = analysisScopeCopy[scope]
+            return (
+              <button
+                key={scope}
+                type="button"
+                role="option"
+                aria-selected={active}
+                className={`uploadScopeOption ${active ? 'uploadScopeOption--active' : ''}`}
+                onClick={() => {
+                  props.onAnalysisScopeChange(scope)
+                  setIsScopeMenuOpen(false)
+                }}
+                disabled={props.isReviewing}
+              >
+                <span className={`uploadScopeOptionCheck ${active ? 'uploadScopeOptionCheck--active' : ''}`}>
+                  <Check size={13} />
+                </span>
+                <span className="uploadScopeOptionMeta">
+                  <span className="uploadScopeOptionTitle">{copy.title}</span>
+                  <span className="uploadScopeOptionDesc">{copy.description}</span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      ) : null}
     </div>
   )
 
@@ -249,67 +334,43 @@ export function UploadDashboard(props: {
                   <div className="postUploadDivider" />
 
                   <div className="postUploadConfigGrid">
-                    {selectorGroups.map((group) => (
-                      <section key={group.key} className="postUploadSelectorGroup">
-                        <div className="postUploadSelectorTitle">
-                          <span className="postUploadSelectorBar" />
-                          <span>{group.title}</span>
-                        </div>
+                    <section className="postUploadSelectorGroup">
+                      <div className="postUploadSelectorTitle">
+                        <span className="postUploadSelectorBar" />
+                        <span>{reviewSideGroup.title}</span>
+                      </div>
 
-                        <div className="postUploadSideGrid" role="radiogroup" aria-label={group.ariaLabel}>
-                          {group.key === 'review-side'
-                            ? (group.options as ReviewSideOption[]).map((side) => {
-                                const active = props.reviewSide === side
-                                const copy = reviewSideCopy[side]
-                                return (
-                                  <button
-                                    key={side}
-                                    type="button"
-                                    role="radio"
-                                    aria-checked={active}
-                                    className={`postUploadSideCard ${active ? 'postUploadSideCard--active' : ''}`}
-                                    onClick={() => props.onReviewSideChange(side)}
-                                    disabled={props.isReviewing}
-                                  >
-                                    <div className="postUploadSideCardHeader">
-                                      <div className="postUploadSideCardTitle">{copy.title}</div>
-                                      <span className={`postUploadRadio ${active ? 'postUploadRadio--active' : ''}`}>
-                                        <span className="postUploadRadioDot" />
-                                      </span>
-                                    </div>
-                                    <div className="postUploadSideCardDesc">{copy.description}</div>
-                                  </button>
-                                )
-                              })
-                            : (group.options as AnalysisScopeOption[]).map((scope) => {
-                                const active = props.analysisScope === scope
-                                const copy = analysisScopeCopy[scope]
-                                return (
-                                  <button
-                                    key={scope}
-                                    type="button"
-                                    role="radio"
-                                    aria-checked={active}
-                                    className={`postUploadSideCard ${active ? 'postUploadSideCard--active' : ''}`}
-                                    onClick={() => props.onAnalysisScopeChange(scope)}
-                                    disabled={props.isReviewing}
-                                  >
-                                    <div className="postUploadSideCardHeader">
-                                      <div className="postUploadSideCardTitle">{copy.title}</div>
-                                      <span className={`postUploadRadio ${active ? 'postUploadRadio--active' : ''}`}>
-                                        <span className="postUploadRadioDot" />
-                                      </span>
-                                    </div>
-                                    <div className="postUploadSideCardDesc">{copy.description}</div>
-                                  </button>
-                                )
-                              })}
-                        </div>
-                      </section>
-                    ))}
+                      <div className="postUploadSideGrid" role="radiogroup" aria-label={reviewSideGroup.ariaLabel}>
+                        {reviewSideGroup.options.map((side) => {
+                          const active = props.reviewSide === side
+                          const copy = reviewSideCopy[side]
+                          return (
+                            <button
+                              key={side}
+                              type="button"
+                              role="radio"
+                              aria-checked={active}
+                              className={`postUploadSideCard ${active ? 'postUploadSideCard--active' : ''}`}
+                              onClick={() => props.onReviewSideChange(side)}
+                              disabled={props.isReviewing}
+                            >
+                              <div className="postUploadSideCardHeader">
+                                <div className="postUploadSideCardTitle">{copy.title}</div>
+                                <span className={`postUploadRadio ${active ? 'postUploadRadio--active' : ''}`}>
+                                  <span className="postUploadRadioDot" />
+                                </span>
+                              </div>
+                              <div className="postUploadSideCardDesc">{copy.description}</div>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </section>
                   </div>
                 </div>
               )}
+
+              {renderAnalysisScopeDropdown()}
             </div>
           </div>
 

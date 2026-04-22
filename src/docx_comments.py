@@ -474,6 +474,16 @@ def _pick_suggestion_text(risk: dict[str, Any]) -> str:
 
 
 
+def _pick_basis_text(risk: dict[str, Any]) -> str:
+    return _first_non_empty_text(
+        [
+            risk.get("basis_minimal"),
+            risk.get("basis_summary"),
+            risk.get("basis"),
+        ]
+    )
+
+
 def _normalize_comment_text(text: str) -> str:
     return re.sub(r"\n{3,}", "\n\n", str(text or "").strip())
 
@@ -487,7 +497,7 @@ def _build_comment_text(risk: dict[str, Any], clauses: list[dict[str, Any]]) -> 
         return accepted_comment_text
 
     issue = str(risk.get("issue") or risk.get("risk_label") or risk.get("title") or "").strip() or "—"
-    basis = str(risk.get("basis_summary") or risk.get("basis") or "").strip() or "—"
+    basis = _pick_basis_text(risk) or "—"
     suggestion = _pick_suggestion_text(risk) or "—"
     suggestion_label = "【建议插入】" if accepted_kind == "suggest_insert" else "【已修改】"
 

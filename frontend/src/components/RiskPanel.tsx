@@ -124,6 +124,11 @@ function presentRiskLabel(r: RiskItem) {
   return stripRuleCodes(r.risk_label || r.dimension || '风险项')
 }
 
+function basisTextOf(r: Partial<RiskItem> | null | undefined) {
+  if (!r) return ''
+  return stripRuleCodes(r.basis_minimal) || stripRuleCodes(r.basis_summary) || stripRuleCodes(r.basis) || ''
+}
+
 function suggestionInsertTextOf(r: Partial<RiskItem> | null | undefined) {
   if (!r) return ''
   return (
@@ -526,7 +531,7 @@ export function RiskPanel(props: {
                         </div>
                         <div className="riskSection">
                           <div className="riskSectionTitle">依据</div>
-                          <div className="riskSectionBody">{stripRuleCodes(r.basis) || '—'}</div>
+                          <div className="riskSectionBody">{basisTextOf(r) || '—'}</div>
                         </div>
 
                         {(() => {

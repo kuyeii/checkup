@@ -39,6 +39,8 @@ export type RiskItem = {
   risk_level: 'high' | 'medium' | 'low' | string
   issue: string
   basis: string
+  basis_minimal?: string
+  basis_summary?: string
   evidence_text?: string
   suggestion: string
   suggestion_minimal?: string

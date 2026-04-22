@@ -11,6 +11,9 @@ _SYNTHETIC_LOCAL_RE = re.compile(r"(?:^|[._-])u(\d+)$", re.IGNORECASE)
 _STANDALONE_REF_RE = re.compile(r"\b[0-9]+(?:\.[A-Za-z0-9]+)+\b")
 _RULE_TAG_RE = re.compile(r"[【\[][^【】\[\]\n]{0,160}(?:RULE|TPL|POLICY|CHECK|REG|MODEL|STD|CLAUSE)_[^【】\[\]\n]{1,160}[】\]]")
 _ADJACENT_DUPLICATE_LABEL_RE = re.compile(r"(第[^，。；;\s]+(?:条|款|段))(?:\s*[、，,；;]\s*\1)+")
+_DOUBLE_WRAPPED_LABEL_RE = re.compile(r"第第(?P<core>[A-Za-z0-9一二三四五六七八九十百千万零〇\d_.()（）\-]+)(?P<suffix>条|款|段)(?P=suffix)")
+_CANONICAL_LABEL_RE = re.compile(r"^第(?P<core>.+?)(?P<suffix>条|款|段)$")
+_SAFE_REF_BOUNDARY = r"A-Za-z0-9_.:：-"
 
 
 def _clean(text: Any) -> str:
@@ -94,6 +97,8 @@ def build_clause_alias_map(clauses: list[dict[str, Any]] | tuple[dict[str, Any],
         clause_uid = _clean(clause.get("clause_uid"))
         if clause_uid:
             alias_map[clause_uid] = label
+        if _is_safe_global_ref_key(label):
+            alias_map[label] = label
 
         for key in (
             clause.get("display_clause_id"),
@@ -132,12 +137,40 @@ def _cleanup_redundant_clause_words(text: str) -> str:
         cleaned = next_text
         if count <= 0:
             break
+    while True:
+        next_text, count = _DOUBLE_WRAPPED_LABEL_RE.subn(r"第\g<core>\g<suffix>", cleaned)
+        cleaned = next_text
+        if count <= 0:
+            break
     cleaned = re.sub(r"((?:第[^，。；;\s]+(?:条|款|段))(?:\s*[、，,；;]\s*第[^，。；;\s]+(?:条|款|段))+)(?:条款|条文)", r"\1", cleaned)
     cleaned = re.sub(r"((?:第[^，。；;\s]+(?:条|款|段)))(?:条款|条文)", r"\1", cleaned)
     cleaned = re.sub(r"(相关|上述|前述|前款|本条)条款条款", r"\1条款", cleaned)
     cleaned = re.sub(r"\s{2,}", " ", cleaned)
     cleaned = re.sub(r"([、，,；;])\1+", r"\1", cleaned)
     return cleaned.strip()
+
+
+def _render_alias_in_context(source: str, start: int, end: int, label: str) -> str:
+    canonical = _clean(label)
+    if not canonical:
+        return canonical
+
+    match = _CANONICAL_LABEL_RE.fullmatch(canonical)
+    if not match:
+        return canonical
+
+    core = match.group("core")
+    suffix = match.group("suffix")
+    has_prefix = start > 0 and source[start - 1] == "第"
+    has_suffix = source.startswith(suffix, end)
+
+    if has_prefix and has_suffix:
+        return core
+    if has_prefix:
+        return f"{core}{suffix}"
+    if has_suffix:
+        return f"第{core}"
+    return canonical
 
 
 def humanize_clause_refs(text: Any, alias_map: dict[str, str] | None) -> str:
@@ -151,11 +184,14 @@ def humanize_clause_refs(text: Any, alias_map: dict[str, str] | None) -> str:
     if alias_map:
         items = sorted(((key, value) for key, value in alias_map.items() if key and value), key=lambda item: -len(item[0]))
         if items:
-            pattern = re.compile("|".join(re.escape(key) for key, _value in items))
+            pattern = re.compile(
+                rf"(?<![{_SAFE_REF_BOUNDARY}])(?:{'|'.join(re.escape(key) for key, _value in items)})(?![{_SAFE_REF_BOUNDARY}])"
+            )
 
             def _replace(match: re.Match[str]) -> str:
                 token = match.group(0)
-                return alias_map.get(token, token)
+                label = alias_map.get(token, token)
+                return _render_alias_in_context(protected_text, match.start(), match.end(), label)
 
             replaced = pattern.sub(_replace, replaced)
 
