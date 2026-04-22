@@ -59,6 +59,7 @@ class WebApiReviewRestoreTests(unittest.TestCase):
             json.dumps(_validated_payload(), ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
+        (run_dir / "source.docx").write_bytes(b"fake-docx")
         (meta_root / "restore_case_001.json").write_text(
             json.dumps(
                 {
@@ -101,6 +102,19 @@ class WebApiReviewRestoreTests(unittest.TestCase):
                 self.assertEqual(payload["status"], "completed")
                 self.assertEqual(payload["run_id"], "restore_case_001")
                 self.assertEqual(len(payload["risk_result_validated"]["risk_result"]["risk_items"]), 1)
+        finally:
+            td.cleanup()
+
+    def test_get_review_result_exposes_download_url_without_prebuilt_docx(self):
+        td, run_root, upload_root, meta_root = self._setup_run()
+        try:
+            with patch.object(web_api, "RUN_ROOT", run_root), patch.object(web_api, "UPLOAD_ROOT", upload_root), patch.object(
+                web_api, "WEB_META_ROOT", meta_root
+            ):
+                payload = web_api.get_review_result("restore_case_001")
+                self.assertTrue(payload["download_ready"])
+                self.assertEqual(payload["download_url"], "/api/reviews/restore_case_001/download")
+                self.assertFalse((run_root / "restore_case_001" / "reviewed_comments.docx").exists())
         finally:
             td.cleanup()
 

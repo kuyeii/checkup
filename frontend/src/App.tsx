@@ -10,22 +10,10 @@ import { GlobalTopBar } from './components/GlobalTopBar'
 import { UploadDashboard } from './components/UploadDashboard'
 import { ReviewProgress, computeProgress as computeReviewProgress } from './components/ReviewProgress'
 import type { AnalysisScopeOption, EditSummary, ReviewHistoryItem, ReviewMeta, ReviewResultPayload, ReviewSideOption } from './types'
+import { readApiError, toUserFacingError } from './utils/appError'
 
 async function sleep(ms: number) {
   await new Promise((r) => setTimeout(r, ms))
-}
-
-async function readErrorDetail(resp: Response) {
-  const text = await resp.text()
-  if (!text) return '请求失败'
-  try {
-    const parsed = JSON.parse(text) as { detail?: string }
-    const detail = String(parsed?.detail || '').trim()
-    if (detail) return detail
-  } catch {
-    // ignore parse error and use raw text
-  }
-  return text
 }
 
 function fetchNoStore(input: RequestInfo | URL, init?: RequestInit) {
@@ -587,17 +575,17 @@ function AlertDialog(props: { open: boolean; title?: string; message: string; on
   if (!props.open) return null
   return (
     <div className="editorOverlay" onClick={props.onClose}>
-      <div className="editorSheet" onClick={(e) => e.stopPropagation()}>
-        <div className="editorHeader">
-          <div className="editorTitle">{props.title || '提示'}</div>
-          <div className="editorActions">
-            <button className="btnPrimarySolid" onClick={props.onClose}>
-              我知道了
-            </button>
-          </div>
+      <div className="editorSheet alertDialogSheet" onClick={(e) => e.stopPropagation()}>
+        <div className="alertDialogHeader">
+          <div className="alertDialogTitle">{props.title || '提示'}</div>
         </div>
-        <div className="editorBody">
-          <div className="editorReadonly">{props.message || '请求失败'}</div>
+        <div className="alertDialogBody">
+          <div className="alertDialogMessage">{props.message || '操作未完成，请稍后重试。'}</div>
+        </div>
+        <div className="alertDialogFooter">
+          <button className="alertDialogPrimary" onClick={props.onClose}>
+            我知道了
+          </button>
         </div>
       </div>
     </div>
@@ -620,6 +608,7 @@ export default function App() {
   const [meta, setMeta] = useState<ReviewMeta | null>(null)
   const [result, setResult] = useState<ReviewResultPayload | null>(null)
   const [isReviewing, setIsReviewing] = useState(false)
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false)
   const [routeHydratingRunId, setRouteHydratingRunId] = useState<string | null>(null)
   const [edits, setEdits] = useState<EditSummary[]>([])
   const [historyEntries, setHistoryEntries] = useState<SessionReviewEntry[]>([])
@@ -677,6 +666,11 @@ export default function App() {
     })
   }, [])
 
+  const showErrorDialog = useCallback((error: unknown, fallbackTitle = '操作未完成') => {
+    const nextError = toUserFacingError(error, { title: fallbackTitle })
+    openDialog(nextError.message, nextError.title)
+  }, [openDialog])
+
   const applyWorkspaceFile = useCallback((nextFile: File | null, options?: { preserveReviewSide?: boolean }) => {
     setFile(nextFile)
     if (!options?.preserveReviewSide) {
@@ -689,21 +683,30 @@ export default function App() {
       openDialog('当前合同仍在审查中，请等待审查完成后再开始新的合同审查。')
       return
     }
+    if (isSubmittingReview) {
+      openDialog('审查请求正在提交，请稍候后再试。')
+      return
+    }
     applyWorkspaceFile(nextFile)
-  }, [applyWorkspaceFile, isReviewing, openDialog])
+  }, [applyWorkspaceFile, isReviewing, isSubmittingReview, openDialog])
 
   const handleReviewSideChange = useCallback((side: ReviewSideOption) => {
     if (isReviewing) {
       openDialog('当前合同仍在审查中，请等待审查完成后再切换审查立场。')
       return
     }
+    if (isSubmittingReview) {
+      openDialog('审查请求正在提交，请稍候后再试。')
+      return
+    }
     setSelectedReviewSide(side)
-  }, [isReviewing, openDialog])
+  }, [isReviewing, isSubmittingReview, openDialog])
 
   useEffect(() => {
     const originalAlert = window.alert.bind(window)
     window.alert = (message?: any) => {
-      openDialog(String(message ?? ''))
+      const nextError = toUserFacingError(message, { title: '提示' })
+      openDialog(nextError.message, nextError.title)
     }
     return () => {
       window.alert = originalAlert
@@ -1094,8 +1097,7 @@ export default function App() {
 
     const statusResp = await fetchNoStore(`/api/reviews/${targetRunId}`)
     if (!statusResp.ok) {
-      const text = await statusResp.text()
-      throw new Error(text || `获取审查状态失败（${statusResp.status}）`)
+      throw await readApiError(statusResp, { title: '加载审查记录失败' })
     }
     nextMeta = (await statusResp.json()) as ReviewMeta
 
@@ -1116,8 +1118,7 @@ export default function App() {
     if (effectiveStatus === 'completed') {
       const resultResp = await fetchNoStore(`/api/reviews/${targetRunId}/result`)
       if (!resultResp.ok) {
-        const text = await resultResp.text()
-        throw new Error(text || `获取审查结果失败（${resultResp.status}）`)
+        throw await readApiError(resultResp, { title: '加载审查结果失败' })
       }
       nextResult = (await resultResp.json()) as ReviewResultPayload
     }
@@ -1189,7 +1190,7 @@ export default function App() {
 
   const openSessionReview = useCallback(async (item: ReviewHistoryItem) => {
     if (item.available === false) {
-      alert('该审查记录缺少原始合同文件（后端返回 document_ready=false），无法打开。')
+      openDialog('该审查记录对应的原始合同暂时不可用，请重新上传合同后再试。', '无法打开审查记录')
       return
     }
 
@@ -1220,65 +1221,75 @@ export default function App() {
       fallbackFile: nextFile
     })
 
-  }, [applyLoadedReviewWorkspace, loadReviewWorkspace, maybeAutoApplyAllForRun, navigate])
+  }, [applyLoadedReviewWorkspace, loadReviewWorkspace, maybeAutoApplyAllForRun, navigate, openDialog])
 
   const startReview = useCallback(async () => {
     if (isReviewing) {
       openDialog('当前合同仍在审查中，请等待审查完成后再开始新的合同审查。')
       return
     }
+    if (isSubmittingReview) {
+      openDialog('审查请求正在提交，请稍候后再试。')
+      return
+    }
     if (!file || !selectedReviewSide) return
-    setIsReviewing(true)
-    setResult(null)
-    setMeta(null)
-    setRunId(null)
-    setEdits([])
+    setIsSubmittingReview(true)
 
-    const form = new FormData()
-    form.append('file', file)
-    form.append('review_side', selectedReviewSide)
-    form.append('contract_type_hint', serverConfig?.contract_type_hint ?? 'service_agreement')
-    form.append('analysis_scope', selectedAnalysisScope)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      form.append('review_side', selectedReviewSide)
+      form.append('contract_type_hint', serverConfig?.contract_type_hint ?? 'service_agreement')
+      form.append('analysis_scope', selectedAnalysisScope)
 
-    const resp = await fetch('/api/reviews', { method: 'POST', body: form })
-    if (!resp.ok) {
-      const text = await resp.text()
-      throw new Error(text)
-    }
-    const data = (await resp.json()) as { run_id: string }
-    newRunIdRef.current = data.run_id
-    writeSessionValue(NEW_RUN_ID_STORAGE_KEY, data.run_id)
-    writeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY, data.run_id)
-    const nextMeta: ReviewMeta = {
-      run_id: data.run_id,
-      status: 'queued',
-      file_name: file.name,
-      analysis_scope: selectedAnalysisScope,
-      step: '已上传，等待开始审查'
-    }
-    setRunId(data.run_id)
-    setMeta(nextMeta)
-    setHistoryEntries((entries) =>
-      upsertHistory(
-        entries,
-        data.run_id,
-        (prev) => ({
-          ...prev,
+      const resp = await fetch('/api/reviews', { method: 'POST', body: form })
+      if (!resp.ok) {
+        throw await readApiError(resp, { title: '发起审查失败' })
+      }
+
+      const data = (await resp.json()) as { run_id: string }
+      newRunIdRef.current = data.run_id
+      writeSessionValue(NEW_RUN_ID_STORAGE_KEY, data.run_id)
+      writeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY, data.run_id)
+      const nextMeta: ReviewMeta = {
+        run_id: data.run_id,
+        status: 'queued',
+        file_name: file.name,
+        analysis_scope: selectedAnalysisScope,
+        step: '已上传，等待开始审查'
+      }
+
+      setIsReviewing(true)
+      setResult(null)
+      setMeta(null)
+      setRunId(null)
+      setEdits([])
+      setRunId(data.run_id)
+      setMeta(nextMeta)
+      setHistoryEntries((entries) =>
+        upsertHistory(
+          entries,
+          data.run_id,
+          (prev) => ({
+            ...prev,
+            file,
+            meta: nextMeta,
+            result: null,
+            file_name: file.name,
+            status: 'queued',
+            summary: nextMeta.step || '已上传，等待开始审查',
+            updated_at: new Date().toISOString(),
+            available: true
+          }),
           file,
-          meta: nextMeta,
-          result: null,
-          file_name: file.name,
-          status: 'queued',
-          summary: nextMeta.step || '已上传，等待开始审查',
-          updated_at: new Date().toISOString(),
-          available: true
-        }),
-        file,
-        nextMeta
+          nextMeta
+        )
       )
-    )
-    navigate(buildReviewPath(data.run_id))
-  }, [file, navigate, selectedAnalysisScope, selectedReviewSide, serverConfig])
+      navigate(buildReviewPath(data.run_id))
+    } finally {
+      setIsSubmittingReview(false)
+    }
+  }, [file, isReviewing, isSubmittingReview, navigate, openDialog, selectedAnalysisScope, selectedReviewSide, serverConfig])
 
   useEffect(() => {
     let cancelled = false
@@ -1327,8 +1338,7 @@ export default function App() {
               fetchNoStore(`/api/reviews/${runId}/result`, { signal: abortController.signal })
             ])
             if (!resultResp.ok) {
-              const text = await resultResp.text()
-              throw new Error(text || `获取结果失败（${resultResp.status}）`)
+              throw await readApiError(resultResp, { title: '加载审查结果失败' })
             }
             const payload = (await resultResp.json()) as ReviewResultPayload
             let nextFile = file
@@ -1387,8 +1397,9 @@ export default function App() {
       } catch (e) {
         if ((e as any)?.name === 'AbortError') return
         if (!cancelled) {
+          const nextError = toUserFacingError(e)
           setIsReviewing(false)
-          const failedMeta = { run_id: runId, status: 'failed', error: String(e) } as ReviewMeta
+          const failedMeta = { run_id: runId, status: 'failed', error: nextError.message } as ReviewMeta
           setMeta(failedMeta)
           removeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY)
           setHistoryEntries((entries) =>
@@ -1400,7 +1411,7 @@ export default function App() {
                 file: prev.file || file,
                 meta: failedMeta,
                 status: 'failed',
-                summary: String(e),
+                summary: nextError.message,
                 updated_at: resolveHistoryUpdatedAt({
                   status: 'failed',
                   remoteUpdatedAt: failedMeta.updated_at,
@@ -1490,7 +1501,7 @@ export default function App() {
         if (cancelled) return
         console.warn(`[review-route] failed to load run ${routeRunId}:`, e)
         navigate('/history', { replace: true })
-        alert(`无法打开审查记录 ${routeRunId}：${String(e)}`)
+        showErrorDialog(e, '无法打开审查记录')
       } finally {
         if (!cancelled) {
           setRouteHydratingRunId((current) => (current === routeRunId ? null : current))
@@ -1508,7 +1519,7 @@ export default function App() {
       }
       setRouteHydratingRunId((current) => (current === routeRunId ? null : current))
     }
-  }, [routeRunId, runId, navigate, loadReviewWorkspace, applyLoadedReviewWorkspace, maybeAutoApplyAllForRun])
+  }, [routeRunId, runId, navigate, loadReviewWorkspace, applyLoadedReviewWorkspace, maybeAutoApplyAllForRun, showErrorDialog])
 
   useEffect(() => {
     if (!runId || !result || !meta || meta.status !== 'completed') return
@@ -1654,7 +1665,7 @@ export default function App() {
           body: JSON.stringify({ status: 'rejected' })
         })
         if (!resp.ok) {
-          throw new Error(await readErrorDetail(resp))
+          throw await readApiError(resp, { title: '更新风险状态失败' })
         }
       }
       mergeUpdatedRisk(riskId, { status: 'rejected', ai_rewrite_decision: 'rejected' })
@@ -1674,7 +1685,7 @@ export default function App() {
           body: JSON.stringify({ status })
         })
         if (!resp.ok) {
-          throw new Error(await readErrorDetail(resp))
+          throw await readApiError(resp, { title: '更新风险状态失败' })
         }
         const payload = (await resp.json()) as { item?: any }
         if (payload.item) {
@@ -1749,7 +1760,7 @@ export default function App() {
               body: JSON.stringify({ revised_text: acceptedRevisedText, target_text: acceptedTargetText || undefined })
             })
             if (!resp.ok) {
-              throw new Error(await readErrorDetail(resp))
+              throw await readApiError(resp, { title: '接受风险失败' })
             }
             const payload = (await resp.json()) as { item?: any }
             if (payload.item) mergeUpdatedRisk(riskId, payload.item)
@@ -1838,7 +1849,7 @@ export default function App() {
               body: JSON.stringify({ revised_text: acceptedRevisedText, target_text: acceptedTargetText || undefined })
             })
             if (!resp.ok) {
-              throw new Error(await readErrorDetail(resp))
+              throw await readApiError(resp, { title: '接受风险失败' })
             }
             const payload = (await resp.json()) as { item?: any }
             if (payload.item) mergeUpdatedRisk(riskId, payload.item)
@@ -2003,8 +2014,7 @@ export default function App() {
         throw err
       }
       if (!resp.ok) {
-        const text = await resp.text()
-        throw new Error(text || '请求失败')
+        throw await readApiError(resp, { title: '更新 AI 改写失败' })
       }
       aiEndpointModeRef.current = 'new'
       const payload = (await resp.json()) as { item?: any }
@@ -2021,9 +2031,13 @@ export default function App() {
         const resp = await fetch(`/api/reviews/${runId}/risks/${encodeURIComponent(String(riskId))}/ai_reject`, {
           method: 'POST'
         })
+        if (resp.status === 404) {
+          const err: any = new Error('Not Found')
+          err.code = 404
+          throw err
+        }
         if (!resp.ok) {
-          const text = await resp.text()
-          throw new Error(text || '请求失败')
+          throw await readApiError(resp, { title: '拒绝 AI 改写失败' })
         }
         const payload = (await resp.json()) as { item?: any }
         return payload.item
@@ -2059,8 +2073,7 @@ export default function App() {
         method: 'POST'
       })
       if (!resp.ok) {
-        const text = await resp.text()
-        throw new Error(text || '请求失败')
+        throw await readApiError(resp, { title: '生成 AI 改写失败' })
       }
       const payload = (await resp.json()) as { item?: any }
       const updated = payload.item
@@ -2305,7 +2318,7 @@ export default function App() {
             try {
               await openSessionReview(item)
             } catch (e) {
-              alert(`打开审查记录失败：${String(e)}`)
+              showErrorDialog(e, '打开审查记录失败')
             }
           }}
         />
@@ -2318,6 +2331,7 @@ export default function App() {
               file={file}
               setFile={handleUploadFileChange}
               isReviewing={isReviewing}
+              isSubmittingReview={isSubmittingReview}
               reviewSide={selectedReviewSide}
               onReviewSideChange={handleReviewSideChange}
               analysisScope={selectedAnalysisScope}
@@ -2326,7 +2340,7 @@ export default function App() {
                 try {
                   await startReview()
                 } catch (e) {
-                  alert(`发起审查失败：${String(e)}`)
+                  showErrorDialog(e, '发起审查失败')
                 }
               }}
               latestReview={latestReview}
@@ -2337,7 +2351,7 @@ export default function App() {
                 try {
                   await openSessionReview(latestReview)
                 } catch (e) {
-                  alert(`打开历史记录失败：${String(e)}`)
+                  showErrorDialog(e, '打开历史记录失败')
                 }
               }}
               onOpenHistory={goHistoryPage}
@@ -2353,7 +2367,7 @@ export default function App() {
                 try {
                   await openSessionReview(item)
                 } catch (e) {
-                  alert(`打开历史记录失败：${String(e)}`)
+                  showErrorDialog(e, '打开历史记录失败')
                 }
               }}
               onStartNew={goUploadPage}

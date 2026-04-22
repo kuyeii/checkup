@@ -73,6 +73,7 @@ export function UploadDashboard(props: {
   file: File | null
   setFile: (file: File | null) => void
   isReviewing: boolean
+  isSubmittingReview: boolean
   reviewSide: ReviewSideOption | null
   onReviewSideChange: (side: ReviewSideOption) => void
   analysisScope: AnalysisScopeOption
@@ -130,17 +131,18 @@ export function UploadDashboard(props: {
   }, [isScopeMenuOpen])
 
   useEffect(() => {
-    if (props.isReviewing) {
+    if (props.isReviewing || props.isSubmittingReview) {
       setIsScopeMenuOpen(false)
     }
-  }, [props.isReviewing])
+  }, [props.isReviewing, props.isSubmittingReview])
 
   const hasFile = Boolean(props.file)
+  const isInteractionLocked = props.isReviewing || props.isSubmittingReview
   const fileSizeLabel = formatFileSize(props.file?.size)
   const selectedScopeCopy = analysisScopeCopy[props.analysisScope]
 
   const handleUploadCardClick = () => {
-    if (props.isReviewing) return
+    if (isInteractionLocked) return
     if (!hasFile) {
       resetInputValue()
       inputRef.current?.click()
@@ -209,7 +211,7 @@ export function UploadDashboard(props: {
         aria-expanded={isScopeMenuOpen}
         aria-label="审查范围选择"
         onClick={() => setIsScopeMenuOpen((open) => !open)}
-        disabled={props.isReviewing}
+        disabled={isInteractionLocked}
       >
         <span className="uploadScopeButtonIcon">
           <FileText size={14} />
@@ -237,7 +239,7 @@ export function UploadDashboard(props: {
                   props.onAnalysisScopeChange(scope)
                   setIsScopeMenuOpen(false)
                 }}
-                disabled={props.isReviewing}
+                disabled={isInteractionLocked}
               >
                 <span className={`uploadScopeOptionCheck ${active ? 'uploadScopeOptionCheck--active' : ''}`}>
                   <Check size={13} />
@@ -274,14 +276,14 @@ export function UploadDashboard(props: {
               onClick={handleUploadCardClick}
               onDragOver={(event) => {
                 event.preventDefault()
-                if (!hasFile && !props.isReviewing) setIsDragActive(true)
+                if (!hasFile && !isInteractionLocked) setIsDragActive(true)
               }}
               onDragLeave={() => setIsDragActive(false)}
               onDrop={(event) => {
                 event.preventDefault()
                 setIsDragActive(false)
                 const nextFile = event.dataTransfer.files?.[0] || null
-                if (!props.isReviewing) pickFile(nextFile)
+                if (!isInteractionLocked) pickFile(nextFile)
               }}
             >
               <input
@@ -325,7 +327,7 @@ export function UploadDashboard(props: {
                         resetInputValue()
                         props.setFile(null)
                       }}
-                      disabled={props.isReviewing}
+                      disabled={isInteractionLocked}
                     >
                       <X size={20} />
                     </button>
@@ -377,10 +379,10 @@ export function UploadDashboard(props: {
           <div className="uploadActions shrink-0">
             <button
               className="startReviewBtn"
-              disabled={!props.file || !props.reviewSide || props.isReviewing}
+              disabled={!props.file || !props.reviewSide || isInteractionLocked}
               onClick={props.onStartReview}
             >
-              {props.isReviewing ? '审查中…' : '开始智能审查'}
+              {props.isSubmittingReview ? '提交中…' : props.isReviewing ? '审查中…' : '开始智能审查'}
             </button>
           </div>
 

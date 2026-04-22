@@ -14,9 +14,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Query, Request, UploadFile
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 from config import settings
 from src.clause_ref_display import build_clause_alias_map, humanize_clause_refs
@@ -98,6 +99,136 @@ _AGGREGATE_GENERIC_OVERLAP_FRAGMENTS = {
     "受测样品",
     "验收检测",
 }
+
+
+def _stringify_error_detail(detail: Any) -> str:
+    if detail is None:
+        return ""
+    if isinstance(detail, str):
+        return detail.strip()
+    if isinstance(detail, list):
+        texts = [_stringify_error_detail(item) for item in detail]
+        return "；".join(text for text in texts if text)
+    if isinstance(detail, dict):
+        for key in ("user_message", "message", "detail", "msg"):
+            text = _stringify_error_detail(detail.get(key))
+            if text:
+                return text
+        for value in detail.values():
+            text = _stringify_error_detail(value)
+            if text:
+                return text
+        return ""
+    return str(detail).strip()
+
+
+def _build_user_facing_error(status_code: int, detail: Any) -> dict[str, Any]:
+    if isinstance(detail, dict):
+        code = str(detail.get("code") or "").strip()
+        title = str(detail.get("title") or "").strip()
+        user_message = str(detail.get("user_message") or detail.get("message") or "").strip()
+        if code or title or user_message:
+            return {
+                "code": code or "API_ERROR",
+                "title": title or "操作未完成",
+                "message": user_message or _stringify_error_detail(detail) or "操作未完成，请稍后重试。",
+                "status": status_code,
+            }
+
+    detail_text = _stringify_error_detail(detail)
+    detail_lower = detail_text.lower()
+
+    if ("仅支持" in detail_text and ".docx" in detail_text) or ("unsupported" in detail_lower and "docx" in detail_lower):
+        return {
+            "code": "UNSUPPORTED_FILE_TYPE",
+            "title": "文件格式不支持",
+            "message": "请上传 .docx 格式的合同文件后再试。",
+            "status": status_code,
+        }
+    if "run_id 不存在" in detail_text:
+        return {
+            "code": "REVIEW_NOT_FOUND",
+            "title": "审查记录不存在",
+            "message": "未找到对应的审查记录，请返回首页重新上传合同。",
+            "status": status_code,
+        }
+    if "risk_id 不存在" in detail_text:
+        return {
+            "code": "RISK_NOT_FOUND",
+            "title": "风险项不存在",
+            "message": "未找到对应的风险项，请刷新页面后再试。",
+            "status": status_code,
+        }
+    if "结果尚未生成完成" in detail_text or "任务尚未完成" in detail_text:
+        return {
+            "code": "REVIEW_NOT_READY",
+            "title": "审查尚未完成",
+            "message": "合同还在处理中，请稍后再试。",
+            "status": status_code,
+        }
+    if status_code in (400, 422):
+        return {
+            "code": "REQUEST_VALIDATION_ERROR",
+            "title": "提交内容有误",
+            "message": "请检查输入内容后重试。",
+            "status": status_code,
+        }
+    if status_code == 404:
+        return {
+            "code": "RESOURCE_NOT_FOUND",
+            "title": "内容不存在",
+            "message": "请求的内容不存在或已失效，请返回上一步重试。",
+            "status": status_code,
+        }
+    if status_code == 409:
+        return {
+            "code": "STATE_CONFLICT",
+            "title": "当前状态暂不可操作",
+            "message": "当前状态暂不支持该操作，请稍后再试。",
+            "status": status_code,
+        }
+    if status_code >= 500:
+        return {
+            "code": "INTERNAL_ERROR",
+            "title": "服务暂时不可用",
+            "message": "服务开小差了，请稍后重试。",
+            "status": status_code,
+        }
+    return {
+        "code": "API_ERROR",
+        "title": "操作未完成",
+        "message": detail_text or "操作未完成，请稍后重试。",
+        "status": status_code,
+    }
+
+
+def _build_error_response_content(status_code: int, detail: Any) -> dict[str, Any]:
+    if isinstance(detail, dict):
+        payload = dict(detail)
+        payload.setdefault("detail", detail.get("detail"))
+    else:
+        payload = {"detail": detail}
+    payload["error"] = _build_user_facing_error(status_code, detail)
+    return payload
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(_: Request, exc: HTTPException) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=_build_error_response_content(exc.status_code, exc.detail),
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(_: Request, exc: RequestValidationError) -> JSONResponse:
+    detail = {
+        "code": "REQUEST_VALIDATION_ERROR",
+        "title": "提交内容有误",
+        "user_message": "请检查上传文件和必填项后重试。",
+        "detail": exc.errors(),
+    }
+    return JSONResponse(status_code=422, content=_build_error_response_content(422, detail))
 
 
 def _split_text_into_sentence_spans(text: str) -> list[tuple[int, int]]:
@@ -2423,7 +2554,7 @@ def _build_result_payload(run_id: str) -> dict[str, Any]:
         if _sanitize_reviewed_display_payload(validated, clauses):
             _persist_reviewed_payload(run_dir, validated)
     meta = _read_meta(run_id)
-    reviewed_docx = run_dir / "reviewed_comments.docx"
+    can_export_reviewed_docx = _can_export_reviewed_docx(run_id)
     return {
         "run_id": run_id,
         "status": meta.get("status"),
@@ -2435,8 +2566,8 @@ def _build_result_payload(run_id: str) -> dict[str, Any]:
         "merged_clauses": clauses,
         "risk_result_validated": validated,
         "risk_result_ai_aggregated": _safe_json(_aggregation_file_path(run_dir)),
-        "download_ready": reviewed_docx.exists(),
-        "download_url": f"/api/reviews/{run_id}/download" if reviewed_docx.exists() else None,
+        "download_ready": can_export_reviewed_docx,
+        "download_url": f"/api/reviews/{run_id}/download" if can_export_reviewed_docx else None,
     }
 
 
@@ -2452,10 +2583,14 @@ def _resolve_document_path(run_id: str) -> Path | None:
     return None
 
 
+def _can_export_reviewed_docx(run_id: str) -> bool:
+    run_dir = RUN_ROOT / run_id
+    return _resolve_document_path(run_id) is not None and (run_dir / "merged_clauses.json").exists()
+
+
 def _to_history_item(meta: dict[str, Any]) -> dict[str, Any]:
     run_id = str(meta.get("run_id") or "")
     run_dir = RUN_ROOT / run_id
-    reviewed_docx = run_dir / "reviewed_comments.docx"
     document_path = _resolve_document_path(run_id)
     return {
         "run_id": run_id,
@@ -2469,7 +2604,7 @@ def _to_history_item(meta: dict[str, Any]) -> dict[str, Any]:
         "step": meta.get("step"),
         "warning": meta.get("warning"),
         "error": meta.get("error"),
-        "download_ready": reviewed_docx.exists(),
+        "download_ready": _can_export_reviewed_docx(run_id),
         "document_ready": document_path is not None,
     }
 
@@ -2709,7 +2844,15 @@ async def create_review(
     normalized_analysis_scope = normalize_analysis_scope(analysis_scope or getattr(settings, "analysis_scope", "full_detail"))
     suffix = Path(file.filename or "contract.docx").suffix.lower()
     if suffix != ".docx":
-        raise HTTPException(status_code=400, detail="目前仅支持 .docx 文件")
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "code": "UNSUPPORTED_FILE_TYPE",
+                "title": "文件格式不支持",
+                "user_message": "请上传 .docx 格式的合同文件后再试。",
+                "detail": f"目前仅支持 .docx 文件，收到：{suffix or 'unknown'}",
+            },
+        )
 
     run_id = datetime.now().strftime("web_%Y%m%d_%H%M%S_") + uuid.uuid4().hex[:6]
     upload_path = UPLOAD_ROOT / f"{run_id}{suffix}"
