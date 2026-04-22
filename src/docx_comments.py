@@ -489,7 +489,7 @@ def _build_comment_text(risk: dict[str, Any], clauses: list[dict[str, Any]]) -> 
     issue = str(risk.get("issue") or risk.get("risk_label") or risk.get("title") or "").strip() or "—"
     basis = str(risk.get("basis_summary") or risk.get("basis") or "").strip() or "—"
     suggestion = _pick_suggestion_text(risk) or "—"
-    suggestion_label = "【建议插入】" if accepted_kind == "suggest_insert" else "【建议】"
+    suggestion_label = "【建议插入】" if accepted_kind == "suggest_insert" else "【已修改】"
 
     return "\n".join(
         [

@@ -22,6 +22,7 @@ from config import settings
 from src.clause_ref_display import build_clause_alias_map, humanize_clause_refs
 from src.dify_client import DifyWorkflowClient, DifyWorkflowError, extract_blocking_outputs
 from src.docx_locator import enrich_reviewed_risks_with_locators
+from src.analysis_scope import analysis_scope_label, normalize_analysis_scope
 from src.parse_outputs import _load_json_with_repair, strip_markdown_json
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -1228,7 +1229,8 @@ def _read_meta(run_id: str) -> dict[str, Any]:
     if path.exists():
         payload = json.loads(path.read_text(encoding="utf-8"))
         payload.setdefault("run_id", run_id)
-        payload.setdefault("updated_at", datetime.utcnow().isoformat() + "Z")
+        raw_updated_at = str(payload.get("updated_at") or "").strip()
+        payload_updated_at = _parse_iso_datetime(raw_updated_at) if raw_updated_at else 0.0
         if payload.get("progress") is None:
             status = str(payload.get("status") or "")
             step = str(payload.get("step") or "")
@@ -1255,14 +1257,14 @@ def _read_meta(run_id: str) -> dict[str, Any]:
                 inferred = _infer_meta_from_run(run_id)
             except Exception:
                 inferred = None
-            payload_updated_at = _parse_iso_datetime(str(payload.get("updated_at") or ""))
-            is_stale_running = payload_updated_at and (time.time() - payload_updated_at >= 300)
+            is_stale_running = (not payload_updated_at) or (time.time() - payload_updated_at >= 300)
             if isinstance(inferred, dict) and str(inferred.get("status") or "") in {"completed", "failed"} and is_stale_running:
                 payload["status"] = inferred.get("status")
                 payload["step"] = inferred.get("step")
                 payload["progress"] = inferred.get("progress")
                 payload["error"] = inferred.get("error")
                 payload["updated_at"] = inferred.get("updated_at")
+        payload.setdefault("updated_at", datetime.utcnow().isoformat() + "Z")
         return payload
     return _infer_meta_from_run(run_id)
 
@@ -2428,6 +2430,8 @@ def _build_result_payload(run_id: str) -> dict[str, Any]:
         "file_name": meta.get("file_name"),
         "review_side": meta.get("review_side"),
         "contract_type_hint": meta.get("contract_type_hint"),
+        "analysis_scope": meta.get("analysis_scope"),
+        "analysis_scope_label": meta.get("analysis_scope_label"),
         "merged_clauses": clauses,
         "risk_result_validated": validated,
         "risk_result_ai_aggregated": _safe_json(_aggregation_file_path(run_dir)),
@@ -2459,6 +2463,8 @@ def _to_history_item(meta: dict[str, Any]) -> dict[str, Any]:
         "status": meta.get("status") or "running",
         "review_side": meta.get("review_side"),
         "contract_type_hint": meta.get("contract_type_hint"),
+        "analysis_scope": meta.get("analysis_scope"),
+        "analysis_scope_label": meta.get("analysis_scope_label"),
         "updated_at": meta.get("updated_at") or (_latest_mtime_iso(run_dir) if run_dir.exists() else None),
         "step": meta.get("step"),
         "warning": meta.get("warning"),
@@ -2507,7 +2513,7 @@ def _normalize_review_side(value: str | None) -> str:
     raise HTTPException(status_code=400, detail='review_side 仅支持"甲方"或"乙方"')
 
 
-def _run_pipeline(*, run_id: str, file_path: Path, file_name: str, review_side: str, contract_type_hint: str) -> None:
+def _run_pipeline(*, run_id: str, file_path: Path, file_name: str, review_side: str, contract_type_hint: str, analysis_scope: str) -> None:
     run_dir = RUN_ROOT / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
     source_docx = run_dir / "source.docx"
@@ -2520,6 +2526,7 @@ def _run_pipeline(*, run_id: str, file_path: Path, file_name: str, review_side: 
     env["RUN_ROOT"] = str(RUN_ROOT)
     env["REVIEW_SIDE"] = review_side
     env["CONTRACT_TYPE_HINT"] = contract_type_hint
+    env["ANALYSIS_SCOPE"] = analysis_scope
 
     _write_meta(
         run_id,
@@ -2528,6 +2535,8 @@ def _run_pipeline(*, run_id: str, file_path: Path, file_name: str, review_side: 
             "file_name": file_name,
             "review_side": review_side,
             "contract_type_hint": contract_type_hint,
+            "analysis_scope": analysis_scope,
+            "analysis_scope_label": analysis_scope_label(analysis_scope),
             "run_dir": str(run_dir),
             "step": "排队完成，准备开始审查",
             "progress": 15,
@@ -2675,9 +2684,12 @@ def get_config() -> dict[str, str]:
         normalized_review_side = _normalize_review_side(settings.review_side) if str(settings.review_side or '').strip() else '乙方'
     except HTTPException:
         normalized_review_side = '乙方'
+    analysis_scope = normalize_analysis_scope(getattr(settings, "analysis_scope", "full_detail"))
     return {
         "review_side": normalized_review_side,
         "contract_type_hint": settings.contract_type_hint,
+        "analysis_scope": analysis_scope,
+        "analysis_scope_label": analysis_scope_label(analysis_scope),
     }
 
 
@@ -2691,8 +2703,10 @@ async def create_review(
     file: UploadFile = File(...),
     review_side: str = Form(settings.review_side),
     contract_type_hint: str = Form("service_agreement"),
+    analysis_scope: str = Form(getattr(settings, "analysis_scope", "full_detail")),
 ) -> dict[str, Any]:
     normalized_review_side = _normalize_review_side(review_side or settings.review_side)
+    normalized_analysis_scope = normalize_analysis_scope(analysis_scope or getattr(settings, "analysis_scope", "full_detail"))
     suffix = Path(file.filename or "contract.docx").suffix.lower()
     if suffix != ".docx":
         raise HTTPException(status_code=400, detail="目前仅支持 .docx 文件")
@@ -2715,6 +2729,8 @@ async def create_review(
             "file_name": file.filename,
             "review_side": normalized_review_side,
             "contract_type_hint": contract_type_hint,
+            "analysis_scope": normalized_analysis_scope,
+            "analysis_scope_label": analysis_scope_label(normalized_analysis_scope),
             "step": "任务已创建，等待执行",
             "progress": 8,
         },
@@ -2727,6 +2743,7 @@ async def create_review(
             file_name=file.filename or upload_path.name,
             review_side=normalized_review_side,
             contract_type_hint=contract_type_hint,
+            analysis_scope=normalized_analysis_scope,
         ),
         daemon=True,
     ).start()

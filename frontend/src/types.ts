@@ -1,4 +1,5 @@
 export type ReviewSideOption = '甲方' | '乙方'
+export type AnalysisScopeOption = 'full_detail' | 'high_risk_only'
 
 export type ReviewMeta = {
   run_id: string
@@ -6,6 +7,8 @@ export type ReviewMeta = {
   file_name?: string
   review_side?: string
   contract_type_hint?: string
+  analysis_scope?: AnalysisScopeOption | string
+  analysis_scope_label?: string
   step?: string
   progress?: number
   message?: string
@@ -86,6 +89,8 @@ export type ReviewResultPayload = {
   file_name?: string
   review_side?: string
   contract_type_hint?: string
+  analysis_scope?: AnalysisScopeOption | string
+  analysis_scope_label?: string
   merged_clauses: Clause[]
   risk_result_validated: {
     is_valid: boolean

@@ -29,6 +29,7 @@ class Settings:
     debug_save_intermediate: bool = os.getenv("DEBUG_SAVE_INTERMEDIATE", "1") == "1"
     fast_screen_enabled: bool = os.getenv("FAST_SCREEN_ENABLED", "1").strip().lower() not in {"0", "false", "no", "off"}
     fast_screen_max_candidates: str = str(os.getenv("FAST_SCREEN_MAX_CANDIDATES", "12"))
+    analysis_scope: str = os.getenv("ANALYSIS_SCOPE", "full_detail")
 
     def anchored_risk_api_key(self) -> str:
         return self.dify_anchored_risk_workflow_api_key or self.dify_risk_workflow_api_key

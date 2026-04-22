@@ -1,6 +1,56 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReviewMeta } from '../types'
 
+const REVIEW_PROGRESS_UI_STATE_STORAGE_KEY = 'markup:reviewProgressUiStateByRun'
+
+type PersistedReviewProgressUiState = {
+  runId: string
+  introStartedAt: number
+  highestActiveIndex: number
+  savedAt: string
+}
+
+function readStoredProgressUiStates() {
+  try {
+    const raw = window.sessionStorage.getItem(REVIEW_PROGRESS_UI_STATE_STORAGE_KEY)
+    if (!raw) return {} as Record<string, PersistedReviewProgressUiState>
+    const parsed = JSON.parse(raw) as Record<string, PersistedReviewProgressUiState>
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch {
+    return {} as Record<string, PersistedReviewProgressUiState>
+  }
+}
+
+function readStoredProgressUiState(runId?: string | null) {
+  const key = String(runId || '').trim()
+  if (!key) return null
+  const states = readStoredProgressUiStates()
+  const state = states[key]
+  if (!state) return null
+  if (state.runId !== key) return null
+  return state
+}
+
+function writeStoredProgressUiState(
+  runId: string,
+  state: { introStartedAt: number; highestActiveIndex: number }
+) {
+  const key = String(runId || '').trim()
+  if (!key) return
+  try {
+    const states = readStoredProgressUiStates()
+    states[key] = {
+      runId: key,
+      introStartedAt: state.introStartedAt,
+      highestActiveIndex: state.highestActiveIndex,
+      savedAt: new Date().toISOString()
+    }
+    window.sessionStorage.setItem(REVIEW_PROGRESS_UI_STATE_STORAGE_KEY, JSON.stringify(states))
+  } catch {
+    return
+  }
+}
+
 function inferStage(step: string) {
   const s = (step || '').toLowerCase()
   if (s.includes('上传') || s.includes('等待') || s.includes('排队') || s.includes('queued')) return 0
@@ -10,7 +60,7 @@ function inferStage(step: string) {
   return 1
 }
 
-function computeProgress(meta: ReviewMeta | null) {
+export function computeProgress(meta: ReviewMeta | null) {
   if (!meta) return { percent: 8, stage: 0, label: '准备中…' }
   if (meta.status === 'failed') return { percent: 100, stage: 3, label: meta.error || '审查失败' }
   if (meta.status === 'completed') return { percent: 100, stage: 3, label: '审查完成' }
@@ -45,6 +95,13 @@ const INTRO_LABELS = [
 
 type TaskState = 'done' | 'active' | 'todo' | 'failed'
 type IntroPhase = 0 | 1 | 2
+
+function resolveIntroPhaseFromStart(introStartedAt: number): IntroPhase {
+  const elapsed = Math.max(0, Date.now() - introStartedAt)
+  if (elapsed >= INTRO_TOTAL_MS) return 2
+  if (elapsed >= INTRO_FIRST_STEP_MS) return 1
+  return 0
+}
 
 function resolveActiveIndex(percent: number) {
   const total = Math.max(1, FLAT_TASKS.length)
@@ -90,26 +147,61 @@ export function ReviewProgress(props: {
   const status = props.meta?.status
   const isWaiting = !status || status === 'queued' || status === 'running'
   const realActiveIndex = useMemo(() => resolveActiveIndex(baseProg.percent), [baseProg.percent])
+  const progressUiRunId = useMemo(() => String(props.runId || '').trim(), [props.runId])
 
-  const [introPhase, setIntroPhase] = useState<IntroPhase>(() => (isWaiting ? 0 : 2))
-  const highestActiveIndexRef = useRef(0)
+  const [introPhase, setIntroPhase] = useState<IntroPhase>(() => {
+    if (!isWaiting) return 2
+    if (realActiveIndex >= INTRO_SECOND_TASK_INDEX) return 2
+    const persisted = readStoredProgressUiState(progressUiRunId)
+    return persisted ? resolveIntroPhaseFromStart(persisted.introStartedAt) : 0
+  })
+  const highestActiveIndexRef = useRef(Math.max(readStoredProgressUiState(progressUiRunId)?.highestActiveIndex ?? 0, realActiveIndex))
 
   useEffect(() => {
-    highestActiveIndexRef.current = 0
-    if (!isWaiting) {
+    const persisted = readStoredProgressUiState(progressUiRunId)
+    const persistedHighestActiveIndex = persisted?.highestActiveIndex ?? 0
+    highestActiveIndexRef.current = Math.max(persistedHighestActiveIndex, realActiveIndex)
+
+    if (!isWaiting || realActiveIndex >= INTRO_SECOND_TASK_INDEX) {
       setIntroPhase(2)
+      if (progressUiRunId) {
+        writeStoredProgressUiState(progressUiRunId, {
+          introStartedAt: persisted?.introStartedAt ?? Date.now(),
+          highestActiveIndex: highestActiveIndexRef.current
+        })
+      }
       return
     }
 
-    setIntroPhase(0)
-    const firstTimer = window.setTimeout(() => setIntroPhase(1), INTRO_FIRST_STEP_MS)
-    const doneTimer = window.setTimeout(() => setIntroPhase(2), INTRO_TOTAL_MS)
+    const introStartedAt = persisted?.introStartedAt ?? Date.now()
+    const nextPhase = resolveIntroPhaseFromStart(introStartedAt)
+    setIntroPhase(nextPhase)
+
+    if (progressUiRunId) {
+      writeStoredProgressUiState(progressUiRunId, {
+        introStartedAt,
+        highestActiveIndex: highestActiveIndexRef.current
+      })
+    }
+
+    const elapsed = Math.max(0, Date.now() - introStartedAt)
+    const firstDelay = Math.max(0, INTRO_FIRST_STEP_MS - elapsed)
+    const doneDelay = Math.max(0, INTRO_TOTAL_MS - elapsed)
+    let firstTimer: number | null = null
+    let doneTimer: number | null = null
+
+    if (elapsed < INTRO_FIRST_STEP_MS) {
+      firstTimer = window.setTimeout(() => setIntroPhase(1), firstDelay)
+    }
+    if (elapsed < INTRO_TOTAL_MS) {
+      doneTimer = window.setTimeout(() => setIntroPhase(2), doneDelay)
+    }
 
     return () => {
-      window.clearTimeout(firstTimer)
-      window.clearTimeout(doneTimer)
+      if (firstTimer != null) window.clearTimeout(firstTimer)
+      if (doneTimer != null) window.clearTimeout(doneTimer)
     }
-  }, [props.runId])
+  }, [progressUiRunId, isWaiting, realActiveIndex])
 
   const displayActiveIndex = useMemo(() => {
     if (introPhase === 0) return 0
@@ -119,7 +211,13 @@ export function ReviewProgress(props: {
 
   useEffect(() => {
     highestActiveIndexRef.current = Math.max(highestActiveIndexRef.current, displayActiveIndex)
-  }, [displayActiveIndex])
+    if (!progressUiRunId) return
+    const persisted = readStoredProgressUiState(progressUiRunId)
+    writeStoredProgressUiState(progressUiRunId, {
+      introStartedAt: persisted?.introStartedAt ?? Date.now(),
+      highestActiveIndex: highestActiveIndexRef.current
+    })
+  }, [progressUiRunId, displayActiveIndex])
 
   const displayLabel = introPhase === 0 ? INTRO_LABELS[0] : introPhase === 1 ? INTRO_LABELS[1] : baseProg.label
   const states = useMemo(() => {

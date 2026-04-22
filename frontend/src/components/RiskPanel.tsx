@@ -116,6 +116,10 @@ function sanitizeAiCommentText(value?: string) {
     .trim()
 }
 
+function isSuggestionInsertComment(value?: string) {
+  return /^建议插入内容\s*[:：]/.test(sanitizeAiCommentText(value))
+}
+
 function presentRiskLabel(r: RiskItem) {
   return stripRuleCodes(r.risk_label || r.dimension || '风险项')
 }
@@ -522,10 +526,7 @@ export function RiskPanel(props: {
                         </div>
                         <div className="riskSection">
                           <div className="riskSectionTitle">依据</div>
-                          <div className="riskSectionBody">
-                            <div>{stripRuleCodes(r.basis) || '—'}</div>
-                            <div style={{ marginTop: 8 }}>建议：{suggestionInsertTextOf(r) || '—'}</div>
-                          </div>
+                          <div className="riskSectionBody">{stripRuleCodes(r.basis) || '—'}</div>
                         </div>
 
                         {(() => {
@@ -577,10 +578,21 @@ export function RiskPanel(props: {
                             )
                           }
 
+                          const effectiveSuggestion = String(localDraftById[localKey] ?? suggestionInsertText ?? '—')
+                          const shouldRenderInsertOnly = !effectiveTarget || isSuggestionInsertComment((ai as any)?.comment_text)
+
+                          if (shouldRenderInsertOnly) {
+                            return (
+                              <div className="riskSection">
+                                <div className="riskSectionTitle">AI 建议内容</div>
+                                <div className="riskSectionBody">建议插入内容：{effectiveSuggestion}</div>
+                              </div>
+                            )
+                          }
+
                           return (
                             <div className="riskSection">
                               <div className="riskSectionTitle">AI 建议内容</div>
-                              <div className="riskSectionBody">{sanitizeAiCommentText((ai as any)?.comment_text) || '—'}</div>
                               <AiRewriteDiff
                                 targetText={effectiveTarget}
                                 revisedText={String(effectiveRevised || '')}

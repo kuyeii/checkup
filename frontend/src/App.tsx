@@ -8,8 +8,8 @@ import { ModernSideNav } from './components/ModernSideNav'
 import { TopBar } from './components/TopBar'
 import { GlobalTopBar } from './components/GlobalTopBar'
 import { UploadDashboard } from './components/UploadDashboard'
-import { ReviewProgress } from './components/ReviewProgress'
-import type { EditSummary, ReviewHistoryItem, ReviewMeta, ReviewResultPayload, ReviewSideOption } from './types'
+import { ReviewProgress, computeProgress as computeReviewProgress } from './components/ReviewProgress'
+import type { AnalysisScopeOption, EditSummary, ReviewHistoryItem, ReviewMeta, ReviewResultPayload, ReviewSideOption } from './types'
 
 async function sleep(ms: number) {
   await new Promise((r) => setTimeout(r, ms))
@@ -108,6 +108,7 @@ const AUTO_AI_DISABLED_STORAGE_KEY = 'markup:autoAiApplyAllDisabled'
 const AUTO_AI_TRIGGERED_STORAGE_KEY = 'markup:autoAiApplyAllTriggeredRunIds'
 const ACTIVE_RUN_ID_STORAGE_KEY = 'markup:activeRunId'
 const REVIEW_SNAPSHOT_STORAGE_KEY = 'markup:reviewSnapshotByRun'
+const ACCEPT_ALL_BATCH_STORAGE_KEY_PREFIX = 'markup:acceptAllBatch:'
 const PREVIEW_WAITING_QUERY_KEY = 'preview_waiting'
 const PREVIEW_AUTO_COMPLETE_QUERY_KEY = 'preview_auto_complete'
 
@@ -170,6 +171,12 @@ function buildReviewPath(runId?: string | null) {
   if (!runId) return '/review'
   return `/review/${encodeURIComponent(runId)}`
 }
+
+function normalizeAnalysisScopeOption(value?: string | null): AnalysisScopeOption {
+  const raw = String(value || '').trim().toLowerCase()
+  return raw === 'high_risk_only' ? 'high_risk_only' : 'full_detail'
+}
+
 
 function parseReviewRunId(pathname: string) {
   const normalized = pathname !== '/' && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
@@ -235,6 +242,36 @@ function removeLocalValue(key: string) {
     return
   }
 }
+
+function acceptAllBatchStorageKey(runId?: string | null) {
+  return `${ACCEPT_ALL_BATCH_STORAGE_KEY_PREFIX}${String(runId || '').trim()}`
+}
+
+function readAcceptAllBatch(runId?: string | null) {
+  const key = String(runId || '').trim()
+  if (!key) return [] as string[]
+  const raw = readLocalValue(acceptAllBatchStorageKey(key))
+  if (!raw) return [] as string[]
+  try {
+    const parsed = JSON.parse(raw) as unknown
+    if (!Array.isArray(parsed)) return [] as string[]
+    return parsed.map((item) => String(item || '').trim()).filter(Boolean)
+  } catch {
+    return [] as string[]
+  }
+}
+
+function writeAcceptAllBatch(runId: string, riskIds: string[]) {
+  const key = String(runId || '').trim()
+  if (!key) return
+  const normalized = riskIds.map((item) => String(item || '').trim()).filter(Boolean)
+  if (normalized.length === 0) {
+    removeLocalValue(acceptAllBatchStorageKey(key))
+    return
+  }
+  writeLocalValue(acceptAllBatchStorageKey(key), JSON.stringify(Array.from(new Set(normalized))))
+}
+
 
 function isPreviewWaitingMode() {
   try {
@@ -578,6 +615,7 @@ export default function App() {
   const prevNavRef = useRef<NavKey>('upload')
   const [file, setFile] = useState<File | null>(null)
   const [selectedReviewSide, setSelectedReviewSide] = useState<ReviewSideOption | null>(null)
+  const [selectedAnalysisScope, setSelectedAnalysisScope] = useState<AnalysisScopeOption>('full_detail')
   const [runId, setRunId] = useState<string | null>(null)
   const [meta, setMeta] = useState<ReviewMeta | null>(null)
   const [result, setResult] = useState<ReviewResultPayload | null>(null)
@@ -585,7 +623,7 @@ export default function App() {
   const [routeHydratingRunId, setRouteHydratingRunId] = useState<string | null>(null)
   const [edits, setEdits] = useState<EditSummary[]>([])
   const [historyEntries, setHistoryEntries] = useState<SessionReviewEntry[]>([])
-  const [serverConfig, setServerConfig] = useState<{ review_side: string; contract_type_hint: string } | null>(null)
+  const [serverConfig, setServerConfig] = useState<{ review_side: string; contract_type_hint: string; analysis_scope: AnalysisScopeOption | string } | null>(null)
   const [lastAcceptAllRiskIds, setLastAcceptAllRiskIds] = useState<string[]>([])
   const [docEditorReady, setDocEditorReady] = useState(false)
   const [dialog, setDialog] = useState<{ open: boolean; title: string; message: string }>({
@@ -963,6 +1001,20 @@ export default function App() {
       .map((r) => String(r.risk_id))
       .filter(Boolean)
   }, [result])
+  useEffect(() => {
+    setLastAcceptAllRiskIds(readAcceptAllBatch(runId))
+  }, [runId])
+
+  useEffect(() => {
+    if (!runId) return
+    writeAcceptAllBatch(runId, lastAcceptAllRiskIds)
+  }, [runId, lastAcceptAllRiskIds])
+
+  const undoableAcceptAllRiskIds = useMemo(() => {
+    if (lastAcceptAllRiskIds.length === 0) return [] as string[]
+    const acceptedSet = new Set(acceptedRiskIds)
+    return lastAcceptAllRiskIds.filter((riskId) => acceptedSet.has(String(riskId)))
+  }, [lastAcceptAllRiskIds, acceptedRiskIds])
   const riskStats = useMemo(() => {
     const items = result?.risk_result_validated?.risk_result?.risk_items || []
     const next = { total: items.length, high: 0, medium: 0, low: 0 }
@@ -1186,6 +1238,7 @@ export default function App() {
     form.append('file', file)
     form.append('review_side', selectedReviewSide)
     form.append('contract_type_hint', serverConfig?.contract_type_hint ?? 'service_agreement')
+    form.append('analysis_scope', selectedAnalysisScope)
 
     const resp = await fetch('/api/reviews', { method: 'POST', body: form })
     if (!resp.ok) {
@@ -1200,6 +1253,7 @@ export default function App() {
       run_id: data.run_id,
       status: 'queued',
       file_name: file.name,
+      analysis_scope: selectedAnalysisScope,
       step: '已上传，等待开始审查'
     }
     setRunId(data.run_id)
@@ -1224,7 +1278,7 @@ export default function App() {
       )
     )
     navigate(buildReviewPath(data.run_id))
-  }, [file, navigate, selectedReviewSide, serverConfig])
+  }, [file, navigate, selectedAnalysisScope, selectedReviewSide, serverConfig])
 
   useEffect(() => {
     let cancelled = false
@@ -1379,8 +1433,13 @@ export default function App() {
       try {
         const resp = await fetch('/api/config')
         if (resp.ok) {
-          const config = (await resp.json()) as { review_side: string; contract_type_hint: string }
-          setServerConfig(config)
+          const config = (await resp.json()) as { review_side: string; contract_type_hint: string; analysis_scope?: AnalysisScopeOption | string }
+          setServerConfig({
+            review_side: config.review_side,
+            contract_type_hint: config.contract_type_hint,
+            analysis_scope: normalizeAnalysisScopeOption(config.analysis_scope)
+          })
+          setSelectedAnalysisScope(normalizeAnalysisScopeOption(config.analysis_scope))
         }
       } catch {
         // ignore config fetch errors, use backend defaults
@@ -1834,8 +1893,11 @@ export default function App() {
   )
 
   const onUndoAcceptAllRisks = useCallback(async () => {
-    const targetRiskIds = lastAcceptAllRiskIds.length > 0 ? lastAcceptAllRiskIds : acceptedRiskIds
-    if (targetRiskIds.length === 0) return
+    const targetRiskIds = undoableAcceptAllRiskIds
+    if (targetRiskIds.length === 0) {
+      setLastAcceptAllRiskIds([])
+      return
+    }
     const failed: string[] = []
     for (const riskId of targetRiskIds) {
       try {
@@ -1849,7 +1911,7 @@ export default function App() {
       throw new Error(`以下风险撤销失败：${failed.join('、')}`)
     }
     setLastAcceptAllRiskIds([])
-  }, [lastAcceptAllRiskIds, acceptedRiskIds, onSetRiskStatus])
+  }, [onSetRiskStatus, undoableAcceptAllRiskIds])
 
   useEffect(() => {
     if (!runId || !file || !result || !docEditorReady) return
@@ -2141,6 +2203,9 @@ export default function App() {
   const latestReview = historyEntries[0] || null
   const recentHistory = historyEntries.slice(0, 4)
 
+  const reviewProgressState = useMemo(() => computeReviewProgress(meta), [meta])
+  const isDocInteractionLocked = Boolean(isReviewing && result == null)
+
   return (
     <>
       {activeNav === 'result' ? (
@@ -2190,6 +2255,9 @@ export default function App() {
                     onReadyChange={setDocEditorReady}
                     clauseTextByUid={clauseTextByUid}
                     className="docEditor"
+                    isInteractionLocked={isDocInteractionLocked}
+                    lockLabel={reviewProgressState.label}
+                    lockProgress={reviewProgressState.percent}
                   />
                 </section>
 
@@ -2213,7 +2281,7 @@ export default function App() {
                       onSetRiskStatus={onSetRiskStatus}
                       onAcceptAllRisks={onAcceptAllRisks}
                       onUndoAcceptAllRisks={onUndoAcceptAllRisks}
-                      canUndoAcceptAllRisks={lastAcceptAllRiskIds.length > 0 || acceptedRiskIds.length > 0}
+                      canUndoAcceptAllRisks={undoableAcceptAllRiskIds.length > 0}
                       onAiApplyRisk={onAiApplyRisk}
                       onAiAcceptRisk={onAiAcceptRisk}
                       onAiEditRisk={onAiEditRisk}
@@ -2252,6 +2320,8 @@ export default function App() {
               isReviewing={isReviewing}
               reviewSide={selectedReviewSide}
               onReviewSideChange={handleReviewSideChange}
+              analysisScope={selectedAnalysisScope}
+              onAnalysisScopeChange={setSelectedAnalysisScope}
               onStartReview={async () => {
                 try {
                   await startReview()

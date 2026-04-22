@@ -67,14 +67,39 @@
   /* Upload Dashboard */
   .dashboardPage {
     @apply flex-1 bg-white m-2 md:m-4 mt-0 rounded-xl md:rounded-2xl shadow-sm border border-gray-100 flex flex-col;
-    min-height: calc(100dvh - 56px - 16px);
+    min-height: 0;
+    overflow: hidden;
   }
   .dashboardPage--withFile {
-    min-height: calc(100dvh - 56px - 16px);
+    min-height: 0;
   }
   .dashboardScroll {
-    min-height: 100%;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
     padding: clamp(10px, 1.8vh, 20px) clamp(12px, 2.4vw, 28px) clamp(16px, 2.4vh, 28px);
+  }
+  .dashboardScroll--uploaded {
+    overflow: hidden;
+  }
+  .dashboardContentLane {
+    --dashboard-content-max-width: clamp(960px, 72vw, 1240px);
+    --dashboard-content-gap: clamp(10px, 1.6vh, 18px);
+    width: min(100%, var(--dashboard-content-max-width));
+    min-width: 0;
+    min-height: 0;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--dashboard-content-gap);
+  }
+  .dashboardContentLane--uploaded {
+    flex: 1 1 auto;
   }
   .uploadHero {
     @apply max-w-3xl mx-auto text-center;
@@ -98,7 +123,7 @@
     margin-top: clamp(8px, 1.3vh, 16px);
   }
   .uploadCardContainer--uploaded {
-    width: min(100%, 606px);
+    width: 100%;
     max-width: 100%;
     border: 1px solid #dde2e8;
     border-style: solid;
@@ -116,7 +141,7 @@
     cursor: default;
     align-items: stretch;
     justify-content: flex-start;
-    padding: 22px 28px 24px;
+    padding: clamp(16px, 2vh, 22px) clamp(18px, 2.2vw, 28px) clamp(18px, 2.2vh, 24px);
     min-height: unset;
     background: #fcfcfd;
   }
@@ -160,7 +185,18 @@
   .postUploadReviewPanel {
     width: 100%;
     display: grid;
-    gap: 20px;
+    gap: clamp(14px, 1.8vh, 20px);
+  }
+  .postUploadConfigGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    gap: clamp(12px, 1.8vw, 18px);
+    align-items: start;
+  }
+  .postUploadSelectorGroup {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
   }
   .postUploadFileRow {
     display: grid;
@@ -235,19 +271,20 @@
   }
   .postUploadSideGrid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+    gap: clamp(10px, 1.4vw, 16px);
   }
   .postUploadSideCard {
-    min-height: 136px;
+    min-height: clamp(88px, 12vh, 120px);
     border-radius: 16px;
     border: 2px solid #d9dde3;
     background: #fcfcfd;
-    padding: 22px 20px;
+    padding: clamp(14px, 1.8vh, 20px) clamp(14px, 1.6vw, 18px);
     text-align: left;
     cursor: pointer;
     display: grid;
-    gap: 16px;
+    align-content: start;
+    gap: clamp(10px, 1.2vh, 14px);
     transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
   }
   .postUploadSideCard:hover {
@@ -262,7 +299,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
   }
   .postUploadSideCardTitle {
     font-size: clamp(14px, 1vw, 16px);
@@ -275,8 +312,8 @@
   }
   .postUploadSideCardDesc {
     max-width: 100%;
-    font-size: clamp(11px, 0.95vw, 13px);
-    line-height: 1.8;
+    font-size: clamp(11px, 0.9vw, 13px);
+    line-height: 1.55;
     color: #667085;
     font-weight: 500;
   }
@@ -303,7 +340,12 @@
     background: #10a35b;
   }
   @media (max-width: 860px) {
-    .uploadCardContainer--uploaded { width: min(100%, 640px); }
+    .dashboardContentLane {
+      --dashboard-content-max-width: 100%;
+    }
+    .postUploadConfigGrid {
+      grid-template-columns: 1fr;
+    }
     .postUploadFileRow {
       grid-template-columns: auto minmax(0, 1fr);
     }
@@ -311,9 +353,6 @@
       grid-column: 2;
       justify-self: end;
       margin-top: -8px;
-    }
-    .postUploadSideGrid {
-      grid-template-columns: 1fr;
     }
     .postUploadSideCardDesc {
       max-width: 100%;
@@ -376,7 +415,7 @@
   }
   .uploadActions {
     @apply max-w-3xl mx-auto flex flex-col items-center;
-    margin-top: clamp(12px, 1.8vh, 18px);
+    margin-top: clamp(10px, 1.4vh, 16px);
   }
   .reviewModeTabs {
     @apply flex items-center gap-3 md:gap-4;
@@ -398,14 +437,19 @@
   /* Core matrix section (must fit without scroll on common desktop heights like 768px) */
   .matrixSection {
     width: 100%;
-    max-width: 1040px;
+    max-width: none;
+    min-height: 0;
     margin-top: clamp(18px, 2.8vh, 34px);
     margin-bottom: clamp(8px, 1.2vh, 16px);
     padding-inline: clamp(10px, 2vw, 16px);
   }
   .matrixSection--uploaded {
-    margin-top: clamp(26px, 4vh, 54px);
-    max-width: 980px;
+    width: 100%;
+    max-width: none;
+    margin-top: clamp(10px, 1.4vh, 16px);
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
   }
   .matrixHeader {
     text-align: center;
@@ -429,11 +473,17 @@
   .matrixGrid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(14px, 1.5vw, 20px);
+    gap: clamp(12px, 1.4vw, 18px);
+    min-height: 0;
+  }
+  .matrixSection--uploaded .matrixGrid {
+    flex: 1 1 auto;
+    grid-auto-rows: 1fr;
+    align-items: stretch;
   }
   @media (max-width: 980px) {
     .matrixGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .matrixSection--uploaded { margin-top: 22px; }
+    .matrixSection--uploaded { margin-top: 14px; }
   }
   @media (max-width: 560px) {
     .matrixGrid { grid-template-columns: 1fr; }
@@ -443,9 +493,14 @@
     border: 1px solid rgb(243 244 246);
     border-radius: 18px;
     box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
-    padding: clamp(18px, 1.8vh, 24px);
+    padding: clamp(16px, 1.7vh, 22px);
     transition: box-shadow 160ms ease, transform 160ms ease;
-    min-height: clamp(178px, 20vh, 220px);
+    min-height: clamp(160px, 18vh, 220px);
+  }
+  .matrixSection--uploaded .matrixCard {
+    min-height: 0;
+    height: 100%;
+    padding: clamp(12px, 1.2vh, 18px);
   }
   .matrixCard:hover {
     box-shadow: 0 12px 26px rgba(16, 24, 40, 0.08);
@@ -471,17 +526,43 @@
   }
   .matrixList {
     display: grid;
-    gap: clamp(6px, 1.2vh, 10px);
+    gap: clamp(6px, 1vh, 10px);
+  }
+  .matrixSection--uploaded .matrixTitle {
+    font-size: clamp(15px, 1.8vh, 18px);
+    margin-bottom: 4px;
+  }
+  .matrixSection--uploaded .matrixSubtitle {
+    font-size: clamp(11px, 1.25vh, 13px);
+  }
+  .matrixSection--uploaded .matrixIcon {
+    width: clamp(34px, 4vh, 42px);
+    height: clamp(34px, 4vh, 42px);
+    margin-bottom: clamp(8px, 1vh, 12px);
+  }
+  .matrixSection--uploaded .matrixCardTitle {
+    font-size: clamp(12px, 1.45vh, 15px);
+    margin-bottom: clamp(6px, 0.8vh, 10px);
+  }
+  .matrixSection--uploaded .matrixList li {
+    line-height: 1.4;
   }
 
   /* Short screens: tighten spacing aggressively (still no zoom/scale, just smaller tokens) */
   @media (max-height: 820px) {
     .dashboardScroll { padding: 10px 16px 16px; }
+    .dashboardScroll--uploaded { row-gap: 10px; }
     .uploadHero { margin-top: 0; margin-bottom: 8px; }
     .uploadCard { min-height: 168px; padding: 16px 18px; }
-    .uploadCard--uploaded { padding: 18px 20px 20px; }
+    .uploadCard--uploaded { padding: 16px 18px 18px; }
+    .postUploadReviewPanel { gap: 12px; }
+    .postUploadSelectorGroup { gap: 10px; }
+    .postUploadSideCard { min-height: 80px; }
     .matrixSection { margin-top: 16px; }
+    .matrixSection--uploaded { margin-top: 8px; }
+    .matrixHeader { margin-bottom: 10px; }
     .matrixCard { padding: 14px; min-height: 154px; }
+    .matrixSection--uploaded .matrixCard { padding: 10px 12px; }
   }
 
   /* History Page */

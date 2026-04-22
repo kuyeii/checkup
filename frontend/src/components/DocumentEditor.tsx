@@ -798,6 +798,9 @@ export const DocumentEditor = forwardRef<
     riskHighlights?: string[]
     clauseTextByUid?: Record<string, string>
     className?: string
+    isInteractionLocked?: boolean
+    lockLabel?: string
+    lockProgress?: number | null
   }
 >(function DocumentEditor(props, ref) {
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -850,9 +853,10 @@ export const DocumentEditor = forwardRef<
       const b = el as BlockEl
       const id = b.dataset.blockId || `b_${idx + 1}`
       b.dataset.blockId = id
-      b.setAttribute('contenteditable', 'true')
+      b.setAttribute('contenteditable', props.isInteractionLocked ? 'false' : 'true')
       b.setAttribute('spellcheck', 'false')
       b.classList.add('editableBlock')
+      b.classList.toggle('editableBlock--locked', Boolean(props.isInteractionLocked))
       map.set(id, b)
     })
 
@@ -892,8 +896,9 @@ export const DocumentEditor = forwardRef<
     if (!insertionBlock) {
       insertionBlock = document.createElement('p') as BlockEl
       insertionBlock.className = 'editableBlock'
-      insertionBlock.setAttribute('contenteditable', 'true')
+      insertionBlock.setAttribute('contenteditable', props.isInteractionLocked ? 'false' : 'true')
       insertionBlock.setAttribute('spellcheck', 'false')
+      insertionBlock.classList.toggle('editableBlock--locked', Boolean(props.isInteractionLocked))
       const nextId = `b_${blockElsRef.current.size + 1}`
       insertionBlock.dataset.blockId = nextId
       if (anchorElement.parentNode) {
@@ -2269,18 +2274,62 @@ export const DocumentEditor = forwardRef<
   }, [ready, allEdits, visuals])
 
   useEffect(() => {
-    return () => {
-      if (focusTimer.current) {
-        window.clearTimeout(focusTimer.current)
+    blockElsRef.current.forEach((el) => {
+      el.setAttribute('contenteditable', props.isInteractionLocked ? 'false' : 'true')
+      el.classList.toggle('editableBlock--locked', Boolean(props.isInteractionLocked))
+    })
+  }, [props.isInteractionLocked])
+
+  useEffect(() => {
+    if (!props.isInteractionLocked) return
+    const activeEl = document.activeElement as HTMLElement | null
+    if (activeEl && docRef.current?.contains(activeEl)) {
+      activeEl.blur()
+    }
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      const anchorNode = selection.anchorNode
+      if (anchorNode && docRef.current?.contains(anchorNode)) {
+        selection.removeAllRanges()
       }
     }
-  }, [])
+  }, [props.isInteractionLocked])
+
+  const lockPercent = typeof props.lockProgress === 'number' && Number.isFinite(props.lockProgress)
+    ? Math.max(1, Math.min(99, Math.round(props.lockProgress)))
+    : null
+  const lockTitle = props.lockLabel?.trim() || '正在分析合同，请稍候…'
 
   return (
     <div className={props.className}>
-      <div ref={scrollRef} className="docScroll">
+      <div ref={scrollRef} className={`docScroll ${props.isInteractionLocked ? 'docScroll--locked' : ''}`}>
         {!ready ? <div className="emptyState">正在加载文档…</div> : null}
         <div ref={rowRef} className={`docRow ${hasComments ? 'docRow--withComments' : 'docRow--compact'}`}>
+          {props.isInteractionLocked ? (
+            <div className="docInteractionMask" aria-live="polite" aria-busy="true">
+              <div className="docInteractionMaskViewport">
+                <div className="docInteractionMaskCard">
+                  <div className="docInteractionMaskDots" aria-hidden="true">
+                    <span className="docInteractionMaskDot" />
+                    <span className="docInteractionMaskDot" />
+                    <span className="docInteractionMaskDot" />
+                    <span className="docInteractionMaskDot" />
+                    <span className="docInteractionMaskDot" />
+                  </div>
+                  <div className="docInteractionMaskTitle">正在分析合同</div>
+                  <div className="docInteractionMaskText">{lockTitle}</div>
+                  <div className="docInteractionMaskHint">分析完成后自动恢复编辑，避免处理中误改原文。</div>
+                  <div className="docInteractionMaskBar" aria-hidden="true">
+                    <span className="docInteractionMaskBarFill" style={lockPercent == null ? undefined : { width: `${lockPercent}%` }} />
+                  </div>
+                  <div className="docInteractionMaskMeta">
+                    <span>{lockPercent == null ? '处理中' : `已完成 ${lockPercent}%`}</span>
+                    <span>原文已临时锁定</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
           <div className="docCanvas" ref={canvasRef}>
             <div ref={docRef} />
             <div className="changeOverlay" aria-hidden="true">

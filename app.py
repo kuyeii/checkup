@@ -19,6 +19,7 @@ from src.normalize_clauses import normalize_clause_records, normalize_clauses
 from src.split_segments import split_into_segments
 from src.validate_risks import validate_risk_result
 from src.workflow_runner import WorkflowRunner
+from src.analysis_scope import apply_analysis_scope, normalize_analysis_scope
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -216,22 +217,28 @@ def main() -> int:
         missing_multi_payload=risk_stream_payloads.get("missing_multi", {}),
         clauses=merged_clauses,
     )
+    analysis_scope = normalize_analysis_scope(getattr(settings, "analysis_scope", "full_detail"))
+    scoped_risk_payload = apply_analysis_scope(normalized_risk_payload, analysis_scope)
     write_json(
         run_dir / "risk_result_raw.json",
         {
             "anchored": risk_stream_payloads.get("anchored", {}),
             "missing_multi": risk_stream_payloads.get("missing_multi", {}),
             "unified": normalized_risk_payload,
+            "scoped": scoped_risk_payload,
+            "analysis_scope": analysis_scope,
         },
     )
-    write_json(run_dir / "risk_result_normalized.json", normalized_risk_payload)
+    write_json(run_dir / "risk_result_normalized.full.json", normalized_risk_payload)
+    write_json(run_dir / "risk_result_normalized.json", scoped_risk_payload)
 
     print("[6/6] Validating risk result...")
-    is_valid, error_message = validate_risk_result(normalized_risk_payload)
+    is_valid, error_message = validate_risk_result(scoped_risk_payload)
     validated = {
         "is_valid": is_valid,
         "error_message": error_message,
-        "risk_result": normalized_risk_payload,
+        "risk_result": scoped_risk_payload,
+        "analysis_scope": analysis_scope,
     }
     write_json(run_dir / "risk_result_validated.json", validated)
 
