@@ -312,10 +312,6 @@ export function RiskPanel(props: {
   onLocateRisk: (opts: { riskId?: number | string; riskSourceType?: string; targetText?: string; anchorText?: string; evidenceText?: string; clauseUids?: string[] }) => void
   onAcceptRisk?: (riskId: number | string, opts?: { revisedText?: string }) => Promise<void>
   onRejectRisk?: (riskId: number | string) => Promise<void>
-  onSetRiskStatus?: (riskId: number | string, status: 'pending' | 'accepted' | 'rejected') => Promise<void>
-  onAcceptAllRisks?: () => Promise<void>
-  onUndoAcceptAllRisks?: () => Promise<void>
-  canUndoAcceptAllRisks?: boolean
 
   /** Legacy APIs (old backend) */
   onAiApplyRisk?: (riskId: number | string) => Promise<void>
@@ -330,7 +326,6 @@ export function RiskPanel(props: {
   const [editorDraftText, setEditorDraftText] = useState('')
   const [editorMode, setEditorMode] = useState<'ai' | 'suggest'>('ai')
   const [localDraftById, setLocalDraftById] = useState<Record<string, string>>({})
-  const [lastAction, setLastAction] = useState<{ riskId: string; riskLabel: string; action: 'accepted' | 'rejected' } | null>(null)
   const riskListRef = useRef<HTMLDivElement | null>(null)
   const pendingRiskListScrollTopRef = useRef<number | null>(null)
 
@@ -482,31 +477,6 @@ export function RiskPanel(props: {
         <div className="riskEmptyState">请先在左侧进入“文件上传”，开始新的合同审查。</div>
       ) : (
         <>
-          {lastAction && props.onSetRiskStatus ? (
-            <div className="riskControls">
-              <div className="riskUndoBar">
-                <div className="riskUndoBarText">
-                  <span className="riskUndoBarTitle">{lastAction.riskLabel}</span>
-                  <span className="riskUndoBarMeta">{lastAction.action === 'accepted' ? '已接受 1 条风险点' : '已拒绝 1 条风险点'}</span>
-                </div>
-                <button
-                  className="btnSmall"
-                  onClick={async () => {
-                    try {
-                      snapshotRiskListScroll()
-                      await props.onSetRiskStatus?.(lastAction.riskId, 'pending')
-                      setLastAction(null)
-                    } catch (e) {
-                      alert(`撤销失败：${String(e)}`)
-                    }
-                  }}
-                >
-                  撤销
-                </button>
-              </div>
-            </div>
-          ) : null}
-
           <div className="riskList" ref={riskListRef}>
             {grouped.map(([dim, items]) => (
               <details key={dim} className="riskGroup" open>
@@ -654,7 +624,6 @@ export function RiskPanel(props: {
                               try {
                                 snapshotRiskListScroll()
                                 await props.onRejectRisk?.(r.risk_id)
-                                setLastAction({ riskId: String(r.risk_id), riskLabel: presentRiskLabel(r), action: 'rejected' })
                               } catch (e) {
                                 console.error('拒绝失败', e)
                                 alert(`拒绝失败：${String(e)}`)
@@ -677,7 +646,6 @@ export function RiskPanel(props: {
                               ).trim()
                               try {
                                 await props.onAcceptRisk?.(r.risk_id, { revisedText: effectiveRevised || undefined })
-                                setLastAction({ riskId: String(r.risk_id), riskLabel: presentRiskLabel(r), action: 'accepted' })
                               } catch (e) {
                                 console.error('接受失败', e)
                                 showAcceptError(e, '接受失败：')
@@ -698,25 +666,7 @@ export function RiskPanel(props: {
                   {acceptedCount > 0 ? '当前没有待处理风险点' : '当前筛选条件下没有风险项。'}
                 </div>
                 {acceptedCount > 0 ? (
-                  <>
-                    <div className="riskEmptyStateDesc">本次风险已全部接受。如需继续调整，可以先恢复为待处理，再重新逐条处理。</div>
-                    {props.onUndoAcceptAllRisks ? (
-                      <button
-                        className="btnSmall btnSmall--primary"
-                        disabled={!props.canUndoAcceptAllRisks}
-                        onClick={async () => {
-                          try {
-                            snapshotRiskListScroll()
-                            await props.onUndoAcceptAllRisks?.()
-                          } catch (e) {
-                            alert(`恢复失败：${String(e)}`)
-                          }
-                        }}
-                      >
-                        恢复全部为待处理
-                      </button>
-                    ) : null}
-                  </>
+                  <div className="riskEmptyStateDesc">本次风险已全部接受。如需回退最近一次操作，可使用顶部的撤销按钮。</div>
                 ) : null}
               </div>
             ) : null}

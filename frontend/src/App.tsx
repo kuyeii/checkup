@@ -49,6 +49,10 @@ type HistoryApiItem = {
   document_ready?: boolean
 }
 
+type UndoAction = {
+  riskIds: string[]
+}
+
 function pickFilenameFromDisposition(contentDisposition: string | null, fallback: string) {
   if (!contentDisposition) return fallback
   const utf8 = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i)
@@ -96,7 +100,6 @@ const AUTO_AI_DISABLED_STORAGE_KEY = 'markup:autoAiApplyAllDisabled'
 const AUTO_AI_TRIGGERED_STORAGE_KEY = 'markup:autoAiApplyAllTriggeredRunIds'
 const ACTIVE_RUN_ID_STORAGE_KEY = 'markup:activeRunId'
 const REVIEW_SNAPSHOT_STORAGE_KEY = 'markup:reviewSnapshotByRun'
-const ACCEPT_ALL_BATCH_STORAGE_KEY_PREFIX = 'markup:acceptAllBatch:'
 const PREVIEW_WAITING_QUERY_KEY = 'preview_waiting'
 const PREVIEW_AUTO_COMPLETE_QUERY_KEY = 'preview_auto_complete'
 
@@ -229,35 +232,6 @@ function removeLocalValue(key: string) {
   } catch {
     return
   }
-}
-
-function acceptAllBatchStorageKey(runId?: string | null) {
-  return `${ACCEPT_ALL_BATCH_STORAGE_KEY_PREFIX}${String(runId || '').trim()}`
-}
-
-function readAcceptAllBatch(runId?: string | null) {
-  const key = String(runId || '').trim()
-  if (!key) return [] as string[]
-  const raw = readLocalValue(acceptAllBatchStorageKey(key))
-  if (!raw) return [] as string[]
-  try {
-    const parsed = JSON.parse(raw) as unknown
-    if (!Array.isArray(parsed)) return [] as string[]
-    return parsed.map((item) => String(item || '').trim()).filter(Boolean)
-  } catch {
-    return [] as string[]
-  }
-}
-
-function writeAcceptAllBatch(runId: string, riskIds: string[]) {
-  const key = String(runId || '').trim()
-  if (!key) return
-  const normalized = riskIds.map((item) => String(item || '').trim()).filter(Boolean)
-  if (normalized.length === 0) {
-    removeLocalValue(acceptAllBatchStorageKey(key))
-    return
-  }
-  writeLocalValue(acceptAllBatchStorageKey(key), JSON.stringify(Array.from(new Set(normalized))))
 }
 
 
@@ -613,7 +587,7 @@ export default function App() {
   const [edits, setEdits] = useState<EditSummary[]>([])
   const [historyEntries, setHistoryEntries] = useState<SessionReviewEntry[]>([])
   const [serverConfig, setServerConfig] = useState<{ review_side: string; contract_type_hint: string; analysis_scope: AnalysisScopeOption | string } | null>(null)
-  const [lastAcceptAllRiskIds, setLastAcceptAllRiskIds] = useState<string[]>([])
+  const [lastUndoAction, setLastUndoAction] = useState<UndoAction | null>(null)
   const [docEditorReady, setDocEditorReady] = useState(false)
   const [dialog, setDialog] = useState<{ open: boolean; title: string; message: string }>({
     open: false,
@@ -670,6 +644,17 @@ export default function App() {
     const nextError = toUserFacingError(error, { title: fallbackTitle })
     openDialog(nextError.message, nextError.title)
   }, [openDialog])
+
+  const recordUndoAction = useCallback((riskIds: Array<string | number>) => {
+    const normalized = Array.from(
+      new Set(
+        riskIds
+          .map((item) => String(item || '').trim())
+          .filter(Boolean)
+      )
+    )
+    setLastUndoAction(normalized.length > 0 ? { riskIds: normalized } : null)
+  }, [])
 
   const applyWorkspaceFile = useCallback((nextFile: File | null, options?: { preserveReviewSide?: boolean }) => {
     setFile(nextFile)
@@ -837,7 +822,7 @@ export default function App() {
   }, [runId])
 
   useEffect(() => {
-    setLastAcceptAllRiskIds([])
+    setLastUndoAction(null)
     restoredAcceptedCommentRunRef.current = null
     setDocEditorReady(false)
   }, [runId])
@@ -997,27 +982,6 @@ export default function App() {
       return status === '' || status === 'pending'
     }).length
   }, [result])
-  const acceptedRiskIds = useMemo(() => {
-    const items = result?.risk_result_validated?.risk_result?.risk_items || []
-    return items
-      .filter((r) => isAcceptedRiskStatus(r?.status))
-      .map((r) => String(r.risk_id))
-      .filter(Boolean)
-  }, [result])
-  useEffect(() => {
-    setLastAcceptAllRiskIds(readAcceptAllBatch(runId))
-  }, [runId])
-
-  useEffect(() => {
-    if (!runId) return
-    writeAcceptAllBatch(runId, lastAcceptAllRiskIds)
-  }, [runId, lastAcceptAllRiskIds])
-
-  const undoableAcceptAllRiskIds = useMemo(() => {
-    if (lastAcceptAllRiskIds.length === 0) return [] as string[]
-    const acceptedSet = new Set(acceptedRiskIds)
-    return lastAcceptAllRiskIds.filter((riskId) => acceptedSet.has(String(riskId)))
-  }, [lastAcceptAllRiskIds, acceptedRiskIds])
   const riskStats = useMemo(() => {
     const items = result?.risk_result_validated?.risk_result?.risk_items || []
     const next = { total: items.length, high: 0, medium: 0, low: 0 }
@@ -1882,13 +1846,13 @@ export default function App() {
     }
 
     if (failedRiskIds.length > 0) {
+      const error: Error & { appliedRiskIds?: string[] } = new Error(`以下风险未接受成功：${failedRiskIds.join('、')}`)
       if (acceptedRiskIds.length > 0) {
-        // Even if some items fail, allow "一键撤销接受全部" to rollback succeeded ones.
-        setLastAcceptAllRiskIds(acceptedRiskIds)
+        error.appliedRiskIds = acceptedRiskIds
       }
-      throw new Error(`以下风险未接受成功：${failedRiskIds.join('、')}`)
+      throw error
     }
-    setLastAcceptAllRiskIds(acceptedRiskIds)
+    return acceptedRiskIds
   }, [runId, result, onSetRiskStatus, mergeUpdatedRisk])
 
   /**
@@ -1903,10 +1867,10 @@ export default function App() {
     [onAcceptRisk]
   )
 
-  const onUndoAcceptAllRisks = useCallback(async () => {
-    const targetRiskIds = undoableAcceptAllRiskIds
+  const onUndoLastAction = useCallback(async () => {
+    const targetRiskIds = lastUndoAction?.riskIds || []
     if (targetRiskIds.length === 0) {
-      setLastAcceptAllRiskIds([])
+      setLastUndoAction(null)
       return
     }
     const failed: string[] = []
@@ -1918,11 +1882,40 @@ export default function App() {
       }
     }
     if (failed.length > 0) {
-      setLastAcceptAllRiskIds(failed)
-      throw new Error(`以下风险撤销失败：${failed.join('、')}`)
+      setLastUndoAction({ riskIds: failed })
+      throw new Error('撤销未完成，请稍后重试。')
     }
-    setLastAcceptAllRiskIds([])
-  }, [onSetRiskStatus, undoableAcceptAllRiskIds])
+    setLastUndoAction(null)
+  }, [lastUndoAction, onSetRiskStatus])
+
+  const handleAcceptRisk = useCallback(
+    async (riskId: number | string, opts?: { revisedText?: string }) => {
+      await onAcceptRisk(riskId, opts)
+      recordUndoAction([riskId])
+    },
+    [onAcceptRisk, recordUndoAction]
+  )
+
+  const handleRejectRisk = useCallback(
+    async (riskId: number | string) => {
+      await onRejectRisk(riskId)
+      recordUndoAction([riskId])
+    },
+    [onRejectRisk, recordUndoAction]
+  )
+
+  const handleAcceptAllRisks = useCallback(async () => {
+    try {
+      const acceptedRiskIds = await onAcceptAllRisks()
+      recordUndoAction(acceptedRiskIds)
+    } catch (error) {
+      const partialRiskIds = Array.isArray((error as any)?.appliedRiskIds) ? (error as any).appliedRiskIds : []
+      if (partialRiskIds.length > 0) {
+        recordUndoAction(partialRiskIds)
+      }
+      throw error
+    }
+  }, [onAcceptAllRisks, recordUndoAction])
 
   useEffect(() => {
     if (!runId || !file || !result || !docEditorReady) return
@@ -2250,8 +2243,10 @@ export default function App() {
                 onGoUpload={goUploadPage}
                 onGoHistory={goHistoryPage}
                 downloadUrl={result?.download_url || null}
-                onAcceptAllRisks={onAcceptAllRisks}
+                onAcceptAllRisks={handleAcceptAllRisks}
                 canAcceptAllRisks={pendingRiskCount > 0}
+                onUndoLastAction={onUndoLastAction}
+                canUndoLastAction={Boolean(lastUndoAction?.riskIds.length)}
               />
 
               <div className="mainGrid">
@@ -2289,12 +2284,8 @@ export default function App() {
                       runId={runId}
                       riskStats={riskStats}
                       onLocateRisk={onLocateRisk}
-                      onAcceptRisk={onAcceptRisk}
-                      onRejectRisk={onRejectRisk}
-                      onSetRiskStatus={onSetRiskStatus}
-                      onAcceptAllRisks={onAcceptAllRisks}
-                      onUndoAcceptAllRisks={onUndoAcceptAllRisks}
-                      canUndoAcceptAllRisks={undoableAcceptAllRiskIds.length > 0}
+                      onAcceptRisk={handleAcceptRisk}
+                      onRejectRisk={handleRejectRisk}
                       onAiApplyRisk={onAiApplyRisk}
                       onAiAcceptRisk={onAiAcceptRisk}
                       onAiEditRisk={onAiEditRisk}

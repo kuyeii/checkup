@@ -14,6 +14,8 @@ export function TopBar(props: {
   downloadUrl: string | null
   onAcceptAllRisks?: () => Promise<void> | void
   canAcceptAllRisks?: boolean
+  onUndoLastAction?: () => Promise<void> | void
+  canUndoLastAction?: boolean
 }) {
   return (
     <header className="topBar glassPane">
@@ -54,10 +56,27 @@ export function TopBar(props: {
             className="btn"
             disabled={!props.canAcceptAllRisks || !props.onAcceptAllRisks}
             onClick={async () => {
-              await props.onAcceptAllRisks?.()
+              try {
+                await props.onAcceptAllRisks?.()
+              } catch (e) {
+                alert(String((e as any)?.message || e || '操作失败'))
+              }
             }}
           >
             一键接受全部
+          </button>
+          <button
+            className="btn"
+            disabled={!props.canUndoLastAction || !props.onUndoLastAction}
+            onClick={async () => {
+              try {
+                await props.onUndoLastAction?.()
+              } catch (e) {
+                alert(String((e as any)?.message || e || '撤销失败'))
+              }
+            }}
+          >
+            撤销
           </button>
         </div>
 
