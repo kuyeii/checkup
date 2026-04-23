@@ -140,7 +140,6 @@ export function ReviewProgress(props: {
   meta: ReviewMeta | null
   runId: string | null
   onGoUpload?: () => void
-  onGoHistory?: () => void
   onRestart?: () => void
 }) {
   const baseProg = useMemo(() => computeProgress(props.meta), [props.meta])

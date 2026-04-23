@@ -10,13 +10,21 @@ export function TopBar(props: {
   isReviewing: boolean
   onBack?: () => void
   onGoUpload: () => void
-  onGoHistory: () => void
   downloadUrl: string | null
   onAcceptAllRisks?: () => Promise<void> | void
   canAcceptAllRisks?: boolean
   onUndoLastAction?: () => Promise<void> | void
   canUndoLastAction?: boolean
+  onActionError?: (error: unknown, fallbackTitle: string) => void
 }) {
+  const handleActionError = (error: unknown, fallbackTitle: string) => {
+    if (props.onActionError) {
+      props.onActionError(error, fallbackTitle)
+      return
+    }
+    alert(String((error as any)?.message || error || fallbackTitle))
+  }
+
   return (
     <header className="topBar glassPane">
       <div className="topBarLead">
@@ -44,9 +52,6 @@ export function TopBar(props: {
           <button className="btn" onClick={props.onGoUpload}>
             上传新合同
           </button>
-          <button className="btn" onClick={props.onGoHistory}>
-            审查记录
-          </button>
           {props.downloadUrl ? (
             <a className="btn btnPrimary" href={props.downloadUrl} target="_blank" rel="noreferrer">
               下载带批注 DOCX
@@ -59,7 +64,7 @@ export function TopBar(props: {
               try {
                 await props.onAcceptAllRisks?.()
               } catch (e) {
-                alert(String((e as any)?.message || e || '操作失败'))
+                handleActionError(e, '一键接受未完成')
               }
             }}
           >
@@ -72,7 +77,7 @@ export function TopBar(props: {
               try {
                 await props.onUndoLastAction?.()
               } catch (e) {
-                alert(String((e as any)?.message || e || '撤销失败'))
+                handleActionError(e, '撤销未完成')
               }
             }}
           >

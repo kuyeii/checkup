@@ -667,12 +667,51 @@ button, input { font: inherit; }
   gap: 12px;
   padding: 12px;
 }
+.mainGrid--resizable {
+  grid-template-columns: minmax(0, 1fr) 14px var(--review-risk-pane-width, 440px);
+  gap: 0;
+}
+.mainGrid--resizable > .docPane,
+.mainGrid--resizable > .riskPane {
+  width: 100%;
+  min-width: 0;
+  justify-self: stretch;
+}
+.mainGrid--dragging {
+  cursor: col-resize;
+}
 .docPane, .riskPane {
   min-height: 0;
   display: flex;
   flex-direction: column;
   border-radius: 28px;
   overflow: hidden;
+}
+.mainGridDivider {
+  width: 14px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: col-resize;
+  touch-action: none;
+}
+.mainGridDividerHandle {
+  width: 4px;
+  height: 72px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.72);
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.04);
+  transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+.mainGridDivider:hover .mainGridDividerHandle,
+.mainGridDivider--dragging .mainGridDividerHandle {
+  background: rgba(59, 130, 246, 0.9);
+  box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.12);
+  transform: scaleY(1.05);
 }
 .paneHeader {
   padding: 14px 18px;
@@ -697,6 +736,14 @@ button, input { font: inherit; }
   .topBarActions,
   .topBarMeta {
     justify-self: start;
+  }
+}
+@media (max-width: 980px) {
+  .mainGrid--resizable {
+    grid-template-columns: 1fr;
+  }
+  .mainGridDivider {
+    display: none;
   }
 }
 

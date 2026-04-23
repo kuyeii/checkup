@@ -53,6 +53,11 @@ type UndoAction = {
   riskIds: string[]
 }
 
+const REVIEW_SPLIT_MIN_DOC_WIDTH = 420
+const REVIEW_SPLIT_MIN_RISK_WIDTH = 320
+const REVIEW_SPLIT_MAX_RISK_WIDTH = 760
+const REVIEW_SPLIT_DIVIDER_WIDTH = 14
+
 function pickFilenameFromDisposition(contentDisposition: string | null, fallback: string) {
   if (!contentDisposition) return fallback
   const utf8 = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i)
@@ -588,6 +593,8 @@ export default function App() {
   const [historyEntries, setHistoryEntries] = useState<SessionReviewEntry[]>([])
   const [serverConfig, setServerConfig] = useState<{ review_side: string; contract_type_hint: string; analysis_scope: AnalysisScopeOption | string } | null>(null)
   const [lastUndoAction, setLastUndoAction] = useState<UndoAction | null>(null)
+  const [reviewRiskPaneWidth, setReviewRiskPaneWidth] = useState(440)
+  const [isReviewSplitDragging, setIsReviewSplitDragging] = useState(false)
   const [docEditorReady, setDocEditorReady] = useState(false)
   const [dialog, setDialog] = useState<{ open: boolean; title: string; message: string }>({
     open: false,
@@ -608,6 +615,8 @@ export default function App() {
   const pollingSeqRef = useRef(0)
   const currentRunIdRef = useRef<string | null>(null)
   const routeLoadingRunIdRef = useRef<string | null>(null)
+  const reviewMainGridRef = useRef<HTMLDivElement | null>(null)
+  const reviewSplitCleanupRef = useRef<(() => void) | null>(null)
   const newRunIdRef = useRef<string | null>(readSessionValue(NEW_RUN_ID_STORAGE_KEY))
   const autoAiTriggeredRef = useRef<Set<string>>(parseTriggeredRunIds(readSessionValue(AUTO_AI_TRIGGERED_STORAGE_KEY)))
   const autoAiInFlightRef = useRef<Set<string>>(new Set())
@@ -655,6 +664,77 @@ export default function App() {
     )
     setLastUndoAction(normalized.length > 0 ? { riskIds: normalized } : null)
   }, [])
+
+  const clampReviewRiskPaneWidth = useCallback((nextWidth: number) => {
+    const containerWidth = reviewMainGridRef.current?.clientWidth || 0
+    const safeWidth = Number.isFinite(nextWidth) ? nextWidth : 440
+    const minWidth = REVIEW_SPLIT_MIN_RISK_WIDTH
+    if (!containerWidth) {
+      return Math.min(Math.max(safeWidth, minWidth), REVIEW_SPLIT_MAX_RISK_WIDTH)
+    }
+    const maxWidth = Math.max(
+      minWidth,
+      Math.min(REVIEW_SPLIT_MAX_RISK_WIDTH, containerWidth - REVIEW_SPLIT_MIN_DOC_WIDTH - REVIEW_SPLIT_DIVIDER_WIDTH)
+    )
+    return Math.min(Math.max(safeWidth, minWidth), maxWidth)
+  }, [])
+
+  const stopReviewSplitDrag = useCallback(() => {
+    reviewSplitCleanupRef.current?.()
+    reviewSplitCleanupRef.current = null
+    setIsReviewSplitDragging(false)
+  }, [])
+
+  const beginReviewSplitDrag = useCallback((event: React.PointerEvent<HTMLButtonElement>) => {
+    if (window.matchMedia('(max-width: 980px)').matches) return
+    event.preventDefault()
+    stopReviewSplitDrag()
+
+    const startX = event.clientX
+    const startWidth = reviewRiskPaneWidth
+    setIsReviewSplitDragging(true)
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const nextWidth = startWidth + (startX - moveEvent.clientX)
+      setReviewRiskPaneWidth(clampReviewRiskPaneWidth(nextWidth))
+    }
+
+    const cleanup = () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerup', finishDrag)
+      window.removeEventListener('pointercancel', finishDrag)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+
+    const finishDrag = () => {
+      cleanup()
+      reviewSplitCleanupRef.current = null
+      setIsReviewSplitDragging(false)
+    }
+
+    reviewSplitCleanupRef.current = cleanup
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    window.addEventListener('pointermove', handlePointerMove)
+    window.addEventListener('pointerup', finishDrag)
+    window.addEventListener('pointercancel', finishDrag)
+  }, [clampReviewRiskPaneWidth, reviewRiskPaneWidth, stopReviewSplitDrag])
+
+  useEffect(() => {
+    const handleResize = () => {
+      setReviewRiskPaneWidth((current) => clampReviewRiskPaneWidth(current))
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      reviewSplitCleanupRef.current?.()
+      reviewSplitCleanupRef.current = null
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [clampReviewRiskPaneWidth])
 
   const applyWorkspaceFile = useCallback((nextFile: File | null, options?: { preserveReviewSide?: boolean }) => {
     setFile(nextFile)
@@ -2211,6 +2291,13 @@ export default function App() {
 
   const reviewProgressState = useMemo(() => computeReviewProgress(meta), [meta])
   const isDocInteractionLocked = Boolean(isReviewing && result == null)
+  const reviewMainGridStyle = useMemo(
+    () =>
+      ({
+        ['--review-risk-pane-width' as '--review-risk-pane-width']: `${reviewRiskPaneWidth}px`
+      }) as React.CSSProperties,
+    [reviewRiskPaneWidth]
+  )
 
   return (
     <>
@@ -2241,15 +2328,19 @@ export default function App() {
                   navigate(pathForNav(prevNavRef.current))
                 }}
                 onGoUpload={goUploadPage}
-                onGoHistory={goHistoryPage}
                 downloadUrl={result?.download_url || null}
                 onAcceptAllRisks={handleAcceptAllRisks}
                 canAcceptAllRisks={pendingRiskCount > 0}
                 onUndoLastAction={onUndoLastAction}
                 canUndoLastAction={Boolean(lastUndoAction?.riskIds.length)}
+                onActionError={showErrorDialog}
               />
 
-              <div className="mainGrid">
+              <div
+                ref={reviewMainGridRef}
+                className={`mainGrid mainGrid--resizable ${isReviewSplitDragging ? 'mainGrid--dragging' : ''}`}
+                style={reviewMainGridStyle}
+              >
                 <section className="docPane glassPane">
                   <div className="paneHeader">
                     <div className="paneTitle">合同原件</div>
@@ -2269,13 +2360,21 @@ export default function App() {
                   />
                 </section>
 
+                <button
+                  type="button"
+                  className={`mainGridDivider ${isReviewSplitDragging ? 'mainGridDivider--dragging' : ''}`}
+                  aria-label="拖动调整左右栏宽度"
+                  onPointerDown={beginReviewSplitDrag}
+                >
+                  <span className="mainGridDividerHandle" />
+                </button>
+
                 <aside className="riskPane glassPane">
                   {isRouteHydrating ? null : result == null ? (
                     <ReviewProgress
                       meta={meta}
                       runId={runId}
                       onGoUpload={goUploadPage}
-                      onGoHistory={goHistoryPage}
                       onRestart={goUploadPage}
                     />
                   ) : (

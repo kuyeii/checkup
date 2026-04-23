@@ -717,6 +717,15 @@ padding: 10px 14px;
   align-items: stretch;
   border-top: 1px solid rgba(15,23,42,0.08);
 }
+.legacyReview .mainGrid--resizable {
+  grid-template-columns: minmax(0, 1fr) 14px var(--review-risk-pane-width, 440px);
+}
+.legacyReview .mainGrid--resizable > .docPane,
+.legacyReview .mainGrid--resizable > .riskPane {
+  width: 100%;
+  min-width: 0;
+  justify-self: stretch;
+}
 .legacyReview .docPane, .legacyReview .riskPane {
   min-height: 0;
   display: flex;
@@ -725,7 +734,35 @@ padding: 10px 14px;
   overflow: hidden;
 }
 .legacyReview .riskPane {
+  border-left: 0;
+}
+.legacyReview .mainGridDivider {
+  width: 14px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
   border-left: 1px solid rgba(15,23,42,0.08);
+  border-right: 1px solid rgba(15,23,42,0.08);
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: col-resize;
+  touch-action: none;
+}
+.legacyReview .mainGridDividerHandle {
+  width: 4px;
+  height: 72px;
+  border-radius: 999px;
+  background: rgba(148,163,184,0.78);
+  box-shadow: 0 0 0 4px rgba(15,23,42,0.04);
+  transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+.legacyReview .mainGridDivider:hover .mainGridDividerHandle,
+.legacyReview .mainGridDivider--dragging .mainGridDividerHandle {
+  background: rgba(37,99,235,0.92);
+  box-shadow: 0 0 0 5px rgba(37,99,235,0.12);
+  transform: scaleY(1.05);
 }
 
 .legacyReview .paneHeader {
@@ -825,6 +862,9 @@ display: none;
   }
   .legacyReview .dashboardStatsGrid, .legacyReview .historySummaryGrid, .legacyReview .historyRow, .legacyReview .mainGrid {
     grid-template-columns: 1fr;
+  }
+  .legacyReview .mainGridDivider {
+    display: none;
   }
   .legacyReview .historyFeatured, .legacyReview .topBar, .legacyReview .topBarLead, .legacyReview .topBarActions, .legacyReview .topBarMeta, .legacyReview .topBarRight {
     display: flex;
