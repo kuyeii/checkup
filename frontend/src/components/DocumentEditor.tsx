@@ -52,6 +52,8 @@ type LocatedRiskHint = {
   updatedAt: number
 }
 
+const LOCK_PROGRESS_STEP_COUNT = 10
+
 export type AppliedAiPatchSnapshot = {
   patchId: string
   targetText: string
@@ -2298,7 +2300,13 @@ export const DocumentEditor = forwardRef<
   const lockPercent = typeof props.lockProgress === 'number' && Number.isFinite(props.lockProgress)
     ? Math.max(1, Math.min(99, Math.round(props.lockProgress)))
     : null
-  const lockTitle = props.lockLabel?.trim() || '正在分析合同，请稍候…'
+  const filledProgressSteps = Math.max(
+    1,
+    Math.min(
+      LOCK_PROGRESS_STEP_COUNT,
+      Math.ceil((lockPercent ?? 1) / (100 / LOCK_PROGRESS_STEP_COUNT))
+    )
+  )
 
   return (
     <div className={props.className}>
@@ -2309,22 +2317,32 @@ export const DocumentEditor = forwardRef<
             <div className="docInteractionMask" aria-live="polite" aria-busy="true">
               <div className="docInteractionMaskViewport">
                 <div className="docInteractionMaskCard">
-                  <div className="docInteractionMaskDots" aria-hidden="true">
-                    <span className="docInteractionMaskDot" />
-                    <span className="docInteractionMaskDot" />
-                    <span className="docInteractionMaskDot" />
-                    <span className="docInteractionMaskDot" />
-                    <span className="docInteractionMaskDot" />
+                  <div className="docInteractionMaskText" aria-label="正在审核中......">
+                    <span className="docInteractionMaskTextLabel">正在审核中</span>
+                    <span className="docInteractionMaskEllipsis" aria-hidden="true">
+                      {Array.from({ length: 6 }).map((_, idx) => (
+                        <span
+                          key={`ellipsis-dot-${idx}`}
+                          className="docInteractionMaskEllipsisDot"
+                          style={{ animationDelay: `${idx * 0.14}s` }}
+                        >
+                          .
+                        </span>
+                      ))}
+                    </span>
                   </div>
-                  <div className="docInteractionMaskTitle">正在分析合同</div>
-                  <div className="docInteractionMaskText">{lockTitle}</div>
-                  <div className="docInteractionMaskHint">分析完成后自动恢复编辑，避免处理中误改原文。</div>
-                  <div className="docInteractionMaskBar" aria-hidden="true">
-                    <span className="docInteractionMaskBarFill" style={lockPercent == null ? undefined : { width: `${lockPercent}%` }} />
-                  </div>
-                  <div className="docInteractionMaskMeta">
-                    <span>{lockPercent == null ? '处理中' : `已完成 ${lockPercent}%`}</span>
-                    <span>原文已临时锁定</span>
+                  <div
+                    className="docInteractionMaskProgress"
+                    role="img"
+                    aria-label={`审核进度 ${filledProgressSteps}/${LOCK_PROGRESS_STEP_COUNT}`}
+                  >
+                    {Array.from({ length: LOCK_PROGRESS_STEP_COUNT }).map((_, idx) => (
+                      <span
+                        key={`progress-step-${idx}`}
+                        className={`docInteractionMaskProgressDot ${idx < filledProgressSteps ? 'docInteractionMaskProgressDot--filled' : ''}`}
+                        aria-hidden="true"
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
