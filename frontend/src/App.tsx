@@ -11,6 +11,7 @@ import { UploadDashboard } from './components/UploadDashboard'
 import { ReviewProgress, computeProgress as computeReviewProgress } from './components/ReviewProgress'
 import type { AnalysisScopeOption, EditSummary, ReviewHistoryItem, ReviewMeta, ReviewResultPayload, ReviewSideOption } from './types'
 import { readApiError, toUserFacingError } from './utils/appError'
+import { normalizeRiskTextForDisplay } from './utils/riskText'
 
 async function sleep(ms: number) {
   await new Promise((r) => setTimeout(r, ms))
@@ -469,19 +470,6 @@ function pickBestPatchTarget(risk: any, preferredTarget?: string) {
   return ''
 }
 
-function normalizeRiskTextForDisplay(value: unknown) {
-  return String(value || '')
-    .replace(/[【\[][^【】\[\]\n]{0,80}_[A-Za-z0-9-]{2,}[】\]]\s*/g, '')
-    .replace(/(?:^|\s)(?:RULE|TPL|POLICY|CHECK|REG|MODEL|STD|CLAUSE)_[A-Za-z0-9_-]+(?=\s|$)/g, ' ')
-    .replace(/segment_[A-Za-z0-9_-]+::[A-Za-z0-9_.()（）-]+/g, ' ')
-    .replace(/(?:条款|条文|clause)\s*[0-9]+(?:\.[A-Za-z0-9]+)+/gi, ' ')
-    .replace(/\b[0-9]+(?:\.[A-Za-z][A-Za-z0-9]*)+\b/g, ' ')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/([。！？])\s*；+/g, '$1')
-    .replace(/；+\s*([。！？])/g, '$1')
-    .replace(/；{2,}/g, '；')
-    .trim()
-}
 
 function pickSuggestionInsertText(risk: any) {
   if (!risk || typeof risk !== 'object') return ''

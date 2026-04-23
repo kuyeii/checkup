@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import DiffMatchPatch from 'diff-match-patch'
 import type { ReviewResultPayload, RiskItem } from '../types'
+import { isSuggestionInsertCommentText, normalizeRiskTextForDisplay } from '../utils/riskText'
 
 function levelLabel(level: string) {
   if (level === 'high') return '高'
@@ -15,18 +16,9 @@ function isAcceptedRiskStatus(status?: string) {
 }
 
 function stripRuleCodes(text?: string) {
-  return (text || '')
-    .replace(/[【\[][^【】\[\]\n]{0,160}(?:RULE|TPL|POLICY|CHECK|REG|MODEL|STD|CLAUSE)_[^【】\[\]\n]{1,160}[】\]]\s*/g, '')
-    .replace(/(?:^|\s)(?:RULE|TPL|POLICY|CHECK|REG|MODEL|STD|CLAUSE)_[A-Za-z0-9_-]+(?=\s|$)/g, ' ')
-    .replace(/segment_[A-Za-z0-9_-]+::[A-Za-z0-9_.()（）-]+/g, ' ')
-    .replace(/(?:条款|条文|clause)\s*[0-9]+(?:\.[A-Za-z0-9]+)+/gi, ' ')
-    .replace(/\b[0-9]+(?:\.[A-Za-z][A-Za-z0-9]*)+\b/g, ' ')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/([。！？])\s*；+/g, '$1')
-    .replace(/；+\s*([。！？])/g, '$1')
-    .replace(/；{2,}/g, '；')
-    .trim()
+  return normalizeRiskTextForDisplay(text)
 }
+
 
 const CLAUSE_UID_PATTERN = /^segment_[A-Za-z0-9_-]+::[A-Za-z0-9_.()（）-]+$/
 const CLAUSE_REF_TOKEN_PATTERN = '[0-9一二三四五六七八九十百千万零〇]+(?:\\.[A-Za-z0-9]+)*'
@@ -105,20 +97,13 @@ function normalizePatchTargetForRisk(risk: Partial<RiskItem> | null | undefined,
 }
 
 function sanitizeAiCommentText(value?: string) {
-  return String(value || '')
-    .replace(/segment_[A-Za-z0-9_-]+::[A-Za-z0-9_.()（）-]+/g, '')
-    .replace(/(?:条款|条文|clause)\s*[0-9]+(?:\.[A-Za-z0-9]+)+/gi, ' ')
-    .replace(/\b[0-9]+(?:\.[A-Za-z][A-Za-z0-9]*)+\b/g, ' ')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/([。！？])\s*；+/g, '$1')
-    .replace(/；+\s*([。！？])/g, '$1')
-    .replace(/；{2,}/g, '；')
-    .trim()
+  return normalizeRiskTextForDisplay(value)
 }
 
 function isSuggestionInsertComment(value?: string) {
-  return /^建议插入内容\s*[:：]/.test(sanitizeAiCommentText(value))
+  return isSuggestionInsertCommentText(value)
 }
+
 
 function presentRiskLabel(r: RiskItem) {
   return stripRuleCodes(r.risk_label || r.dimension || '风险项')
