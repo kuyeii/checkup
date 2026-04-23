@@ -2310,144 +2310,146 @@ export const DocumentEditor = forwardRef<
 
   return (
     <div className={props.className}>
-      <div ref={scrollRef} className={`docScroll ${props.isInteractionLocked ? 'docScroll--locked' : ''}`}>
-        {!ready ? <div className="emptyState">正在加载文档…</div> : null}
-        <div ref={rowRef} className={`docRow ${hasComments ? 'docRow--withComments' : 'docRow--compact'}`}>
-          {props.isInteractionLocked ? (
-            <div className="docInteractionMask" aria-live="polite" aria-busy="true">
-              <div className="docInteractionMaskViewport">
-                <div className="docInteractionMaskCard">
-                  <div className="docInteractionMaskText" aria-label="正在审核中......">
-                    <span className="docInteractionMaskTextLabel">正在审核中</span>
-                    <span className="docInteractionMaskEllipsis" aria-hidden="true">
-                      {Array.from({ length: 6 }).map((_, idx) => (
+      <div className="docViewport">
+        <div ref={scrollRef} className={`docScroll ${props.isInteractionLocked ? 'docScroll--locked' : ''}`}>
+          {!ready ? <div className="emptyState">正在加载文档…</div> : null}
+          <div ref={rowRef} className={`docRow ${hasComments ? 'docRow--withComments' : 'docRow--compact'}`}>
+            <div className="docCanvas" ref={canvasRef}>
+              <div ref={docRef} />
+              <div className="changeOverlay" aria-hidden="true">
+                {allEdits.map((edit) => {
+                  const visual = visuals[edit.id]
+                  if (!visual) return null
+                  return (
+                    <React.Fragment key={`overlay-${edit.id}`}>
+                      {visual.rects.map((rect, index) => (
                         <span
-                          key={`ellipsis-dot-${idx}`}
-                          className="docInteractionMaskEllipsisDot"
-                          style={{ animationDelay: `${idx * 0.14}s` }}
-                        >
-                          .
-                        </span>
+                          key={`${edit.id}-rect-${index}`}
+                          ref={(el) => {
+                            if (index === visual.rects.length - 1) {
+                              if (el) sourceElsRef.current.set(edit.id, el)
+                              else sourceElsRef.current.delete(edit.id)
+                              scheduleMeasureLinePaths()
+                            }
+                          }}
+                          data-change-id={edit.id}
+                          data-anchor={index === visual.rects.length - 1 ? 'source' : undefined}
+                          className={`changeHighlight changeHighlight--${edit.type}`}
+                          style={{
+                            left: `${rect.left}px`,
+                            top: `${rect.top}px`,
+                            width: `${Math.max(6, rect.width)}px`,
+                            height: `${Math.max(18, rect.height)}px`
+                          }}
+                        />
                       ))}
-                    </span>
-                  </div>
-                  <div
-                    className="docInteractionMaskProgress"
-                    role="img"
-                    aria-label={`审核进度 ${filledProgressSteps}/${LOCK_PROGRESS_STEP_COUNT}`}
-                  >
-                    {Array.from({ length: LOCK_PROGRESS_STEP_COUNT }).map((_, idx) => (
-                      <span
-                        key={`progress-step-${idx}`}
-                        className={`docInteractionMaskProgressDot ${idx < filledProgressSteps ? 'docInteractionMaskProgressDot--filled' : ''}`}
-                        aria-hidden="true"
-                      />
-                    ))}
-                  </div>
-                </div>
+                      {visual.marker ? (
+                        <span
+                          ref={(el) => {
+                            if (visual.rects.length === 0) {
+                              if (el) sourceElsRef.current.set(edit.id, el)
+                              else sourceElsRef.current.delete(edit.id)
+                              scheduleMeasureLinePaths()
+                            }
+                          }}
+                          data-change-id={edit.id}
+                          data-anchor={visual.rects.length === 0 ? 'source' : undefined}
+                          className={`changeDeleteMarker changeDeleteMarker--${edit.type}`}
+                          style={{
+                            left: `${visual.marker.left}px`,
+                            top: `${visual.marker.top}px`,
+                            height: `${visual.marker.height}px`
+                          }}
+                        />
+                      ) : null}
+                    </React.Fragment>
+                  )
+                })}
               </div>
             </div>
-          ) : null}
-          <div className="docCanvas" ref={canvasRef}>
-            <div ref={docRef} />
-            <div className="changeOverlay" aria-hidden="true">
-              {allEdits.map((edit) => {
-                const visual = visuals[edit.id]
-                if (!visual) return null
-                return (
-                  <React.Fragment key={`overlay-${edit.id}`}>
-                    {visual.rects.map((rect, index) => (
-                      <span
-                        key={`${edit.id}-rect-${index}`}
-                        ref={(el) => {
-                          if (index === visual.rects.length - 1) {
-                            if (el) sourceElsRef.current.set(edit.id, el)
-                            else sourceElsRef.current.delete(edit.id)
-                            scheduleMeasureLinePaths()
-                          }
-                        }}
-                        data-change-id={edit.id}
-                        data-anchor={index === visual.rects.length - 1 ? 'source' : undefined}
-                        className={`changeHighlight changeHighlight--${edit.type}`}
-                        style={{
-                          left: `${rect.left}px`,
-                          top: `${rect.top}px`,
-                          width: `${Math.max(6, rect.width)}px`,
-                          height: `${Math.max(18, rect.height)}px`
-                        }}
-                      />
-                    ))}
-                    {visual.marker ? (
-                      <span
-                        ref={(el) => {
-                          if (visual.rects.length === 0) {
-                            if (el) sourceElsRef.current.set(edit.id, el)
-                            else sourceElsRef.current.delete(edit.id)
-                            scheduleMeasureLinePaths()
-                          }
-                        }}
-                        data-change-id={edit.id}
-                        data-anchor={visual.rects.length === 0 ? 'source' : undefined}
-                        className={`changeDeleteMarker changeDeleteMarker--${edit.type}`}
-                        style={{
-                          left: `${visual.marker.left}px`,
-                          top: `${visual.marker.top}px`,
-                          height: `${visual.marker.height}px`
-                        }}
-                      />
-                    ) : null}
-                  </React.Fragment>
-                )
-              })}
-            </div>
-          </div>
 
-          {allEdits.length > 0 ? (
-            <svg className="commentLines" aria-hidden="true" style={{ height: overlayHeight ? `${overlayHeight}px` : '100%' }}>
-              {trunkPaths.map((points, index) => (
-                <polyline key={`trunk-${index}`} points={points} className="commentPolyline commentTrunk" />
-              ))}
-              {allEdits.map((edit) => {
-                const points = linePaths[edit.id]
-                if (!points) return null
-                return <polyline key={`line-${edit.id}`} points={points} className="commentPolyline" />
-              })}
-            </svg>
-          ) : null}
-
-          <div className={`commentGutter ${allEdits.length > 0 ? 'commentGutter--open' : ''}`} style={{ left: `${gutterLeft}px` }}>
-            <div className="commentGutterInner" style={{ height: overlayHeight ? `${overlayHeight}px` : undefined }}>
-              {allEdits
-                .slice()
-                .sort((a, b) => a.updatedAt - b.updatedAt)
-                .map((edit) => (
-                  <button
-                    key={edit.id}
-                    ref={(el) => {
-                      if (el) cardElsRef.current.set(edit.id, el)
-                      else cardElsRef.current.delete(edit.id)
-                      scheduleMeasureLinePaths()
-                    }}
-                    className={`commentBalloon commentBalloon--${edit.type}`}
-                    onClick={() => scrollToEdit(edit.id)}
-                    title="定位到修订位置"
-                    style={{ top: `${balloonTops[edit.id] ?? 0}px` }}
-                  >
-                    <div className="commentBalloonHead">
-                      <span className="commentTag">{edit.tagText || (edit.type === 'insert' ? '插入' : edit.type === 'delete' ? '删除' : '替换')}</span>
-                      <span className="commentTime">{new Date(edit.updatedAt).toLocaleTimeString()}</span>
-                    </div>
-                    {edit.deletedText ? <div className="commentText commentDel">删：{edit.deletedText}</div> : null}
-                    {edit.insertedText ? (
-                      <div className="commentText commentIns">
-                        {edit.kind === 'suggest_insert' ? edit.insertedText : `增：${edit.insertedText}`}
-                      </div>
-                    ) : null}
-                  </button>
+            {allEdits.length > 0 ? (
+              <svg className="commentLines" aria-hidden="true" style={{ height: overlayHeight ? `${overlayHeight}px` : '100%' }}>
+                {trunkPaths.map((points, index) => (
+                  <polyline key={`trunk-${index}`} points={points} className="commentPolyline commentTrunk" />
                 ))}
+                {allEdits.map((edit) => {
+                  const points = linePaths[edit.id]
+                  if (!points) return null
+                  return <polyline key={`line-${edit.id}`} points={points} className="commentPolyline" />
+                })}
+              </svg>
+            ) : null}
+
+            <div className={`commentGutter ${allEdits.length > 0 ? 'commentGutter--open' : ''}`} style={{ left: `${gutterLeft}px` }}>
+              <div className="commentGutterInner" style={{ height: overlayHeight ? `${overlayHeight}px` : undefined }}>
+                {allEdits
+                  .slice()
+                  .sort((a, b) => a.updatedAt - b.updatedAt)
+                  .map((edit) => (
+                    <button
+                      key={edit.id}
+                      ref={(el) => {
+                        if (el) cardElsRef.current.set(edit.id, el)
+                        else cardElsRef.current.delete(edit.id)
+                        scheduleMeasureLinePaths()
+                      }}
+                      className={`commentBalloon commentBalloon--${edit.type}`}
+                      onClick={() => scrollToEdit(edit.id)}
+                      title="定位到修订位置"
+                      style={{ top: `${balloonTops[edit.id] ?? 0}px` }}
+                    >
+                      <div className="commentBalloonHead">
+                        <span className="commentTag">{edit.tagText || (edit.type === 'insert' ? '插入' : edit.type === 'delete' ? '删除' : '替换')}</span>
+                        <span className="commentTime">{new Date(edit.updatedAt).toLocaleTimeString()}</span>
+                      </div>
+                      {edit.deletedText ? <div className="commentText commentDel">删：{edit.deletedText}</div> : null}
+                      {edit.insertedText ? (
+                        <div className="commentText commentIns">
+                          {edit.kind === 'suggest_insert' ? edit.insertedText : `增：${edit.insertedText}`}
+                        </div>
+                      ) : null}
+                    </button>
+                  ))}
+              </div>
             </div>
           </div>
         </div>
+        {props.isInteractionLocked ? (
+          <div className="docInteractionMask" aria-live="polite" aria-busy="true">
+            <div className="docInteractionMaskViewport">
+              <div className="docInteractionMaskCard">
+                <div className="docInteractionMaskText" aria-label="正在审核中......">
+                  <span className="docInteractionMaskTextLabel">正在审核中</span>
+                  <span className="docInteractionMaskEllipsis" aria-hidden="true">
+                    {Array.from({ length: 6 }).map((_, idx) => (
+                      <span
+                        key={`ellipsis-dot-${idx}`}
+                        className="docInteractionMaskEllipsisDot"
+                        style={{ animationDelay: `${idx * 0.14}s` }}
+                      >
+                        .
+                      </span>
+                    ))}
+                  </span>
+                </div>
+                <div
+                  className="docInteractionMaskProgress"
+                  role="img"
+                  aria-label={`审核进度 ${filledProgressSteps}/${LOCK_PROGRESS_STEP_COUNT}`}
+                >
+                  {Array.from({ length: LOCK_PROGRESS_STEP_COUNT }).map((_, idx) => (
+                    <span
+                      key={`progress-step-${idx}`}
+                      className={`docInteractionMaskProgressDot ${idx < filledProgressSteps ? 'docInteractionMaskProgressDot--filled' : ''}`}
+                      aria-hidden="true"
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   )

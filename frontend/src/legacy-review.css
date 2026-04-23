@@ -882,6 +882,14 @@ flex: 1 1 auto;
   position: relative;
   background: #fff;
 }
+.legacyReview .docViewport {
+position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: #f6f7fb;
+}
 .legacyReview .docToolbar {
 height: 44px;
   flex: 0 0 auto;
@@ -920,12 +928,13 @@ font-size: 12px; width: 52px; text-align: center; color: var(--text);
 font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 520px; display: block;
 }
 .legacyReview .docScroll {
-position: relative;
   flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
   min-height: 0;
   overflow: auto;
   /* Figma-style: neutral work surface behind the paper */
-  background: #f6f7fb;
+  background: transparent;
 }
 .legacyReview .docScroll--locked .editableBlock {
   user-select: none;
@@ -938,15 +947,15 @@ position: absolute;
   inset: 0;
   z-index: 6;
   pointer-events: none;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(8px) saturate(1.04);
   -webkit-backdrop-filter: blur(8px) saturate(1.04);
 }
 .legacyReview .docInteractionMaskViewport {
-position: sticky;
-  top: 0;
-  min-height: max(100%, 100vh);
-  min-height: max(100%, 100dvh);
+width: 100%;
+  height: 100%;
+  min-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -966,7 +975,6 @@ width: auto;
   box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
   padding: 18px 24px 16px;
   color: #111827;
-  transform: translateY(-80px);
 }
 .legacyReview .docInteractionMaskText {
 display: inline-flex;
