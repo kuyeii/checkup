@@ -777,6 +777,168 @@ def _strip_leading_list_introducer(text: str | None) -> str:
     return cleaned
 
 
+def _build_suggestion_guided_patch_for_target(
+    item: dict[str, Any],
+    target_text: str | None,
+    ops: dict[str, Any] | None = None,
+) -> tuple[str, str, dict[str, Any]] | None:
+    resolved_target = str(target_text or "").strip()
+    if not resolved_target:
+        return None
+
+    resolved_ops = ops or _parse_aggregate_suggestion_ops(item)
+    replace_pairs = list(resolved_ops.get("replace_pairs") or [])
+    delete_phrases = [str(v or "").strip() for v in (resolved_ops.get("delete_phrases") or []) if str(v or "").strip()]
+    replace_texts = [str(v or "").strip() for v in (resolved_ops.get("replace_texts") or []) if str(v or "").strip()]
+    if not replace_pairs and not delete_phrases and not replace_texts:
+        return None
+
+    revised_text = ""
+    for from_text, to_text in replace_pairs:
+        if _looks_placeholder_replace_text(to_text):
+            continue
+        if from_text in resolved_target:
+            revised_text = resolved_target.replace(from_text, to_text, 1)
+            break
+
+    if not revised_text and delete_phrases and not replace_pairs and not replace_texts:
+        revised_text = resolved_target
+        changed = False
+        for phrase in delete_phrases:
+            if phrase and phrase in revised_text:
+                revised_text = revised_text.replace(phrase, "", 1)
+                changed = True
+        if changed:
+            revised_text = _clean_deleted_phrase_artifacts(revised_text)
+        else:
+            revised_text = ""
+
+    if not revised_text and not replace_pairs and not delete_phrases:
+        for phrase in replace_texts:
+            if _looks_placeholder_replace_text(phrase):
+                continue
+            revised_text = phrase
+            break
+
+    revised_text = str(revised_text or "").strip()
+    if not revised_text or revised_text == resolved_target:
+        return None
+    return resolved_target, revised_text, resolved_ops
+
+
+def _extract_clause_refs_from_text(text: str | None) -> list[str]:
+    raw = str(text or "")
+    if not raw:
+        return []
+    refs: list[str] = []
+    seen: set[str] = set()
+    patterns = [
+        re.compile(r"(?:条款\s*)?第\s*(\d+(?:\.\d+)*)\s*条"),
+        re.compile(r"(\d+\.\d+(?:\.\d+)*)"),
+    ]
+    for pattern in patterns:
+        for match in pattern.finditer(raw):
+            ref = str(match.group(1) or "").strip()
+            if not ref or ref in seen:
+                continue
+            seen.add(ref)
+            refs.append(ref)
+    return refs
+
+
+def _ordered_clause_search_candidates(risk: dict[str, Any], clauses: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    ordered: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    def add(clause: dict[str, Any] | None) -> None:
+        if not isinstance(clause, dict):
+            return
+        key = str(clause.get("clause_uid") or clause.get("display_clause_id") or clause.get("clause_id") or id(clause)).strip()
+        if not key or key in seen:
+            return
+        seen.add(key)
+        ordered.append(clause)
+
+    _, by_ref = _build_clause_lookup(clauses)
+    current_clause = _find_clause_for_risk(risk, clauses)
+    add(current_clause)
+
+    for field in ("issue", "suggestion", "risk_label", "factual_basis", "reasoning_basis"):
+        for ref in _extract_clause_refs_from_text(risk.get(field)):
+            add(_select_clause_candidate(by_ref.get(ref) or [], risk=risk))
+
+    current_segment_id = str((current_clause or {}).get("segment_id") or "").strip()
+    if current_segment_id:
+        for clause in clauses:
+            if str(clause.get("segment_id") or "").strip() == current_segment_id:
+                add(clause)
+
+    current_clause_id = str((current_clause or {}).get("display_clause_id") or (current_clause or {}).get("clause_id") or "").strip()
+    article_prefix = current_clause_id.split(".", 1)[0] if "." in current_clause_id else ""
+    if article_prefix:
+        for clause in clauses:
+            display_clause_id = str(clause.get("display_clause_id") or clause.get("clause_id") or "").strip()
+            if display_clause_id.startswith(article_prefix + "."):
+                add(clause)
+
+    for clause in clauses:
+        add(clause)
+    return ordered
+
+
+def _resolve_suggestion_guided_patch_context(
+    risk: dict[str, Any],
+    clauses: list[dict[str, Any]],
+) -> dict[str, Any] | None:
+    ops = _parse_aggregate_suggestion_ops(risk)
+    replace_pairs = [(str(a or "").strip(), str(b or "").strip()) for a, b in (ops.get("replace_pairs") or [])]
+    delete_phrases = [str(v or "").strip() for v in (ops.get("delete_phrases") or []) if str(v or "").strip()]
+    if not replace_pairs and not delete_phrases:
+        return None
+
+    primary_fragments: list[str] = []
+    for from_text, _ in replace_pairs:
+        if from_text:
+            primary_fragments.append(from_text)
+    primary_fragments.extend(delete_phrases)
+
+    base_target = _extract_target_text(risk)
+    base_patch = _build_suggestion_guided_patch_for_target(risk, base_target, ops)
+    if base_patch is not None:
+        target_text, revised_text, _ = base_patch
+        return {
+            "target_text": target_text,
+            "revised_text": revised_text,
+            "clause_text": str(target_text or ""),
+            "ops": ops,
+        }
+
+    for clause in _ordered_clause_search_candidates(risk, clauses):
+        clause_text = str(clause.get("source_excerpt") or clause.get("clause_text") or "").strip()
+        if not clause_text:
+            continue
+        for fragment in primary_fragments:
+            if not fragment or fragment not in clause_text:
+                continue
+            target_text = _expand_fragment_to_unique_sentence(clause_text, fragment) or fragment
+            patch = _build_suggestion_guided_patch_for_target(risk, target_text, ops)
+            if patch is None and target_text != clause_text:
+                patch = _build_suggestion_guided_patch_for_target(risk, clause_text, ops)
+            if patch is None:
+                continue
+            resolved_target, revised_text, _ = patch
+            return {
+                "target_text": resolved_target,
+                "revised_text": revised_text,
+                "clause_text": clause_text,
+                "matched_clause_uid": str(clause.get("clause_uid") or "").strip(),
+                "matched_clause_id": str(clause.get("display_clause_id") or clause.get("clause_id") or "").strip(),
+                "matched_fragment": fragment,
+                "ops": ops,
+            }
+    return None
+
+
 def _build_suggestion_guided_aggregate_patch(item: dict[str, Any]) -> tuple[str, str, dict[str, Any]] | None:
     aggregate_type = str(item.get("aggregate_type") or "").strip().lower()
     if aggregate_type != "anchored_only":
@@ -788,46 +950,7 @@ def _build_suggestion_guided_aggregate_patch(item: dict[str, Any]) -> tuple[str,
     if len(_aggregate_overlap_fragment(evidence_text)) < 6:
         return None
 
-    ops = _parse_aggregate_suggestion_ops(item)
-    replace_pairs = list(ops.get("replace_pairs") or [])
-    delete_phrases = [str(v or "").strip() for v in (ops.get("delete_phrases") or []) if str(v or "").strip()]
-    replace_texts = [str(v or "").strip() for v in (ops.get("replace_texts") or []) if str(v or "").strip()]
-    if not replace_pairs and not delete_phrases and not replace_texts:
-        return None
-
-    target_text = str(evidence_text or "").strip()
-    revised_text = ""
-
-    for from_text, to_text in replace_pairs:
-        if _looks_placeholder_replace_text(to_text):
-            continue
-        if from_text in target_text:
-            revised_text = target_text.replace(from_text, to_text, 1)
-            break
-
-    if not revised_text and delete_phrases and not replace_pairs and not replace_texts:
-        revised_text = target_text
-        changed = False
-        for phrase in delete_phrases:
-            if phrase and phrase in revised_text:
-                revised_text = revised_text.replace(phrase, "", 1)
-                changed = True
-        if changed:
-            revised_text = _clean_deleted_phrase_artifacts(revised_text)
-        else:
-            revised_text = ""
-
-    if not revised_text:
-        for phrase in replace_texts:
-            if _looks_placeholder_replace_text(phrase):
-                continue
-            revised_text = phrase
-            break
-
-    revised_text = str(revised_text or "").strip()
-    if not revised_text or revised_text == target_text:
-        return None
-    return target_text, revised_text, ops
+    return _build_suggestion_guided_patch_for_target(item, evidence_text)
 
 
 def _should_prefer_suggestion_guided_patch(
@@ -1508,30 +1631,22 @@ def _normalize_target_text(raw_text: str | None, *, preserve_full_clause: bool =
     return _sanitize_ai_target_text(raw) or raw
 
 def _find_clause_for_risk(risk: dict[str, Any], clauses: list[dict[str, Any]]) -> dict[str, Any] | None:
-    by_uid: dict[str, dict[str, Any]] = {}
-    by_ref: dict[str, dict[str, Any]] = {}
-    for clause in clauses:
-        if not isinstance(clause, dict):
-            continue
-        uid = str(clause.get("clause_uid") or "").strip()
-        if uid:
-            by_uid[uid] = clause
-            by_ref.setdefault(uid, clause)
-        for field in ("clause_id", "display_clause_id", "local_clause_id", "source_clause_id"):
-            for ref in _as_clause_ref_list(clause.get(field)):
-                by_ref.setdefault(ref, clause)
+    by_uid, by_ref = _build_clause_lookup(clauses)
 
     for field in ("clause_uids", "related_clause_uids", "clause_uid"):
         for uid in _as_clause_ref_list(risk.get(field)):
-            clause = by_uid.get(uid) or by_ref.get(uid)
+            clause = by_uid.get(uid)
             if clause is not None:
                 return clause
+            chosen = _select_clause_candidate(by_ref.get(uid) or [], risk=risk)
+            if chosen is not None:
+                return chosen
 
     for field in ("clause_ids", "related_clause_ids", "display_clause_ids", "clause_id", "display_clause_id"):
         for ref in _as_clause_ref_list(risk.get(field)):
-            clause = by_ref.get(ref) or by_uid.get(ref)
-            if clause is not None:
-                return clause
+            chosen = _select_clause_candidate(by_ref.get(ref) or [], risk=risk)
+            if chosen is not None:
+                return chosen
     return None
 
 
@@ -1676,17 +1791,98 @@ def _load_run_clauses(run_dir: Path) -> list[dict[str, Any]]:
     return [item for item in raw_items if isinstance(item, dict)]
 
 
-def _build_clause_uid_alias_map(clauses: list[dict[str, Any]]) -> dict[str, str]:
-    alias: dict[str, str] = {}
+def _build_clause_lookup(clauses: list[dict[str, Any]]) -> tuple[dict[str, dict[str, Any]], dict[str, list[dict[str, Any]]]]:
+    by_uid: dict[str, dict[str, Any]] = {}
+    by_ref: dict[str, list[dict[str, Any]]] = {}
+
     for clause in clauses:
-        uid = str(clause.get("clause_uid") or "").strip()
-        if not uid:
+        if not isinstance(clause, dict):
             continue
-        alias.setdefault(uid, uid)
+        uid = str(clause.get("clause_uid") or "").strip()
+        if uid:
+            by_uid[uid] = clause
+            uid_bucket = by_ref.setdefault(uid, [])
+            if clause not in uid_bucket:
+                uid_bucket.append(clause)
         for field in ("clause_id", "display_clause_id", "local_clause_id", "source_clause_id"):
             for ref in _as_clause_ref_list(clause.get(field)):
-                alias.setdefault(ref, uid)
+                bucket = by_ref.setdefault(ref, [])
+                if clause not in bucket:
+                    bucket.append(clause)
+
+    return by_uid, by_ref
+
+
+
+def _risk_clause_match_texts(risk: dict[str, Any] | None) -> list[str]:
+    if not isinstance(risk, dict):
+        return []
+    texts: list[str] = []
+    seen: set[str] = set()
+    for field in ("target_text", "anchor_text", "evidence_text", "clause_text", "issue"):
+        value = re.sub(r"\s+", " ", str(risk.get(field) or "")).strip()
+        if not value or value in seen:
+            continue
+        seen.add(value)
+        texts.append(value)
+    return texts
+
+
+
+def _select_clause_candidate(candidates: list[dict[str, Any]], risk: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    unique: list[dict[str, Any]] = []
+    seen_keys: set[str] = set()
+    for clause in candidates or []:
+        if not isinstance(clause, dict):
+            continue
+        uid = str(clause.get("clause_uid") or "").strip()
+        key = uid or str(id(clause))
+        if key in seen_keys:
+            continue
+        seen_keys.add(key)
+        unique.append(clause)
+
+    if not unique:
+        return None
+    if len(unique) == 1:
+        return unique[0]
+
+    texts = _risk_clause_match_texts(risk)
+    if texts:
+        narrowed: list[dict[str, Any]] = []
+        narrowed_seen: set[str] = set()
+        for clause in unique:
+            clause_text = re.sub(r"\s+", " ", str(clause.get("source_excerpt") or clause.get("clause_text") or "")).strip()
+            if not clause_text:
+                continue
+            if not any(text and (text in clause_text or clause_text in text) for text in texts):
+                continue
+            uid = str(clause.get("clause_uid") or "").strip()
+            key = uid or str(id(clause))
+            if key in narrowed_seen:
+                continue
+            narrowed_seen.add(key)
+            narrowed.append(clause)
+        if len(narrowed) == 1:
+            return narrowed[0]
+
+    return None
+
+
+
+def _build_clause_uid_alias_map(clauses: list[dict[str, Any]]) -> dict[str, str]:
+    by_uid, by_ref = _build_clause_lookup(clauses)
+    alias: dict[str, str] = {uid: uid for uid in by_uid}
+    for ref, candidates in by_ref.items():
+        candidate_uids = {
+            str(clause.get("clause_uid") or "").strip()
+            for clause in candidates
+            if str(clause.get("clause_uid") or "").strip()
+        }
+        if len(candidate_uids) == 1:
+            alias.setdefault(ref, next(iter(candidate_uids)))
     return alias
+
 
 
 def _collect_risk_clause_keys(risk: dict[str, Any], clause_alias_map: dict[str, str] | None = None) -> set[str]:
@@ -1697,9 +1893,14 @@ def _collect_risk_clause_keys(risk: dict[str, Any], clause_alias_map: dict[str, 
         for uid in _as_clause_ref_list(risk.get(field)):
             keys.add(alias_map.get(uid) or uid)
 
+    has_canonical_uid = bool(keys)
     for field in ("clause_ids", "related_clause_ids", "display_clause_ids", "clause_id", "display_clause_id"):
         for ref in _as_clause_ref_list(risk.get(field)):
-            keys.add(alias_map.get(ref) or ref)
+            resolved = alias_map.get(ref)
+            if resolved:
+                keys.add(resolved)
+            elif not has_canonical_uid:
+                keys.add(ref)
 
     return keys
 
@@ -2055,22 +2256,16 @@ def _has_other_accepted_risk_in_same_clause(
 
 
 def _find_clause_by_key(clause_key: str, clauses: list[dict[str, Any]], alias_map: dict[str, str] | None = None) -> dict[str, Any] | None:
-    alias = alias_map or _build_clause_uid_alias_map(clauses)
-    normalized_key = alias.get(str(clause_key or "").strip()) or str(clause_key or "").strip()
-    if not normalized_key:
+    raw_key = str(clause_key or "").strip()
+    if not raw_key:
         return None
-    for clause in clauses:
-        if not isinstance(clause, dict):
-            continue
-        clause_uid = str(clause.get("clause_uid") or "").strip()
-        if clause_uid and clause_uid == normalized_key:
-            return clause
-        refs: set[str] = set()
-        for field in ("clause_id", "display_clause_id", "local_clause_id", "source_clause_id"):
-            refs.update(_as_clause_ref_list(clause.get(field)))
-        if normalized_key in refs:
-            return clause
-    return None
+    alias = alias_map or _build_clause_uid_alias_map(clauses)
+    normalized_key = alias.get(raw_key) or raw_key
+    by_uid, by_ref = _build_clause_lookup(clauses)
+    clause = by_uid.get(normalized_key)
+    if clause is not None:
+        return clause
+    return _select_clause_candidate(by_ref.get(normalized_key) or [])
 
 
 def _select_group_representative_risk(anchored_risks: list[dict[str, Any]], multi_risks: list[dict[str, Any]]) -> dict[str, Any]:
@@ -2458,6 +2653,12 @@ def _build_rewrite_inputs(*, run_id: str, run_dir: Path, risk: dict[str, Any]) -
     clause_source = ""
     if clause is not None:
         clause_source = str(clause.get("source_excerpt") or clause.get("clause_text") or "").strip()
+
+    guided_context = _resolve_suggestion_guided_patch_context(risk, merged_clauses)
+    if guided_context is not None:
+        target_text = str(guided_context.get("target_text") or target_text or "").strip()
+        clause_source = str(guided_context.get("clause_text") or clause_source or "").strip()
+
     clause_text = _clause_text_window(clause_source, target_text, limit=1200)
 
     suggestion = str(risk.get("suggestion") or "").strip()
@@ -2499,6 +2700,32 @@ def _generate_ai_rewrite(
             {"target_text": target_text, "revised_text": revised_text, "workflow_kind": "aggregate"},
             revised_text,
         )
+    else:
+        normalized_target = re.sub(r"\s+", " ", str(rewrite_target_text or "").strip())
+        normalized_revised = re.sub(r"\s+", " ", str(rewrite_revised_text or "").strip())
+        if normalized_target and normalized_target == normalized_revised:
+            merged_clauses = _safe_json(run_dir / "merged_clauses.json")
+            if isinstance(merged_clauses, list):
+                guided_context = _resolve_suggestion_guided_patch_context(risk, merged_clauses)
+                if guided_context is not None:
+                    rewrite_target_text = str(guided_context.get("target_text") or rewrite_target_text or "").strip()
+                    rewrite_revised_text = str(guided_context.get("revised_text") or "").strip()
+                    if rewrite_revised_text and rewrite_revised_text != rewrite_target_text:
+                        rationale = (
+                            str(rationale or "").strip()
+                            or "原始 AI 改写未产生实际变更，已根据建议中的显式替换关系自动定位可修改片段并生成修订文本。"
+                        )
+                    else:
+                        return {
+                            "state": "failed",
+                            "target_text": rewrite_target_text,
+                            "revised_text": "",
+                            "comment_text": "AI 改写未产生实际变更，且未能根据建议定位到可替换片段。",
+                            "rationale": str(rationale or "").strip(),
+                            "edit_type": edit_type or "replace",
+                            "workflow_kind": "default",
+                            "created_at": _iso_now(),
+                        }
     return {
         "state": "succeeded",
         "target_text": rewrite_target_text,
