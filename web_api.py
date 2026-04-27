@@ -64,6 +64,26 @@ _QUOTED_TEXT_RE_LIST = [
     re.compile(r'"([^"\n]{4,})"'),
 ]
 _ACCEPTED_RISK_STATUSES = {"accepted", "ai_applied"}
+_PLACEHOLDER_TARGET_RE = re.compile(
+    r"^(?:"
+    r"[/／]+"
+    r"|[_＿]{2,}"
+    r"|[-—–]{2,}"
+    r"|[.。…]{2,}"
+    r"|[~～]{2,}"
+    r"|[【\[]\s*[】\]]"
+    r"|[（(]\s*[）)]"
+    r"|待补充|待填写|待确认|TBD|N/?A"
+    r")$",
+    re.IGNORECASE,
+)
+
+_CHINESE_ORDINAL_CHARS = "零〇一二三四五六七八九十百千万"
+_LEADING_LIST_ITEM_MARKER_RE_LIST = [
+    re.compile(rf"^(?P<marker>\s*[（(]\s*(?:\d{{1,3}}|[{_CHINESE_ORDINAL_CHARS}]{{1,8}})\s*[）)]\s*)(?P<body>\S.*)$"),
+    re.compile(r"^(?P<marker>\s*\d{1,3}(?:\.\d{1,3}){1,5}(?:[.．、)）]\s*|\s+))(?P<body>\S.*)$"),
+    re.compile(rf"^(?P<marker>\s*(?:\d{{1,3}}|[{_CHINESE_ORDINAL_CHARS}]{{1,8}})[.．、)）]\s*)(?P<body>\S.*)$"),
+]
 
 
 
@@ -261,6 +281,71 @@ def _sequence_match_stats(source: str, revised: str) -> tuple[int, int, list[Any
 
 def _aggregate_overlap_fragment(fragment: str) -> str:
     return re.sub(r"[\s，,；;。!！？?：:、（）()【】\[\]{}《》“”\"'‘’]", "", str(fragment or ""))
+
+
+def _split_leading_list_item_marker(text: str | None) -> tuple[str, str] | None:
+    raw = str(text or "")
+    if not raw.strip():
+        return None
+
+    for pattern in _LEADING_LIST_ITEM_MARKER_RE_LIST:
+        match = pattern.match(raw)
+        if not match:
+            continue
+        marker = str(match.group("marker") or "")
+        body = str(match.group("body") or "")
+        if not marker.strip() or not body.strip():
+            continue
+        # Avoid treating decimal literals such as "5.0版本" as list markers.
+        if body.lstrip().startswith(tuple("0123456789.")):
+            continue
+        return marker, body
+    return None
+
+
+def _leading_marker_key(marker: str | None) -> str:
+    return re.sub(r"\s+", "", str(marker or "")).replace("．", ".").replace("（", "(").replace("）", ")")
+
+
+def _should_keep_leading_list_marker_outside_patch(before_body: str, revised_text: str) -> bool:
+    body = str(before_body or "").strip()
+    revised = str(revised_text or "").strip()
+    if not body or not revised:
+        return False
+
+    body_core = _aggregate_overlap_fragment(body)
+    revised_core = _aggregate_overlap_fragment(revised)
+    if len(body_core) < 6 or len(revised_core) < 6:
+        return False
+
+    if _common_prefix_len(body, revised) >= min(6, len(body), len(revised)):
+        return True
+
+    matched_chars, longest_block, _ = _sequence_match_stats(body, revised)
+    min_shared = max(8, min(len(body_core), len(revised_core)) // 4)
+    return longest_block >= 6 or matched_chars >= min_shared
+
+
+def _preserve_leading_list_marker_outside_patch(target_text: str | None, revised_text: str | None) -> tuple[str, str]:
+    target = str(target_text or "").strip()
+    revised = str(revised_text or "").strip()
+    split_target = _split_leading_list_item_marker(target)
+    if split_target is None:
+        return target, revised
+
+    target_marker, target_body = split_target
+    split_revised = _split_leading_list_item_marker(revised)
+    if split_revised is not None:
+        revised_marker, _ = split_revised
+        # If the AI already preserved or intentionally changed a visible list
+        # marker, keep the patch pair as-is.
+        if _leading_marker_key(revised_marker) == _leading_marker_key(target_marker) or revised_marker.strip():
+            return target, revised
+
+    if not _should_keep_leading_list_marker_outside_patch(target_body, revised):
+        return target, revised
+
+    return target_body.strip(), revised
 
 
 def _has_strong_sentence_overlap(sentence: str, revised: str) -> bool:
@@ -1144,6 +1229,156 @@ def _repair_mixed_aggregate_primary_evidence_drift(
     return evidence_floor
 
 
+def _tail_still_present_in_revised(source_tail: str, revised_text: str) -> bool:
+    tail_core = _aggregate_overlap_fragment(source_tail)
+    revised_core = _aggregate_overlap_fragment(revised_text)
+    if len(tail_core) < 6 or not revised_core:
+        return False
+
+    probe_lengths = [min(len(tail_core), size) for size in (24, 16, 10, 6)]
+    for size in probe_lengths:
+        if size < 6:
+            continue
+        if tail_core[:size] in revised_core:
+            return True
+    return False
+
+
+def _aggregate_tail_rewrite_has_explicit_intent(
+    item: dict[str, Any],
+    source_tail: str,
+) -> bool:
+    tail_core = _aggregate_overlap_fragment(source_tail)
+    if len(tail_core) < 6:
+        return False
+
+    ops = _parse_aggregate_suggestion_ops(item)
+    intent_phrases: list[str] = []
+    intent_phrases.extend(str(value or "").strip() for value in (ops.get("delete_phrases") or []))
+    for from_text, _to_text in (ops.get("replace_pairs") or []):
+        intent_phrases.append(str(from_text or "").strip())
+
+    for phrase in intent_phrases:
+        phrase_core = _aggregate_overlap_fragment(phrase)
+        if len(phrase_core) < 4:
+            continue
+        if phrase_core in tail_core or tail_core in phrase_core:
+            return True
+    return False
+
+
+def _looks_like_replaced_aggregate_tail(source_tail: str, changed_before: str, changed_after: str) -> bool:
+    tail = str(source_tail or "").lstrip()
+    before_core = _aggregate_overlap_fragment(changed_before)
+    tail_core = _aggregate_overlap_fragment(tail)
+    after_core = _aggregate_overlap_fragment(changed_after)
+    if len(before_core) < 6 or len(tail_core) < 6:
+        return False
+
+    # The changed source side should be the remainder after the short prefix,
+    # not an unrelated overlap produced by SequenceMatcher.
+    if not (before_core in tail_core or tail_core.startswith(before_core) or before_core.startswith(tail_core)):
+        return False
+
+    continuation_markers = (
+        "，",
+        ",",
+        "、",
+        "；",
+        ";",
+        "或",
+        "及",
+        "以及",
+        "并",
+        "且",
+        "但",
+        "否则",
+    )
+    if not tail.startswith(continuation_markers):
+        return False
+
+    # Allow deletion-only rewrites (changed_after empty) and true replacements.
+    return not after_core or len(after_core) >= 4
+
+
+def _candidate_prefix_tail_rewrite_floor(
+    item: dict[str, Any],
+    candidate_text: str | None,
+    current_target: str | None,
+    revised_text: str | None,
+) -> str:
+    candidate = str(candidate_text or "").strip()
+    current = str(current_target or "").strip()
+    revised = str(revised_text or "").strip()
+    if not candidate or not current or not revised:
+        return ""
+    if candidate == current or len(candidate) <= len(current):
+        return ""
+    if not candidate.startswith(current):
+        return ""
+
+    current_core = _aggregate_overlap_fragment(current)
+    tail_after_current = candidate[len(current) :]
+    tail_core = _aggregate_overlap_fragment(tail_after_current)
+    if len(current_core) < 4 or len(tail_core) < 6:
+        return ""
+
+    common_prefix = _common_prefix_len(candidate, revised)
+    if common_prefix < max(4, len(current) - 1):
+        return ""
+
+    if _tail_still_present_in_revised(tail_after_current, revised):
+        return ""
+
+    changed_before, changed_after = _minimize_patch_pair(candidate, revised)
+    changed_before_core = _aggregate_overlap_fragment(changed_before)
+    if len(changed_before_core) < 6:
+        return ""
+
+    explicit_intent = _aggregate_tail_rewrite_has_explicit_intent(item, tail_after_current)
+    structural_tail_rewrite = _looks_like_replaced_aggregate_tail(tail_after_current, changed_before, changed_after)
+    if not explicit_intent and not structural_tail_rewrite:
+        return ""
+
+    return candidate
+
+
+def _repair_aggregate_prefix_tail_rewrite_target(
+    item: dict[str, Any],
+    source_target: str | None,
+    baseline: str | None,
+    resolved: str | None,
+    revised_text: str | None = None,
+) -> str:
+    current = str(resolved or "").strip()
+    if not current:
+        return current
+
+    candidate_values = [
+        source_target,
+        baseline,
+        _aggregate_group_fallback_text(item, "evidence_text"),
+        str(item.get("evidence_text") or "").strip(),
+        _aggregate_group_fallback_text(item, "target_text"),
+        str(item.get("target_text") or "").strip(),
+    ]
+
+    seen: set[str] = set()
+    candidates: list[str] = []
+    for value in candidate_values:
+        candidate = str(value or "").strip()
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        candidates.append(candidate)
+
+    for candidate in sorted(candidates, key=lambda text: -len(text)):
+        floor = _candidate_prefix_tail_rewrite_floor(item, candidate, current, revised_text)
+        if floor:
+            return floor
+    return current
+
+
 def _common_prefix_len(left: str, right: str) -> int:
     prefix = 0
     max_prefix = min(len(left), len(right))
@@ -1251,6 +1486,7 @@ def _resolve_aggregate_patch_target(item: dict[str, Any], ai_payload: dict[str, 
     resolved = _apply_anchored_only_target_floor(item, baseline, resolved)
     resolved = _repair_mixed_aggregate_primary_evidence_drift(item, source_target, resolved, next_revised)
     resolved = _apply_mixed_aggregate_target_floor(item, baseline, resolved, next_revised)
+    resolved = _repair_aggregate_prefix_tail_rewrite_target(item, source_target, baseline, resolved, next_revised)
     return resolved
 
 
@@ -1358,6 +1594,62 @@ def _extend_aggregate_target_with_source_suffix_overlap(
     return candidate
 
 
+def _strip_revised_source_context_around_target(
+    source_text: str | None,
+    current_target: str | None,
+    revised_text: str | None,
+) -> str:
+    source = str(source_text or "").strip()
+    current = str(current_target or "").strip()
+    revised = str(revised_text or "").strip()
+    if not source or not current or not revised:
+        return revised
+    if current == source or current not in source:
+        return revised
+    if _count_fragment_occurrences(source, current) != 1:
+        return revised
+
+    target_start = source.find(current)
+    if target_start < 0:
+        return revised
+    target_end = target_start + len(current)
+
+    source_prefix = source[:target_start]
+    source_suffix = source[target_end:]
+    prefix_core = _aggregate_overlap_fragment(source_prefix)
+    suffix_core = _aggregate_overlap_fragment(source_suffix)
+    copied_context_core_len = len(prefix_core) + len(suffix_core)
+    if copied_context_core_len < 12:
+        return revised
+
+    if source_prefix and not revised.startswith(source_prefix):
+        return revised
+    if source_suffix and not revised.endswith(source_suffix):
+        return revised
+
+    start = len(source_prefix) if source_prefix else 0
+    end = len(revised) - len(source_suffix) if source_suffix else len(revised)
+    if end <= start:
+        return revised
+
+    candidate = revised[start:end].strip()
+    if not candidate:
+        return revised
+
+    candidate_core = _aggregate_overlap_fragment(candidate)
+    current_core = _aggregate_overlap_fragment(current)
+    revised_core = _aggregate_overlap_fragment(revised)
+    if not candidate_core or len(candidate_core) >= len(revised_core):
+        return revised
+
+    matched_chars, longest_block, _ = _sequence_match_stats(current, candidate)
+    min_shared = max(8, min(len(current_core), len(candidate_core)) // 3)
+    if longest_block < 6 and matched_chars < min_shared:
+        return revised
+
+    return candidate
+
+
 
 def _finalize_aggregate_patch_pair(item: dict[str, Any], ai_payload: dict[str, Any], revised_text: str | None = None) -> tuple[str, str]:
     resolved_target = _resolve_aggregate_patch_target(item, ai_payload, revised_text)
@@ -1372,6 +1664,13 @@ def _finalize_aggregate_patch_pair(item: dict[str, Any], ai_payload: dict[str, A
             next_revised = guided_revised
 
     next_revised = _strip_deleted_phrase_from_revised_change_head(item, resolved_target, next_revised)
+    # If the aggregate workflow returned a full clause while the resolved
+    # target is only the evidence sentence, remove the unchanged source context
+    # that was copied around the target. This keeps the replacement span narrow
+    # and prevents accepting the rewrite from inserting duplicated neighboring
+    # subclauses. Only exact, unique source context is stripped; if the model
+    # changed neighboring text, keep the wider rewrite path below.
+    next_revised = _strip_revised_source_context_around_target(source_target, resolved_target, next_revised)
     # If the model has copied the immediate source suffix that follows the
     # current target, expand the target forward to consume that unchanged span
     # as part of the replacement. Otherwise accepting the rewrite would append
@@ -1387,6 +1686,7 @@ def _finalize_aggregate_patch_pair(item: dict[str, Any], ai_payload: dict[str, A
     # replacement must not synthesize a new sentence boundary, otherwise the
     # remaining original suffix will be duplicated or split into a new sentence.
     next_revised = _strip_unsafe_aggregate_revised_tail(source_target, resolved_target, next_revised)
+    resolved_target, next_revised = _preserve_leading_list_marker_outside_patch(resolved_target, next_revised)
     return resolved_target, next_revised
 
 def _meta_path(run_id: str) -> Path:
@@ -1629,6 +1929,128 @@ def _normalize_target_text(raw_text: str | None, *, preserve_full_clause: bool =
     if preserve_full_clause:
         return raw
     return _sanitize_ai_target_text(raw) or raw
+
+
+def _placeholder_target_token(text: str | None) -> str:
+    token = str(text or "").strip()
+    if not token:
+        return ""
+    token = token.strip('“”"\'‘’「」')
+    token = re.sub(r"\s+", "", token)
+    return token
+
+
+def _looks_placeholder_target_text(text: str | None) -> bool:
+    token = _placeholder_target_token(text)
+    if not token:
+        return False
+    return bool(_PLACEHOLDER_TARGET_RE.fullmatch(token))
+
+
+def _resolve_non_aggregate_clause_text(item: dict[str, Any], run_dir: Path | None = None) -> str:
+    if not isinstance(item, dict):
+        return ""
+    clauses = _load_run_clauses(run_dir) if isinstance(run_dir, Path) else []
+    clause = _find_clause_for_risk(item, clauses) if clauses else None
+    return str((clause or {}).get("source_excerpt") or (clause or {}).get("clause_text") or "").strip()
+
+
+def _resolve_non_aggregate_sentence_candidate(clause_text: str | None, raw_candidate: str | None) -> str:
+    clause = str(clause_text or "").strip()
+    raw = str(raw_candidate or "").strip()
+    if not raw:
+        return ""
+
+    normalized = _normalize_target_text(raw)
+    if clause:
+        for candidate in (normalized, raw):
+            candidate = str(candidate or "").strip()
+            if not candidate:
+                continue
+            expanded = _expand_fragment_to_unique_sentence(clause, candidate)
+            if expanded:
+                return expanded
+            if candidate in clause and _is_unique_stable_sentence_span(clause, candidate):
+                return candidate
+
+    for candidate in (normalized, raw):
+        candidate = str(candidate or "").strip()
+        if candidate and _is_unique_stable_sentence_span(candidate, candidate):
+            return candidate
+    return ""
+
+
+def _collect_non_aggregate_sentence_candidates(
+    item: dict[str, Any],
+    run_dir: Path | None = None,
+) -> list[str]:
+    clause_text = _resolve_non_aggregate_clause_text(item, run_dir=run_dir)
+    raw_candidates = [
+        str(item.get("evidence_text") or "").strip(),
+        str(item.get("target_text") or "").strip(),
+        clause_text,
+    ]
+    resolved: list[str] = []
+    seen: set[str] = set()
+    for raw in raw_candidates:
+        candidate = _resolve_non_aggregate_sentence_candidate(clause_text, raw)
+        compact = _aggregate_overlap_fragment(candidate)
+        if not candidate or not compact or candidate in seen:
+            continue
+        seen.add(candidate)
+        resolved.append(candidate)
+    return resolved
+
+
+def _is_sentence_level_placeholder_rewrite(
+    sentence_text: str | None,
+    target_text: str | None,
+    revised_text: str | None,
+) -> bool:
+    sentence = str(sentence_text or "").strip()
+    target = str(target_text or "").strip()
+    revised = str(revised_text or "").strip()
+    if not sentence or not target or not revised:
+        return False
+    if sentence == revised:
+        return False
+    if target not in sentence or _count_fragment_occurrences(sentence, target) != 1:
+        return False
+
+    before_changed, after_changed = _minimize_patch_pair(sentence, revised)
+    if not before_changed.strip() or not after_changed.strip():
+        return False
+    if not _looks_placeholder_target_text(before_changed):
+        return False
+
+    after_core = _aggregate_overlap_fragment(after_changed)
+    if len(after_core) < 4:
+        return False
+    return True
+
+
+def _finalize_non_aggregate_patch_pair(
+    item: dict[str, Any],
+    ai_payload: dict[str, Any],
+    *,
+    run_dir: Path | None = None,
+    revised_text: str | None = None,
+) -> tuple[str, str]:
+    current_target = _normalize_target_text(str(ai_payload.get("target_text") or ""))
+    next_revised = str(revised_text or ai_payload.get("revised_text") or "").strip()
+    if not current_target or not next_revised:
+        return current_target, next_revised
+    source_text = _resolve_non_aggregate_clause_text(item, run_dir=run_dir)
+    if not _looks_placeholder_target_text(current_target):
+        next_revised = _strip_revised_source_context_around_target(source_text, current_target, next_revised)
+        return _preserve_leading_list_marker_outside_patch(current_target, next_revised)
+
+    for sentence_candidate in _collect_non_aggregate_sentence_candidates(item, run_dir=run_dir):
+        if _is_sentence_level_placeholder_rewrite(sentence_candidate, current_target, next_revised):
+            next_revised = _strip_revised_source_context_around_target(source_text, sentence_candidate, next_revised)
+            return _preserve_leading_list_marker_outside_patch(sentence_candidate, next_revised)
+    next_revised = _strip_revised_source_context_around_target(source_text, current_target, next_revised)
+    return _preserve_leading_list_marker_outside_patch(current_target, next_revised)
 
 def _find_clause_for_risk(risk: dict[str, Any], clauses: list[dict[str, Any]]) -> dict[str, Any] | None:
     by_uid, by_ref = _build_clause_lookup(clauses)
@@ -2049,7 +2471,20 @@ def _sanitize_reviewed_ai_payload(payload: dict[str, Any], run_dir: Path | None 
                     changed = True
                 revised_text = next_revised
             else:
-                target_for_comment = str(ai_payload.get("target_text") or "").strip() or fallback_target
+                target_for_comment, next_revised = _finalize_non_aggregate_patch_pair(
+                    item,
+                    ai_payload,
+                    run_dir=run_dir,
+                    revised_text=revised_text,
+                )
+                if target_for_comment and str(ai_payload.get("target_text") or "").strip() != target_for_comment:
+                    ai_payload["target_text"] = target_for_comment
+                    changed = True
+                if str(ai_payload.get("revised_text") or "").strip() != next_revised:
+                    ai_payload["revised_text"] = next_revised
+                    changed = True
+                revised_text = next_revised
+                target_for_comment = str(ai_payload.get("target_text") or target_for_comment or "").strip() or fallback_target
             next_comment = _build_ai_comment_text(target_text=target_for_comment, revised_text=revised_text)
             if str(ai_payload.get("comment_text") or "").strip() != next_comment:
                 ai_payload["comment_text"] = next_comment
@@ -2178,6 +2613,7 @@ def _build_ai_rewrite_patch(risk: dict[str, Any]) -> dict[str, Any] | None:
 
     before_text = str(ai_rewrite.get("target_text") or "").strip()
     revised_text = str(ai_rewrite.get("revised_text") or "")
+    before_text, revised_text = _preserve_leading_list_marker_outside_patch(before_text, revised_text)
     if not before_text and not revised_text:
         return None
 
@@ -2726,6 +3162,12 @@ def _generate_ai_rewrite(
                             "workflow_kind": "default",
                             "created_at": _iso_now(),
                         }
+        rewrite_target_text, rewrite_revised_text = _finalize_non_aggregate_patch_pair(
+            risk,
+            {"target_text": rewrite_target_text, "revised_text": rewrite_revised_text, "workflow_kind": "default"},
+            run_dir=run_dir,
+            revised_text=rewrite_revised_text,
+        )
     return {
         "state": "succeeded",
         "target_text": rewrite_target_text,
@@ -3569,6 +4011,14 @@ def ai_accept_risk(run_id: str, risk_id: str, body: AiAcceptBody) -> dict[str, A
             str(ai_rewrite.get("revised_text") or revised_text or ""),
         )
         ai_rewrite["revised_text"] = normalized_revised
+    else:
+        current_target, normalized_revised = _finalize_non_aggregate_patch_pair(
+            target,
+            ai_rewrite,
+            run_dir=run_dir,
+            revised_text=str(ai_rewrite.get("revised_text") or revised_text or ""),
+        )
+        ai_rewrite["revised_text"] = normalized_revised
     if current_target:
         ai_rewrite["target_text"] = current_target
     ai_rewrite["comment_text"] = _build_ai_comment_text(
@@ -3624,7 +4074,13 @@ def ai_edit_risk(run_id: str, risk_id: str, body: AiEditBody) -> dict[str, Any]:
         resolved_target, normalized_revised = _finalize_aggregate_patch_pair(aggregate_context, ai_rewrite, revised_text)
         ai_rewrite["revised_text"] = normalized_revised
     else:
-        resolved_target = current_target
+        resolved_target, normalized_revised = _finalize_non_aggregate_patch_pair(
+            target,
+            ai_rewrite,
+            run_dir=run_dir,
+            revised_text=revised_text,
+        )
+        ai_rewrite["revised_text"] = normalized_revised
     if resolved_target:
         ai_rewrite["target_text"] = resolved_target
         current_target = resolved_target
