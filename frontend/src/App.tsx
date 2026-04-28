@@ -68,6 +68,37 @@ function pickFilenameFromDisposition(contentDisposition: string | null, fallback
   return plain?.[1] || fallback
 }
 
+const DOCX_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+
+function isRenderableDocxFile(candidate: File | null | undefined) {
+  if (!candidate) return false
+  const name = String(candidate.name || '').toLowerCase()
+  const type = String(candidate.type || '').toLowerCase()
+  return name.endsWith('.docx') || type === DOCX_MIME_TYPE
+}
+
+function normalizeDocxFilename(name: string | null | undefined, fallback: string) {
+  const raw = String(name || fallback || 'contract.docx').trim() || 'contract.docx'
+  if (/\.docx$/i.test(raw)) return raw
+  const lastSlash = Math.max(raw.lastIndexOf('/'), raw.lastIndexOf('\\\\'))
+  const base = lastSlash >= 0 ? raw.slice(lastSlash + 1) : raw
+  const withoutKnownExt = base.replace(/\.(pdf|doc)$/i, '')
+  return `${withoutKnownExt || 'contract'}.docx`
+}
+
+async function fileFromReviewDocumentResponse(runId: string, resp: Response, fallbackName?: string | null) {
+  if (!resp.ok) return null
+  const blob = await resp.blob()
+  const dispositionName = pickFilenameFromDisposition(resp.headers.get('content-disposition'), fallbackName || `${runId}.docx`)
+  const fileName = normalizeDocxFilename(dispositionName, `${runId}.docx`)
+  return new File([blob], fileName, { type: DOCX_MIME_TYPE })
+}
+
+async function fetchReviewDocumentFile(runId: string, fallbackName?: string | null, init?: RequestInit) {
+  const docResp = await fetchNoStore(`/api/reviews/${runId}/document`, init)
+  return fileFromReviewDocumentResponse(runId, docResp, fallbackName)
+}
+
 function createHistoryEntry(runId: string, file: File | null, meta?: ReviewMeta | null): SessionReviewEntry {
   const now = new Date().toISOString()
   return {
@@ -570,7 +601,7 @@ export default function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const prevNavRef = useRef<NavKey>('upload')
   const [file, setFile] = useState<File | null>(null)
-  const [selectedReviewSide, setSelectedReviewSide] = useState<ReviewSideOption | null>(null)
+  const [selectedReviewSide, setSelectedReviewSide] = useState<ReviewSideOption>('甲方')
   const [selectedAnalysisScope, setSelectedAnalysisScope] = useState<AnalysisScopeOption>('full_detail')
   const [runId, setRunId] = useState<string | null>(null)
   const [meta, setMeta] = useState<ReviewMeta | null>(null)
@@ -728,7 +759,7 @@ export default function App() {
   const applyWorkspaceFile = useCallback((nextFile: File | null, options?: { preserveReviewSide?: boolean }) => {
     setFile(nextFile)
     if (!options?.preserveReviewSide) {
-      setSelectedReviewSide(null)
+      setSelectedReviewSide('甲方')
     }
   }, [])
 
@@ -1125,7 +1156,7 @@ export default function App() {
     const { runId: targetRunId, file: seedFile, meta: seedMeta, result: seedResult, fileName } = params
 
     let nextMeta = seedMeta
-    let nextFile = seedFile
+    let nextFile = isRenderableDocxFile(seedFile) ? seedFile : null
     let nextResult = seedResult
 
     const statusResp = await fetchNoStore(`/api/reviews/${targetRunId}`)
@@ -1136,18 +1167,12 @@ export default function App() {
 
     const effectiveStatus = String(nextMeta?.status || '').toLowerCase()
 
-    if (!nextFile) {
-      const docResp = await fetchNoStore(`/api/reviews/${targetRunId}/document`)
-      if (docResp.ok) {
-        const blob = await docResp.blob()
-        const fallbackName = nextMeta?.file_name || fileName || `${targetRunId}.docx`
-        const resolvedFileName = pickFilenameFromDisposition(docResp.headers.get('content-disposition'), fallbackName)
-        nextFile = new File([blob], resolvedFileName, {
-          type: blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        })
-      }
+    if (!nextFile && (effectiveStatus === 'completed' || nextMeta?.document_ready)) {
+      nextFile = await fetchReviewDocumentFile(
+        targetRunId,
+        nextMeta?.working_file_name || nextMeta?.file_name || fileName || `${targetRunId}.docx`
+      )
     }
-
     if (effectiveStatus === 'completed') {
       const resultResp = await fetchNoStore(`/api/reviews/${targetRunId}/result`)
       if (!resultResp.ok) {
@@ -1281,6 +1306,7 @@ export default function App() {
       }
 
       const data = (await resp.json()) as { run_id: string }
+      const previewFile = isRenderableDocxFile(file) ? file : null
       newRunIdRef.current = data.run_id
       writeSessionValue(NEW_RUN_ID_STORAGE_KEY, data.run_id)
       writeLocalValue(ACTIVE_RUN_ID_STORAGE_KEY, data.run_id)
@@ -1289,7 +1315,8 @@ export default function App() {
         status: 'queued',
         file_name: file.name,
         analysis_scope: selectedAnalysisScope,
-        step: '已上传，等待开始审查'
+        step: '已上传，等待开始审查',
+        document_ready: false
       }
 
       setIsReviewing(true)
@@ -1297,6 +1324,7 @@ export default function App() {
       setMeta(null)
       setRunId(null)
       setEdits([])
+      applyWorkspaceFile(previewFile, { preserveReviewSide: true })
       setRunId(data.run_id)
       setMeta(nextMeta)
       setHistoryEntries((entries) =>
@@ -1305,7 +1333,7 @@ export default function App() {
           data.run_id,
           (prev) => ({
             ...prev,
-            file,
+            file: previewFile,
             meta: nextMeta,
             result: null,
             file_name: file.name,
@@ -1314,7 +1342,7 @@ export default function App() {
             updated_at: new Date().toISOString(),
             available: true
           }),
-          file,
+          previewFile,
           nextMeta
         )
       )
@@ -1322,7 +1350,7 @@ export default function App() {
     } finally {
       setIsSubmittingReview(false)
     }
-  }, [file, isReviewing, isSubmittingReview, navigate, openDialog, selectedAnalysisScope, selectedReviewSide, serverConfig])
+  }, [applyWorkspaceFile, file, isReviewing, isSubmittingReview, navigate, openDialog, selectedAnalysisScope, selectedReviewSide, serverConfig])
 
   useEffect(() => {
     let cancelled = false
@@ -1348,7 +1376,7 @@ export default function App() {
               runId,
               (prev) => ({
               ...prev,
-              file: prev.file || file,
+              file: prev.file || (isRenderableDocxFile(file) ? file : null),
               meta: m,
               file_name: prev.file_name || file?.name || m.file_name,
               status: m.status,
@@ -1360,11 +1388,37 @@ export default function App() {
               }),
               available: true
             }),
-            file,
+            (isRenderableDocxFile(file) ? file : null),
               m
             )
           )
 
+
+          if (m.document_ready && !isRenderableDocxFile(file)) {
+            const preparedFile = await fetchReviewDocumentFile(
+              runId,
+              m.working_file_name || m.file_name || `${runId}.docx`,
+              { signal: abortController.signal }
+            )
+            if (preparedFile && !cancelled) {
+              applyWorkspaceFile(preparedFile, { preserveReviewSide: true })
+              setHistoryEntries((entries) =>
+                upsertHistory(
+                  entries,
+                  runId,
+                  (prev) => ({
+                    ...prev,
+                    file: preparedFile,
+                    file_name: prev.file_name || m.file_name || preparedFile.name,
+                    meta: m,
+                    available: true
+                  }),
+                  preparedFile,
+                  m
+                )
+              )
+            }
+          }
           if (m.status === 'completed') {
             const [docResp, resultResp] = await Promise.all([
               fetchNoStore(`/api/reviews/${runId}/document`, { signal: abortController.signal }),
@@ -1374,13 +1428,12 @@ export default function App() {
               throw await readApiError(resultResp, { title: '加载审查结果失败' })
             }
             const payload = (await resultResp.json()) as ReviewResultPayload
-            let nextFile = file
-            if (docResp.ok) {
-              const blob = await docResp.blob()
-              const fallbackName = m.file_name || file?.name || `${runId}.docx`
-              const fileName = pickFilenameFromDisposition(docResp.headers.get('content-disposition'), fallbackName)
-              nextFile = new File([blob], fileName, { type: blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
-            }
+            const fetchedFile = await fileFromReviewDocumentResponse(
+              runId,
+              docResp,
+              m.working_file_name || m.file_name || file?.name || `${runId}.docx`
+            )
+            const nextFile = fetchedFile || (isRenderableDocxFile(file) ? file : null)
             if (cancelled) return
             applyWorkspaceFile(nextFile, { preserveReviewSide: true })
             setResult(payload)
@@ -1441,7 +1494,7 @@ export default function App() {
               runId,
               (prev) => ({
                 ...prev,
-                file: prev.file || file,
+                file: prev.file || (isRenderableDocxFile(file) ? file : null),
                 meta: failedMeta,
                 status: 'failed',
                 summary: nextError.message,
@@ -1452,7 +1505,7 @@ export default function App() {
                 }),
                 available: true
               }),
-              file,
+              (isRenderableDocxFile(file) ? file : null),
               failedMeta
             )
           )

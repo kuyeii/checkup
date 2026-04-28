@@ -38,6 +38,14 @@ const analysisScopeCopy: Record<AnalysisScopeOption, {
 const reviewSideOptions = ['甲方', '乙方'] as ReviewSideOption[]
 const analysisScopeOptions = ['full_detail', 'high_risk_only'] as AnalysisScopeOption[]
 
+function formatFileTypeLabel(fileName?: string) {
+  const suffix = String(fileName || '').split('.').pop()?.toLowerCase() || ''
+  if (suffix === 'pdf') return 'PDF'
+  if (suffix === 'doc') return 'DOC'
+  if (suffix === 'docx') return 'DOCX'
+  return '文件'
+}
+
 function formatFileSize(size?: number) {
   const safeSize = Number(size || 0)
   if (!Number.isFinite(safeSize) || safeSize <= 0) return '—'
@@ -111,6 +119,7 @@ export function UploadDashboard(props: {
   const hasFile = Boolean(props.file)
   const isInteractionLocked = props.isReviewing || props.isSubmittingReview
   const fileSizeLabel = formatFileSize(props.file?.size)
+  const fileTypeLabel = formatFileTypeLabel(props.file?.name)
 
   const handleUploadClick = () => {
     if (isInteractionLocked) return
@@ -156,7 +165,7 @@ export function UploadDashboard(props: {
             <input
               ref={inputRef}
               type="file"
-              accept=".docx"
+              accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               className="hiddenInput"
               onClick={(event) => event.stopPropagation()}
               onChange={(event) => {
@@ -168,14 +177,15 @@ export function UploadDashboard(props: {
             {!hasFile ? (
               <>
                 <LandingFileIcon />
-                <div className="landingUploadTitle">拖拽合同到此处，开始本地隐私审查</div>
+                <div className="landingUploadTitle">合同文件仅在本地解析审核，数据隐私安全可控</div>
+                <div className="landingUploadHint">支持 PDF、Word（.doc/.docx）</div>
               </>
             ) : (
               <div className="landingSelectedFile" onClick={(event) => event.stopPropagation()}>
                 <div className="landingSelectedFileIcon"><FileText size={28} /></div>
                 <div className="landingSelectedFileMeta">
                   <div className="landingSelectedFileName" title={props.file?.name || ''}>{props.file?.name}</div>
-                  <div className="landingSelectedFileInfo">{fileSizeLabel} · DOCX</div>
+                  <div className="landingSelectedFileInfo">{fileSizeLabel} · {fileTypeLabel}</div>
                 </div>
                 <button
                   type="button"
@@ -193,7 +203,7 @@ export function UploadDashboard(props: {
             )}
           </div>
 
-          <div className="landingSecurityHint">本地运行环境内完成审查，隐私数据全程受保护，审查后可随时删除。</div>
+          <div className="landingSecurityHint">我们将严格保护您的文件安全，审查完成后可选择删除文件。</div>
         </section>
 
         <section className="landingOptionsPanel" aria-label="审查设置">

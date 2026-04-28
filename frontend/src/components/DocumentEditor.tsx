@@ -8,6 +8,40 @@ function uid() {
   return Math.random().toString(16).slice(2) + Date.now().toString(16)
 }
 
+function setDocMessage(container: HTMLElement, message: string) {
+  container.innerHTML = ''
+  const el = document.createElement('div')
+  el.className = 'emptyState'
+  el.textContent = message
+  container.appendChild(el)
+}
+
+function hasZipEndOfCentralDirectory(bytes: Uint8Array) {
+  const maxCommentLength = 0xffff
+  const minOffset = Math.max(0, bytes.length - maxCommentLength - 22)
+  for (let i = bytes.length - 22; i >= minOffset; i -= 1) {
+    if (bytes[i] === 0x50 && bytes[i + 1] === 0x4b && bytes[i + 2] === 0x05 && bytes[i + 3] === 0x06) {
+      return true
+    }
+  }
+  return false
+}
+
+function looksLikeDocxBuffer(buf: ArrayBuffer) {
+  const bytes = new Uint8Array(buf)
+  if (bytes.length < 22) return false
+  const hasZipHeader = bytes[0] === 0x50 && bytes[1] === 0x4b
+  return hasZipHeader && hasZipEndOfCentralDirectory(bytes)
+}
+
+function friendlyDocxRenderError(error: unknown) {
+  const raw = String(error || '')
+  if (/central directory|zip file|end of central/i.test(raw)) {
+    return '当前文件不是有效的 DOCX 文档，或转换后的 Word 文件已损坏。请重新上传文字型 PDF / .docx 文件后再试。'
+  }
+  return `DOCX 渲染失败：${raw}`
+}
+
 type BlockEl = HTMLElement & { dataset: { blockId?: string } }
 
 type StructuralItem = {
@@ -2192,16 +2226,28 @@ export const DocumentEditor = forwardRef<
       locatedRiskHintMapRef.current = new Map()
       props.onEditsChange([])
 
-      if (!props.file || !docRef.current) {
-        setReady(true)
+      if (!docRef.current) {
+        setReady(false)
         return
       }
 
       docRef.current.innerHTML = ''
 
+      if (!props.file) {
+        setDocMessage(docRef.current, '正在准备可预览的 Word 文档，请稍候…')
+        setReady(false)
+        return
+      }
+
       try {
         const buf = await props.file.arrayBuffer()
         if (cancelled) return
+
+        if (!looksLikeDocxBuffer(buf)) {
+          setDocMessage(docRef.current, '当前文件还不是可预览的 DOCX 文档。PDF / DOC 文件需要先在后端转换完成后才能预览。')
+          setReady(false)
+          return
+        }
 
         await renderAsync(buf, docRef.current, undefined, {
           className: 'docx',
@@ -2219,8 +2265,8 @@ export const DocumentEditor = forwardRef<
         setReady(true)
       } catch (e) {
         if (!cancelled && docRef.current) {
-          docRef.current.innerHTML = `<div class="emptyState">DOCX 渲染失败：${String(e)}</div>`
-          setReady(true)
+          setDocMessage(docRef.current, friendlyDocxRenderError(e))
+          setReady(false)
         }
       }
     }

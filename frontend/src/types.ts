@@ -14,6 +14,12 @@ export type ReviewMeta = {
   message?: string
   error?: string
   warning?: string
+  error_code?: string
+  error_detail?: string
+  document_ready?: boolean
+  original_format?: string
+  working_file_name?: string
+  converted?: boolean
   updated_at?: string
 }
 

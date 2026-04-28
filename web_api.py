@@ -23,6 +23,7 @@ from config import settings
 from src.clause_ref_display import build_clause_alias_map, humanize_clause_refs
 from src.dify_client import DifyWorkflowClient, DifyWorkflowError, extract_blocking_outputs
 from src.docx_locator import enrich_reviewed_risks_with_locators
+from src.document_ingest import DocumentIngestError, SUPPORTED_UPLOAD_EXTENSIONS, get_libreoffice_diagnostics, is_valid_docx_file, normalize_upload_to_docx
 from src.analysis_scope import analysis_scope_label, normalize_analysis_scope
 from src.parse_outputs import _load_json_with_repair, strip_markdown_json
 
@@ -162,7 +163,7 @@ def _build_user_facing_error(status_code: int, detail: Any) -> dict[str, Any]:
         return {
             "code": "UNSUPPORTED_FILE_TYPE",
             "title": "文件格式不支持",
-            "message": "请上传 .docx 格式的合同文件后再试。",
+            "message": "请上传 PDF 或 Word（.doc/.docx）格式的合同文件后再试。",
             "status": status_code,
         }
     if "run_id 不存在" in detail_text:
@@ -1756,12 +1757,13 @@ def _infer_meta_from_run(run_id: str) -> dict[str, Any]:
         progress = 65
 
     source_doc = run_dir / "source.docx"
-    upload_doc = UPLOAD_ROOT / f"{run_id}.docx"
+    uploaded_candidates = sorted(UPLOAD_ROOT.glob(f"{run_id}.*"), key=lambda p: p.stat().st_mtime, reverse=True)
+    upload_doc = uploaded_candidates[0] if uploaded_candidates else UPLOAD_ROOT / f"{run_id}.docx"
     reviewed_doc = run_dir / "reviewed_comments.docx"
-    if source_doc.exists():
-        file_name = source_doc.name
-    elif upload_doc.exists():
+    if upload_doc.exists():
         file_name = upload_doc.name
+    elif source_doc.exists():
+        file_name = source_doc.name
     elif reviewed_doc.exists():
         file_name = reviewed_doc.name
     else:
@@ -3247,9 +3249,18 @@ def _resolve_document_path(run_id: str) -> Path | None:
         UPLOAD_ROOT / f"{run_id}.docx",
         run_dir / "reviewed_comments.docx",
     ):
-        if candidate.exists():
+        if candidate.exists() and is_valid_docx_file(candidate):
             return candidate
     return None
+
+
+def _safe_docx_download_name(preferred_name: str | None, fallback_name: str) -> str:
+    raw = str(preferred_name or fallback_name or "contract.docx").strip() or "contract.docx"
+    name = Path(raw).name.strip() or "contract.docx"
+    if name.lower().endswith(".docx"):
+        return name
+    stem = Path(name).stem.strip() or Path(fallback_name).stem or "contract"
+    return f"{stem}.docx"
 
 
 def _can_export_reviewed_docx(run_id: str) -> bool:
@@ -3320,12 +3331,6 @@ def _normalize_review_side(value: str | None) -> str:
 def _run_pipeline(*, run_id: str, file_path: Path, file_name: str, review_side: str, contract_type_hint: str, analysis_scope: str) -> None:
     run_dir = RUN_ROOT / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
-    source_docx = run_dir / "source.docx"
-    if not source_docx.exists():
-        try:
-            shutil.copy2(file_path, source_docx)
-        except Exception:
-            pass
     env = os.environ.copy()
     env["RUN_ROOT"] = str(RUN_ROOT)
     env["REVIEW_SIDE"] = review_side
@@ -3344,18 +3349,81 @@ def _run_pipeline(*, run_id: str, file_path: Path, file_name: str, review_side: 
             "run_dir": str(run_dir),
             "step": "排队完成，准备开始审查",
             "progress": 15,
+            "document_ready": False,
         },
     )
 
-    cmd = ["python", "app.py", str(file_path), "--run-id", run_id]
-    proc = subprocess.Popen(
-        cmd,
-        cwd=str(BASE_DIR),
-        env=env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
+    try:
+        _write_meta(
+            run_id,
+            {
+                "status": "running",
+                "step": "正在解析上传文件格式",
+                "progress": 18,
+            },
+        )
+        ingest = normalize_upload_to_docx(file_path, run_dir)
+        source_docx = ingest.working_docx_path
+        _write_meta(
+            run_id,
+            {
+                "status": "running",
+                "step": "已转换为可审查 Word 文档，准备解析合同" if ingest.converted else "文件格式校验完成，准备解析合同",
+                "progress": 24,
+                "original_format": ingest.source_format,
+                "working_file_name": source_docx.name,
+                "converted": ingest.converted,
+                "conversion_warnings": ingest.warnings,
+                "document_ready": True,
+            },
+        )
+    except DocumentIngestError as exc:
+        _write_meta(
+            run_id,
+            {
+                "status": "failed",
+                "step": exc.title,
+                "progress": 100,
+                "error": exc.user_message,
+                "error_detail": exc.detail,
+                "error_code": exc.code,
+                "document_ready": False,
+            },
+        )
+        return
+
+    _write_meta(
+        run_id,
+        {
+            "status": "running",
+            "step": "文档已准备完成，正在启动 Dify 审查流程",
+            "progress": 28,
+            "document_ready": True,
+        },
     )
+
+    cmd = ["python", "app.py", str(source_docx), "--run-id", run_id]
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            cwd=str(BASE_DIR),
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except OSError as exc:
+        _write_meta(
+            run_id,
+            {
+                "status": "failed",
+                "step": "审查流程启动失败",
+                "progress": 100,
+                "error": "无法启动后端审查流程，请检查 Python 运行环境后重试。",
+                "error_detail": str(exc),
+            },
+        )
+        return
 
     last_phase = ""
     while True:
@@ -3431,7 +3499,7 @@ def _run_pipeline(*, run_id: str, file_path: Path, file_name: str, review_side: 
         "python",
         "-m",
         "src.docx_comments",
-        str(file_path),
+        str(source_docx),
         str(run_dir / "merged_clauses.json"),
         str(run_dir / "risk_result_validated.json"),
         "--out",
@@ -3502,6 +3570,23 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+def _optional_module_status(module_name: str) -> dict[str, str | bool]:
+    try:
+        __import__(module_name)
+        return {"available": True, "error": ""}
+    except Exception as exc:  # pragma: no cover - depends on runtime environment
+        return {"available": False, "error": str(exc)}
+
+
+@app.get("/api/diagnostics/converters")
+def converter_diagnostics() -> dict[str, Any]:
+    return {
+        "libreoffice": get_libreoffice_diagnostics(),
+        "pdf2docx": _optional_module_status("pdf2docx"),
+        "pymupdf": _optional_module_status("fitz"),
+    }
+
+
 @app.post("/api/reviews")
 async def create_review(
     file: UploadFile = File(...),
@@ -3512,14 +3597,14 @@ async def create_review(
     normalized_review_side = _normalize_review_side(review_side or settings.review_side)
     normalized_analysis_scope = normalize_analysis_scope(analysis_scope or getattr(settings, "analysis_scope", "full_detail"))
     suffix = Path(file.filename or "contract.docx").suffix.lower()
-    if suffix != ".docx":
+    if suffix not in SUPPORTED_UPLOAD_EXTENSIONS:
         raise HTTPException(
             status_code=400,
             detail={
                 "code": "UNSUPPORTED_FILE_TYPE",
                 "title": "文件格式不支持",
-                "user_message": "请上传 .docx 格式的合同文件后再试。",
-                "detail": f"目前仅支持 .docx 文件，收到：{suffix or 'unknown'}",
+                "user_message": "请上传 PDF 或 Word（.doc/.docx）格式的合同文件后再试。",
+                "detail": f"目前支持 .pdf / .doc / .docx，收到：{suffix or 'unknown'}",
             },
         )
 
@@ -3529,10 +3614,6 @@ async def create_review(
         shutil.copyfileobj(file.file, f)
     run_dir = RUN_ROOT / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
-    try:
-        shutil.copy2(upload_path, run_dir / "source.docx")
-    except Exception:
-        pass
 
     _write_meta(
         run_id,
@@ -3545,6 +3626,7 @@ async def create_review(
             "analysis_scope_label": analysis_scope_label(normalized_analysis_scope),
             "step": "任务已创建，等待执行",
             "progress": 8,
+            "document_ready": False,
         },
     )
     threading.Thread(
@@ -3586,7 +3668,7 @@ def get_review_document(run_id: str) -> FileResponse:
     if output is None:
         raise HTTPException(status_code=404, detail="未找到该 run 对应的 DOCX")
     meta = _read_meta(run_id)
-    preferred_name = str(meta.get("file_name") or output.name or f"{run_id}.docx").strip() or output.name
+    preferred_name = _safe_docx_download_name(meta.get("working_file_name") or meta.get("file_name"), output.name or f"{run_id}.docx")
     return FileResponse(
         output,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
