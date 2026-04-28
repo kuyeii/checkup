@@ -10,6 +10,23 @@ function statusLabel(status: ReviewHistoryItem['status']) {
   return status
 }
 
+function formatReviewTime(value?: string) {
+  if (!value) return '—'
+  const date = new Date(value)
+  if (!Number.isFinite(date.getTime())) return '—'
+  return date.toLocaleString('zh-CN', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+function statusClass(item: ReviewHistoryItem) {
+  if (item.available === false) return 'queued'
+  return item.status || 'queued'
+}
+
 export function ReviewHistoryPanel(props: {
   items: ReviewHistoryItem[]
   stats: any
@@ -41,7 +58,7 @@ export function ReviewHistoryPanel(props: {
   const pagedItems = useMemo(() => {
     const start = (page - 1) * pageSize
     return props.items.slice(start, start + pageSize)
-  }, [props.items, page])
+  }, [props.items, page, pageSize])
 
   const pageNumbers = useMemo(() => {
     if (totalPages <= 7) return Array.from({ length: totalPages }, (_, idx) => idx + 1)
@@ -52,113 +69,115 @@ export function ReviewHistoryPanel(props: {
 
   const showingStart = props.items.length === 0 ? 0 : (page - 1) * pageSize + 1
   const showingEnd = Math.min(page * pageSize, props.items.length)
+  const completedCount = props.stats?.completed ?? props.items.filter((item) => item.status === 'completed').length
+  const runningCount = props.stats?.running ?? props.items.filter((item) => item.status === 'running' || item.status === 'queued').length
 
   return (
-    <div className="historyPage">
-      <div className="dashboardScroll h-full flex flex-col">
-        <div className="historyHeader mb-5">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2.5 mb-2">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
-                  <History size={18} />
-                </div>
-                <h1 className="text-[22px] leading-7 font-semibold text-gray-900">审查记录</h1>
-              </div>
-              <p className="text-sm text-gray-500">查看并管理历史合同审查任务</p>
-            </div>
-            <button
-              type="button"
-              onClick={props.onStartNew}
-              className="shrink-0 inline-flex items-center justify-center h-10 px-4 rounded-xl border border-emerald-200 text-emerald-700 text-sm font-medium hover:bg-emerald-50 transition-colors"
-            >
-              发起新审查
-            </button>
-          </div>
-        </div>
+    <div className="historyPage landingHistoryPage">
+      <div className="landingWave landingWave--left" aria-hidden="true" />
+      <div className="landingWave landingWave--right" aria-hidden="true" />
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 max-w-[1200px] mx-auto">
-          <div className="rounded-2xl border border-gray-100 bg-white px-4 py-3">
-            <div className="text-xs text-gray-500 mb-1">总任务数</div>
-            <div className="text-xl font-semibold text-gray-900">{props.stats?.total ?? props.items.length}</div>
+      <div className="landingHistoryScroll">
+        <header className="landingHistoryHeader">
+          <div className="landingHistoryHeaderIcon" aria-hidden="true">
+            <History size={20} strokeWidth={2.4} />
           </div>
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/40 px-4 py-3">
-            <div className="text-xs text-emerald-700/80 mb-1">已完成</div>
-            <div className="text-xl font-semibold text-emerald-700">{props.stats?.completed ?? 0}</div>
+          <div className="landingHistoryHeaderText">
+            <h1>审查记录</h1>
+            <p>查看并管理历史合同审查任务</p>
           </div>
-          <div className="rounded-2xl border border-amber-100 bg-amber-50/40 px-4 py-3">
-            <div className="text-xs text-amber-700/80 mb-1">进行中</div>
-            <div className="text-xl font-semibold text-amber-700">{props.stats?.running ?? 0}</div>
-          </div>
-        </div>
+          <button type="button" onClick={props.onStartNew} className="landingHistoryNewBtn">
+            发起新审查
+          </button>
+        </header>
 
-        <div className="w-full max-w-[1200px] mx-auto overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm flex-1 min-h-0 flex flex-col">
-          <table className="historyTable w-full min-w-[680px]">
-            <thead>
-              <tr>
-                <th className="text-left py-3.5 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">文件名称</th>
-                <th className="text-left py-3.5 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">任务类型</th>
-                <th className="text-left py-3.5 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">审查时间</th>
-                <th className="text-left py-3.5 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">状态</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {props.items.length === 0 ? (
+        <section className="landingHistoryStats" aria-label="审查记录统计">
+          <div className="landingHistoryStatCard">
+            <div className="landingHistoryStatLabel">总任务数</div>
+            <div className="landingHistoryStatValue">{props.stats?.total ?? props.items.length}</div>
+          </div>
+          <div className="landingHistoryStatCard">
+            <div className="landingHistoryStatLabel">已完成</div>
+            <div className="landingHistoryStatValue">{completedCount}</div>
+          </div>
+          <div className="landingHistoryStatCard">
+            <div className="landingHistoryStatLabel">进行中</div>
+            <div className="landingHistoryStatValue">{runningCount}</div>
+          </div>
+        </section>
+
+        <section className="landingHistoryTableCard" aria-label="审查记录列表">
+          <div className="landingHistoryTableWrap">
+            <table className="historyTable landingHistoryTable">
+              <thead>
                 <tr>
-                  <td colSpan={4} className="text-center py-20 text-gray-400">暂无审查记录</td>
+                  <th>文件名称</th>
+                  <th>任务类型</th>
+                  <th>审查时间</th>
+                  <th>状态</th>
                 </tr>
-              ) : (
-                pagedItems.map((item) => (
-                  <tr
-                    key={item.id}
-                    className={`historyRow ${item.available === false ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 transition-colors cursor-pointer'}`}
-                    onClick={item.available === false ? undefined : () => props.onOpen(item)}
-                  >
-                    <td className="py-3.5 px-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                          <FileText size={16} className="text-blue-600" />
-                        </div>
-                        <span className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{item.file_name || item.run_id}</span>
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-6 text-sm text-gray-600">深度审查</td>
-                    <td className="py-3.5 px-6 text-sm text-gray-500">
-                      <div className="inline-flex items-center gap-1.5">
-                        <CalendarDays size={14} className="text-gray-400" />
-                        <span>
-                          {new Date(item.updated_at).toLocaleString('zh-CN', {
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-6">
-                      <div className="flex items-center gap-2">
-                        <span className={`statusDot statusDot--${item.available === false ? 'queued' : item.status}`} />
-                        <span className="text-sm text-gray-700">{item.available === false ? '缺少文件' : statusLabel(item.status)}</span>
-                      </div>
+              </thead>
+              <tbody>
+                {props.items.length === 0 ? (
+                  <tr>
+                    <td colSpan={4}>
+                      <div className="landingHistoryEmpty">暂无审查记录</div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  pagedItems.map((item) => {
+                    const disabled = item.available === false
+                    const state = statusClass(item)
+                    return (
+                      <tr
+                        key={item.id}
+                        className={`historyRow landingHistoryRow ${disabled ? 'landingHistoryRow--disabled' : ''}`}
+                        onClick={disabled ? undefined : () => props.onOpen(item)}
+                      >
+                        <td>
+                          <div className="landingHistoryFileCell">
+                            <span className="landingHistoryFileIcon" aria-hidden="true">
+                              <FileText size={16} strokeWidth={2.3} />
+                            </span>
+                            <span className="landingHistoryFileName" title={item.file_name || item.run_id}>
+                              {item.file_name || item.run_id}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <span className="landingHistoryType">深度审查</span>
+                        </td>
+                        <td>
+                          <span className="landingHistoryTime">
+                            <CalendarDays size={14} strokeWidth={2.2} />
+                            {formatReviewTime(item.updated_at)}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`landingHistoryStatus landingHistoryStatus--${state}`}>
+                            <span className={`statusDot statusDot--${state}`} />
+                            {disabled ? '缺少文件' : statusLabel(item.status)}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
 
           {props.items.length > 0 ? (
-            <div className="flex items-center justify-between border-t border-gray-100 px-4 sm:px-6 py-3 bg-gray-50/60">
-              <div className="text-xs sm:text-sm text-gray-500">
+            <div className="landingHistoryPagination">
+              <div className="landingHistoryPaginationText">
                 显示第 {showingStart}-{showingEnd} 条，共 {props.items.length} 条
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="landingHistoryPaginationControls">
                 <button
                   type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="landingHistoryPageBtn landingHistoryPageBtn--icon"
                   aria-label="上一页"
                 >
                   <ChevronLeft size={16} />
@@ -168,15 +187,11 @@ export function ReviewHistoryPanel(props: {
                   const needBreak = typeof prev === 'number' && num - prev > 1
                   return (
                     <React.Fragment key={num}>
-                      {needBreak ? <span className="px-1 text-gray-400 text-xs">...</span> : null}
+                      {needBreak ? <span className="landingHistoryPageEllipsis">...</span> : null}
                       <button
                         type="button"
                         onClick={() => setPage(num)}
-                        className={`h-8 min-w-8 px-2 inline-flex items-center justify-center rounded-lg border text-sm ${
-                          num === page
-                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 font-medium'
-                            : 'border-gray-200 text-gray-600 hover:bg-white'
-                        }`}
+                        className={`landingHistoryPageBtn ${num === page ? 'landingHistoryPageBtn--active' : ''}`}
                       >
                         {num}
                       </button>
@@ -187,7 +202,7 @@ export function ReviewHistoryPanel(props: {
                   type="button"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="landingHistoryPageBtn landingHistoryPageBtn--icon"
                   aria-label="下一页"
                 >
                   <ChevronRight size={16} />
@@ -195,7 +210,7 @@ export function ReviewHistoryPanel(props: {
               </div>
             </div>
           ) : null}
-        </div>
+        </section>
       </div>
     </div>
   )

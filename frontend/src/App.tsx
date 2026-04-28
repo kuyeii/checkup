@@ -12,6 +12,7 @@ import { ReviewProgress, computeProgress as computeReviewProgress } from './comp
 import type { AnalysisScopeOption, EditSummary, ReviewHistoryItem, ReviewMeta, ReviewResultPayload, ReviewSideOption } from './types'
 import { readApiError, toUserFacingError } from './utils/appError'
 import { normalizeRiskTextForDisplay } from './utils/riskText'
+import './homepageUnified.css'
 
 async function sleep(ms: number) {
   await new Promise((r) => setTimeout(r, ms))
@@ -2402,7 +2403,7 @@ export default function App() {
         />
 
         <main className={`contentShell ${activeNav === 'upload' ? 'contentShell--noScroll' : ''}`}>
-          <GlobalTopBar />
+          <GlobalTopBar variant={activeNav === 'upload' ? 'landing' : 'user'} />
 
           {activeNav === 'upload' ? (
             <UploadDashboard
